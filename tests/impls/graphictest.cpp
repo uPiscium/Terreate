@@ -1,4 +1,5 @@
 #include <graphictest.hpp>
+#include <iostream>
 
 namespace Terreate::Test::Graphic {
 
@@ -338,8 +339,9 @@ void TestApp::Frame(Window *window) {
   mClock.Tick();
 }
 
-void LaunchApp() {
+void LaunchApp(GLState &glState) {
   Window window(2500, 1600, "Test Window", WindowSettings());
+  InitializeGLAD(glState);
   glViewport(0, 0, 2500, 1600);
   window.DisableVsync();
 
@@ -365,9 +367,9 @@ void LaunchApp() {
 }
 
 void Run() {
-  Initialize();
-  LaunchApp();
-  Terminate();
+  GLState glState;
+  InitializeGLFW(glState);
+  LaunchApp(glState);
+  Terminate(glState);
 }
-
 } // namespace Terreate::Test::Graphic

@@ -25,6 +25,7 @@ int main() {
 
 #ifdef BUILD_GRAPHIC_TESTS // Default: ON
   // Graphic tests
-  Graphic::Run();
+  std::thread graphicThread(Graphic::Run);
+  graphicThread.join();
 #endif // BUILD_GRAPHIC_TESTS
 }

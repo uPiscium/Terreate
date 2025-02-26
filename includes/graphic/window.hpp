@@ -186,17 +186,17 @@ void DropCallbackWrapper(GLFWwindow *window, int count, const char **paths);
 
 struct WindowSettings {
 public:
-  Uint resizable = GLFW_TRUE;
-  Uint visible = GLFW_TRUE;
-  Uint decorated = GLFW_TRUE;
-  Uint focused = GLFW_TRUE;
-  Uint autoIconify = GLFW_TRUE;
-  Uint floating = GLFW_FALSE;
-  Uint maximized = GLFW_FALSE;
-  Uint centerCursor = GLFW_TRUE;
-  Uint transparentFramebuffer = GLFW_FALSE;
-  Uint focusOnShow = GLFW_TRUE;
-  Uint scaleToMonitor = GLFW_FALSE;
+  Bool resizable = true;
+  Bool visible = true;
+  Bool decorated = true;
+  Bool focused = true;
+  Bool autoIconify = true;
+  Bool floating = false;
+  Bool maximized = false;
+  Bool centerCursor = true;
+  Bool transparentFramebuffer = false;
+  Bool focusOnShow = true;
+  Bool scaleToMonitor = false;
 };
 
 class Window {
@@ -262,6 +262,7 @@ public:
    * @param: height: Window height.
    * @param: title: Window title.
    * @param: settings: Window settings.
+   * @param: state: OpenGL state.
    */
   Window(Uint const &width, Uint const &height, Str const &title,
          WindowSettings const &settings);

@@ -7,7 +7,6 @@
 #include <queue>
 #include <thread>
 
-#include <core/uuid.hpp>
 #include <exceptions.hpp>
 #include <types.hpp>
 

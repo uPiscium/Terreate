@@ -27,9 +27,6 @@ typedef std::ofstream OutputFileStream;
 
 template <typename... EventArgs> using Event = Core::Event<EventArgs...>;
 
-extern bool GLFW_INITIALIZED;
-extern bool GLAD_INITIALIZED;
-
 class Clock {
 private:
   Float mLastTime = 0.0f;
@@ -58,8 +55,14 @@ public:
   static Double GetCurrentRuntime() { return glfwGetTime(); }
 };
 
-void Initialize();
-void Terminate();
+struct GLState {
+  Bool GLFW_INITIALIZED = false;
+  Bool GLAD_INITIALIZED = false;
+};
+
+void InitializeGLFW(GLState &state);
+void InitializeGLAD(GLState &state);
+void Terminate(GLState &state);
 
 // Enums
 // Use to select opengl color frame buffer attachement.

@@ -5,8 +5,6 @@
 #include <mutex>
 #include <types.hpp>
 
-#include <iostream>
-
 namespace Terreate::Core {
 using namespace Terreate::Types;
 

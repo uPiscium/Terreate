@@ -150,17 +150,10 @@ Window::Window(Uint const &width, Uint const &height, Str const &title,
   glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, settings.transparentFramebuffer);
   glfwWindowHint(GLFW_FOCUS_ON_SHOW, settings.focusOnShow);
   glfwWindowHint(GLFW_SCALE_TO_MONITOR, settings.scaleToMonitor);
+
   mWindow = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
   glfwSetWindowUserPointer(mWindow, this);
-
   glfwMakeContextCurrent(mWindow);
-
-  if (!GLAD_INITIALIZED) {
-    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
-      throw Exceptions::GraphicsException("Failed to initialize GLAD.");
-    }
-    GLAD_INITIALIZED = true;
-  }
 
   this->scrollOffset.Set(&mScrollOffset);
   this->codePoints.Set(&mCodePoints);
