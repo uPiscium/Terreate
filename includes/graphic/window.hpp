@@ -31,13 +31,13 @@ struct Key {
 public:
   Keyboard key = Keyboard::K_LAST;
   TCi32 scancode = 0;
-  TCi32 action = 0;
+  Bool pressed = 0;
   Modifier mods = 0;
 
 public:
   Key(int key_, int scancode_, int action_, int mods_)
-      : key((Keyboard)key_), scancode(scancode_), action(action_), mods(mods_) {
-  }
+      : key((Keyboard)key_), scancode(scancode_), pressed((Bool)action_),
+        mods(mods_) {}
 };
 
 class Window;
@@ -59,6 +59,29 @@ typedef Event<Window *, Double const &, Double const &> ScrollEvent;
 typedef Event<Window *, Key const &> KeyEvent;
 typedef Event<Window *, Uint const &> CharEvent;
 typedef Event<Window *, Vec<Str> const &> FileDropEvent;
+
+namespace Subscribers {
+typedef Subscriber<Window *, Int const &, Int const &> WindowPositionSubscriber;
+typedef Subscriber<Window *, Int const &, Int const &> WindowSizeSubscriber;
+typedef Subscriber<Window *> WindowCloseSubscriber;
+typedef Subscriber<Window *> WindowRefreshSubscriber;
+typedef Subscriber<Window *, Bool const &> WindowFocusSubscriber;
+typedef Subscriber<Window *, Bool const &> WindowIconifySubscriber;
+typedef Subscriber<Window *, Bool const &> WindowMaximizeSubscriber;
+typedef Subscriber<Window *, Uint const &, Uint const &>
+    WindowFramebufferSizeSubscriber;
+typedef Subscriber<Window *, Float const &, Float const &>
+    WindowContentScaleSubscriber;
+typedef Subscriber<Window *, Uint const &, Uint const &, Modifier const &>
+    MousebuttonSubscriber;
+typedef Subscriber<Window *, Double const &, Double const &>
+    CursorPositionSubscriber;
+typedef Subscriber<Window *, Bool const &> CursorEnterSubscriber;
+typedef Subscriber<Window *, Double const &, Double const &> ScrollSubscriber;
+typedef Subscriber<Window *, Key const &> KeySubscriber;
+typedef Subscriber<Window *, Uint const &> CharSubscriber;
+typedef Subscriber<Window *, Vec<Str> const &> FileDropSubscriber;
+} // namespace Subscribers
 
 class Icon final {
 private:
@@ -262,10 +285,10 @@ public:
    * @param: height: Window height.
    * @param: title: Window title.
    * @param: settings: Window settings.
-   * @param: state: OpenGL state.
+   * @param: shared: GL context to share resources with.
    */
   Window(Uint const &width, Uint const &height, Str const &title,
-         WindowSettings const &settings);
+         WindowSettings const &settings, Window *shared = nullptr);
   ~Window() { this->Destroy(); }
 
   /*

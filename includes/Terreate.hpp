@@ -2,6 +2,7 @@
 #define __TERREATE_HPP__
 
 #include <audio.hpp>
+#include <context.hpp>
 #include <core.hpp>
 #include <graphic.hpp>
 #include <io.hpp>

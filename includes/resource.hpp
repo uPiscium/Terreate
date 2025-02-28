@@ -5,7 +5,7 @@
 #include <exceptions.hpp>
 #include <types.hpp>
 
-namespace Terreate::Resource {
+namespace Terreate {
 using namespace Terreate::Types;
 
 template <typename T> class Resource {
@@ -93,6 +93,6 @@ public:
   }
 };
 
-} // namespace Terreate::Resource
+} // namespace Terreate
 
 #endif // __TERREATE_RESOURCE_HPP__

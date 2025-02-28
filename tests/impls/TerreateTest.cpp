@@ -4,53 +4,87 @@
 
 namespace Terreate::Test {
 
-void RunThread(std::atomic<Bool> *running, std::atomic<Ubyte> *numWindows,
-               Graphic::Window *window) {
-  auto thread = std::thread([window, running, numWindows]() {
-    numWindows->fetch_add(1);
-    while (!window->IsClosed()) {
-      window->SetCurrentContext();
-      window->Fill(1.0f, 1.0f, 0.0f);
-      window->Clear();
+class App {
+public:
+  Bool FrameFunction(Context *context) {
+    context->window->Fill(1.0f, 1.0f, 0.0f);
+    context->window->Clear();
+    context->window->Swap();
+    return !context->window->IsPressing(Graphic::Keyboard::K_ESCAPE);
+  }
 
-      if (window->IsPressing(Graphic::Keyboard::K_ESCAPE)) {
-        break;
-      }
+  Bool FrameFunction2(Context *context) {
+    context->window->Fill(0.0f, 1.0f, 1.0f);
+    context->window->Clear();
+    context->window->Swap();
+    return !context->window->IsPressing(Graphic::Keyboard::K_ESCAPE);
+  }
 
-      window->Swap();
-      std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-    window->Destroy();
-
-    if (numWindows->fetch_sub(1) == 1) {
-      running->store(false);
-    }
-  });
-
-  thread.detach();
-}
+  Bool FrameFunction3(Context *context) {
+    context->window->Fill(1.0f, 0.0f, 1.0f);
+    context->window->Clear();
+    context->window->Swap();
+    return !context->window->IsPressing(Graphic::Keyboard::K_ESCAPE);
+  }
+};
 
 void Run() {
-  Graphic::InitializeGLFW();
-  Graphic::Window window1(800, 600, "Window 1", Graphic::WindowSettings());
-  Graphic::Window window2(800, 600, "Window 2", Graphic::WindowSettings());
-  Graphic::Window window3(800, 600, "Window 3", Graphic::WindowSettings());
-  Graphic::Window window4(800, 600, "Window 4", Graphic::WindowSettings());
-  Graphic::Window window5(800, 600, "Window 5", Graphic::WindowSettings());
-  Graphic::InitializeGLAD();
-  glfwMakeContextCurrent(nullptr);
+  ContextHandler handler;
+  App app;
+  auto context1 = handler.CreateContext(800, 600, "Window 1");
+  auto context2 = handler.CreateContext(800, 600, "Window 2");
+  auto context3 = handler.CreateContext(800, 600, "Window 3");
+  auto context4 = handler.CreateContext(800, 600, "Window 4");
 
-  std::atomic<Bool> running = true;
-  std::atomic<Ubyte> numWindows = 0;
-  RunThread(&running, &numWindows, &window1);
-  RunThread(&running, &numWindows, &window2);
-  RunThread(&running, &numWindows, &window3);
-  RunThread(&running, &numWindows, &window4);
+  auto key =
+      KeySubscriber([&](Graphic::Window *window, Graphic::Key const &key) {
+        if (key.key == Graphic::Keyboard::K_Q && key.pressed)
+          handler.Quit();
+      });
 
-  while (running) {
+  context1->window->onKeyInput +=
+      KeySubscriber([&](Graphic::Window *window, Graphic::Key const &key) {
+        if (key.key == Graphic::Keyboard::K_ENTER && key.pressed) {
+          auto context = handler.CreateContext(400, 300, "Sub window");
+          context->onEnd += ContextSubscriber([&](Context *context) {
+            std::cout << "Sub window has ended" << std::endl;
+          });
+          context->Run(
+              [&app](Context *context) { return app.FrameFunction2(context); });
+        }
+      });
+
+  context1->window->onKeyInput += key;
+  context2->window->onKeyInput += key;
+  context3->window->onKeyInput += key;
+  context4->window->onKeyInput += key;
+
+  context1->onEnd += ContextSubscriber([&](Context *context) {
+    std::cout << "Window 1 has ended" << std::endl;
+  });
+  context2->onEnd += ContextSubscriber([&](Context *context) {
+    std::cout << "Window 2 has ended" << std::endl;
+  });
+  context3->onEnd += ContextSubscriber([&](Context *context) {
+    std::cout << "Window 3 has ended" << std::endl;
+  });
+  context4->onEnd += ContextSubscriber([&](Context *context) {
+    std::cout << "Window 4 has ended" << std::endl;
+  });
+
+  context1->Run(
+      [&app](Context *context) { return app.FrameFunction(context); });
+  context2->Run(
+      [&app](Context *context) { return app.FrameFunction(context); });
+  context3->Run(
+      [&app](Context *context) { return app.FrameFunction(context); });
+  context4->Run(
+      [&app](Context *context) { return app.FrameFunction(context); });
+
+  while (handler.IsRunning()) {
     glfwPollEvents();
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
   }
-  Graphic::Terminate();
 }
 
 } // namespace Terreate::Test

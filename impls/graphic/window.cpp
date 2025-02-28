@@ -138,7 +138,7 @@ void DropCallbackWrapper(GLFWwindow *window, int count, const char **paths) {
 } // namespace Callbacks
 
 Window::Window(Uint const &width, Uint const &height, Str const &title,
-               WindowSettings const &settings) {
+               WindowSettings const &settings, Window *shared) {
   glfwWindowHint(GLFW_RESIZABLE, settings.resizable);
   glfwWindowHint(GLFW_VISIBLE, settings.visible);
   glfwWindowHint(GLFW_DECORATED, settings.decorated);
@@ -151,7 +151,8 @@ Window::Window(Uint const &width, Uint const &height, Str const &title,
   glfwWindowHint(GLFW_FOCUS_ON_SHOW, settings.focusOnShow);
   glfwWindowHint(GLFW_SCALE_TO_MONITOR, settings.scaleToMonitor);
 
-  mWindow = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+  GLFWwindow *sharedWindow = shared ? shared->mWindow : nullptr;
+  mWindow = glfwCreateWindow(width, height, title.c_str(), NULL, sharedWindow);
   glfwSetWindowUserPointer(mWindow, this);
   glfwMakeContextCurrent(mWindow);
 

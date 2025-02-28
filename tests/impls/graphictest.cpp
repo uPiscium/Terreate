@@ -140,7 +140,7 @@ void TestApp::KeyCallback(Window *window, Key const &key) {
     window->Close();
   }
 
-  if (key.key == Keyboard::K_BACKSPACE && key.action) {
+  if (key.key == Keyboard::K_BACKSPACE && key.pressed) {
     if (!mTextString.empty() &&
         (mDelflag > mDelInterval || mPressingFlag > 1)) {
       mDelflag = 0u;
@@ -300,8 +300,8 @@ void TestApp::Frame(Window *window) {
   mTexture2.Unbind();
   /* mInfoFont.Unuse(); */
   mScreenShader.Unuse();
-  mText.LoadText(WStr(L"立方体"));
-  auto size = mFont.GetTextSize(WStr(L"立方体"));
+  mText.LoadText(WStr(L"Cube"));
+  auto size = mFont.GetTextSize(WStr(L"Cube"));
   mText.Render(500 - size.first / 2.0, 500 - size.second / 2.0,
                mScreen.GetWidth(), mScreen.GetHeight());
   mScreen.Unbind();
