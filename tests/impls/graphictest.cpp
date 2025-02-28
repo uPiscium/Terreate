@@ -300,8 +300,8 @@ void TestApp::Frame(Window *window) {
   mTexture2.Unbind();
   /* mInfoFont.Unuse(); */
   mScreenShader.Unuse();
-  mText.LoadText(L"立方体");
-  auto size = mFont.GetTextSize(L"立方体");
+  mText.LoadText(WStr(L"立方体"));
+  auto size = mFont.GetTextSize(WStr(L"立方体"));
   mText.Render(500 - size.first / 2.0, 500 - size.second / 2.0,
                mScreen.GetWidth(), mScreen.GetHeight());
   mScreen.Unbind();

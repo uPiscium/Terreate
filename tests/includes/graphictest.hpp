@@ -51,7 +51,7 @@ private:
   Texture mTexture;
   Texture mTexture2;
 
-  WStr mTextString = L"日本語テスト";
+  WStr mTextString = WStr(L"日本語テスト");
   // WStr mTextString = L"ABC";
   Uint mDelflag = 0u;
   Uint mPressingFlag = 0u;
