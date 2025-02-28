@@ -36,6 +36,7 @@ void Run() {
   Graphic::Window window2(800, 600, "Window 2", Graphic::WindowSettings());
   Graphic::Window window3(800, 600, "Window 3", Graphic::WindowSettings());
   Graphic::Window window4(800, 600, "Window 4", Graphic::WindowSettings());
+  Graphic::Window window5(800, 600, "Window 5", Graphic::WindowSettings());
   Graphic::InitializeGLAD();
   glfwMakeContextCurrent(nullptr);
 
