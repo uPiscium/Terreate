@@ -10,7 +10,7 @@ option(BUILD_AUDIO_TESTS "Build the audio tests" OFF)
 option(BUILD_GRAPHICS_TESTS "Build the graphics tests" ON)
 option(BUILD_IO_TESTS "Build the io tests" ON)
 
-add_executable(${PROJECT_NAME} audiotest.cpp coretest.cpp graphictest.cpp iotest.cpp main.cpp)
+add_executable(${PROJECT_NAME} TerreateTest.cpp audiotest.cpp coretest.cpp graphictest.cpp iotest.cpp main.cpp)
 
 if(BUILD_CORE_TESTS)
   add_compile_definitions(BUILD_CORE_TESTS)

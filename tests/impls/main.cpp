@@ -1,4 +1,5 @@
-﻿#include <audiotest.hpp>
+﻿#include <TerreateTest.hpp>
+#include <audiotest.hpp>
 #include <coretest.hpp>
 #include <exceptions.hpp>
 #include <graphictest.hpp>
@@ -25,7 +26,9 @@ int main() {
 
 #ifdef BUILD_GRAPHIC_TESTS // Default: ON
   // Graphic tests
-  std::thread graphicThread(Graphic::Run);
-  graphicThread.join();
+  /* std::thread graphicThread(Graphic::Run); */
+  /* graphicThread.join(); */
 #endif // BUILD_GRAPHIC_TESTS
+
+  Terreate::Test::Run();
 }

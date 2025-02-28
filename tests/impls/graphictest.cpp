@@ -272,7 +272,7 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
 
 void TestApp::Frame(Window *window) {
   window->PollEvents();
-  window->Fill({0.2, 0.2, 0.2});
+  window->Fill(0.2, 0.2, 0.2);
   window->Clear();
 
   /* auto state = */
@@ -339,9 +339,9 @@ void TestApp::Frame(Window *window) {
   mClock.Tick();
 }
 
-void LaunchApp(GLState &glState) {
+void LaunchApp() {
   Window window(2500, 1600, "Test Window", WindowSettings());
-  InitializeGLAD(glState);
+  InitializeGLAD();
   glViewport(0, 0, 2500, 1600);
   window.DisableVsync();
 
@@ -367,9 +367,8 @@ void LaunchApp(GLState &glState) {
 }
 
 void Run() {
-  GLState glState;
-  InitializeGLFW(glState);
-  LaunchApp(glState);
-  Terminate(glState);
+  InitializeGLFW();
+  LaunchApp();
+  Terminate();
 }
 } // namespace Terreate::Test::Graphic

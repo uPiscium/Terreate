@@ -503,8 +503,8 @@ public:
    * @detail: Color format is (red, green, blue). Each color is float (0
    * ~ 1.0).
    */
-  void Fill(Vec<float> const &color) const {
-    glClearColor(color[0], color[1], color[2], 0.0f);
+  void Fill(Float const &r, Float const &g, Float const &b) const {
+    glClearColor(r, g, b, 0.0f);
   }
   /*
    * @brief: This function clears color, depth, and stencil buffers.

@@ -11,7 +11,7 @@ add_subdirectory(audio)
 add_subdirectory(graphic)
 add_subdirectory(io)
 
-add_library(${PROJECT_NAME} STATIC dummy.cpp)
+add_library(${PROJECT_NAME} STATIC context.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../includes/Deps/)
 target_include_directories(${PROJECT_NAME} PUBLIC ../includes)

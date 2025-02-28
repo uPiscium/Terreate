@@ -28,12 +28,11 @@ void Clock::Tick() {
   }
 }
 
-void InitializeGLFW(GLState &state) {
+void InitializeGLFW() {
   if (!glfwInit()) {
     throw Exceptions::GraphicsException("Failed to initialize GLFW");
     return;
   }
-  state.GLFW_INITIALIZED = true;
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -43,20 +42,15 @@ void InitializeGLFW(GLState &state) {
   glfwSetJoystickCallback(JoystickCallback);
 }
 
-void InitializeGLAD(GLState &state) {
+void InitializeGLAD() {
   if (!gladLoaderLoadGL()) {
     throw Exceptions::GraphicsException("Failed to initialize GLAD");
     return;
   }
-  state.GLAD_INITIALIZED = true;
 }
 
-void Terminate(GLState &state) {
-  if (state.GLAD_INITIALIZED) {
-    gladLoaderUnloadGL();
-  }
-  if (state.GLFW_INITIALIZED) {
-    glfwTerminate();
-  }
+void Terminate() {
+  gladLoaderUnloadGL();
+  glfwTerminate();
 }
 } // namespace Terreate::Graphic

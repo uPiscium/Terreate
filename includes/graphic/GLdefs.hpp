@@ -55,14 +55,9 @@ public:
   static Double GetCurrentRuntime() { return glfwGetTime(); }
 };
 
-struct GLState {
-  Bool GLFW_INITIALIZED = false;
-  Bool GLAD_INITIALIZED = false;
-};
-
-void InitializeGLFW(GLState &state);
-void InitializeGLAD(GLState &state);
-void Terminate(GLState &state);
+void InitializeGLFW();
+void InitializeGLAD();
+void Terminate();
 
 // Enums
 // Use to select opengl color frame buffer attachement.
