@@ -17,7 +17,7 @@ typedef Vec<vec4> TangentArray;
 typedef Vec<vec4> BitangentArray;
 typedef Vec<vec2> UVArray;
 typedef Vec<Vec<Uint>> ConstructionOrder;
-typedef Vec<std::array<Uint, 3>> FaceArray;
+typedef Vec<Vec<Uint>> FaceArray;
 
 struct VertexDataSet {
   PositionArray positions;
