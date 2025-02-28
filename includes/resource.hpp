@@ -16,8 +16,6 @@ private:
 public:
   Resource() : mResource(nullptr) {}
   Resource(T *&&resource) : mResource(resource) {}
-  template <typename... Args>
-  Resource(Args &&...args) : mResource(new T(std::forward<Args>(args)...)) {}
   Resource(Resource const &other) : mResource(other.mResource) {
     mUUID = Core::UUID::Copy(other.mUUID);
   }
@@ -33,7 +31,7 @@ public:
   Bool IsValid() const { return mResource != nullptr; }
 
   void Assign(T *&&resource) { mResource = resource; }
-  template <typename... Args> void Generate(Args &&...args) {
+  template <typename... Args> void Assign(Args &&...args) {
     this->Delete();
     mResource = new T(std::forward<Args>(args)...);
   }
@@ -62,7 +60,9 @@ public:
 
 public:
   template <typename... Args> static Resource<T> Create(Args &&...args) {
-    return Resource<T>(std::forward<Args>(args)...);
+    Resource<T> resource;
+    resource.Assign(std::forward<Args>(args)...);
+    return resource;
   }
 };
 

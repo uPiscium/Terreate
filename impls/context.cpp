@@ -44,7 +44,7 @@ ContextHandler::ContextHandler() {
   Graphic::InitializeGLFW();
   WindowSettings setting;
   setting.visible = false;
-  mMasterWindow = Display(1, 1, "Master Window", setting);
+  mMasterWindow.Assign(1, 1, "Master Window", setting);
   Graphic::InitializeGLAD();
   glfwMakeContextCurrent(nullptr);
 }
@@ -67,9 +67,10 @@ ContextHandler::CreateContext(Uint const &width, Uint const &height,
                               WindowSettings const &settings) {
   std::unique_lock<std::mutex> lock(mContextMutex);
   auto context =
-      Resource<Context>(width, height, title, settings, mMasterWindow,
-                        &mRunning, &mNumContexts, this);
-  mContexts.push_back(context);
+      Resource<Context>::Create(width, height, title, settings, mMasterWindow,
+                                &mRunning, &mNumContexts, this);
+  mContexts.push_back(context); // TODO: [Windows] Error -> No viable
+                                // overloaded. / replace with emplace_back()?
   glfwMakeContextCurrent(nullptr);
   return context;
 }

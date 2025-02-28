@@ -38,7 +38,7 @@ public:
           std::atomic<Bool> *quit, std::atomic<Ubyte> *numContexts,
           ContextHandler *handler)
       : mQuit(quit), mNumContexts(numContexts), mHandler(handler) {
-    window = Display(width, height, title, settings, shared.Get());
+    window.Assign(width, height, title, settings, shared.Get());
   }
   ~Context() { this->QuitContext(); }
 
