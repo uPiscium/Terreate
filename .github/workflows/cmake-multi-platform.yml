@@ -65,7 +65,7 @@ jobs:
       with:
         path: |
           ${{ steps.strings.outputs.build-output-dir }}
-        key: cmake-${{ runner.os }}
+        key: cmake-${{ matrix.cpp_compiler }}
         restore-keys: |
           cmake-
 
