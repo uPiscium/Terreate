@@ -1,5 +1,5 @@
--I./includes/deps/
--I./includes/deps/TerreateCore/deps/
--I./tests/deps/
+-I./includes/Deps/
+-I./includes/
+-I./tests/includes/
 -I/home/linuxbrew/.linuxbrew/include/c++/v1/
 -std=c++20

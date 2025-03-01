@@ -1,28 +1,97 @@
-#ifndef __TERREATE_GRAPHICS_EXCEPTIONS_HPP__
-#define __TERREATE_GRAPHICS_EXCEPTIONS_HPP__
+#ifndef __TERREATE_EXCEPTIONS_HPP__
+#define __TERREATE_EXCEPTIONS_HPP__
 
-#include <exception>
+#include <types.hpp>
 
-#include "defines.hpp"
+namespace Terreate::Exceptions {
+using namespace Terreate::Types;
 
-namespace TerreateGraphics::Exceptions {
-using namespace TerreateGraphics::Defines;
-
-class GraphicsException : public std::exception {
+class TerreateException : public std::exception {
 private:
   Str mMessage;
 
 public:
-  GraphicsException(Str const &message) : mMessage(message) {}
+  TerreateException(Str const &message) noexcept : mMessage(message) {}
+  virtual ~TerreateException() noexcept {}
 
   virtual const char *what() const noexcept override {
     return mMessage.c_str();
   }
 };
 
-class NullObjectException : public GraphicsException {
+class ResourceException : public TerreateException {
 public:
-  NullObjectException() : GraphicsException("Null object is accessed!") {}
+  ResourceException(Str const &message) noexcept : TerreateException(message) {}
+};
+
+/*
+ * Core system exceptions
+ */
+class CoreException : public TerreateException {
+public:
+  CoreException(Str const &message) noexcept : TerreateException(message) {}
+};
+
+class ExecutorError : public CoreException {
+public:
+  ExecutorError(Str const &message) noexcept : CoreException(message) {}
+};
+
+class TaskError : public CoreException {
+public:
+  TaskError(Str const &message) noexcept : CoreException(message) {}
+};
+
+class NullReferenceException : public CoreException {
+public:
+  NullReferenceException(Str const &message) noexcept
+      : CoreException(message) {}
+};
+
+class NullObjectException : public CoreException {
+public:
+  NullObjectException() : CoreException("Null object") {}
+};
+
+class NotImplementedException : public CoreException {
+public:
+  NotImplementedException() noexcept : CoreException("Not implemented") {}
+  NotImplementedException(Str const &message) noexcept
+      : CoreException(message) {}
+};
+
+/*
+ * Audio system exceptions
+ */
+class AudioException : public TerreateException {
+public:
+  AudioException(Str const &message) noexcept : TerreateException(message) {}
+};
+
+class OpenALException : public AudioException {
+public:
+  OpenALException(Str const &message) noexcept : AudioException(message) {}
+};
+
+class SourceError : public AudioException {
+public:
+  SourceError(Str const &message) noexcept : AudioException(message) {}
+};
+
+/*
+ * Graphics system exceptions
+ */
+
+class GraphicsException : public TerreateException {
+private:
+  Str mMessage;
+
+public:
+  GraphicsException(Str const &message) : TerreateException(message) {}
+
+  virtual const char *what() const noexcept override {
+    return mMessage.c_str();
+  }
 };
 
 class BufferError : public GraphicsException {
@@ -64,6 +133,19 @@ class WindowError : public GraphicsException {
 public:
   WindowError(Str const &message) : GraphicsException(message) {}
 };
-} // namespace TerreateGraphics::Exceptions
 
-#endif // __TERREATE_GRAPHICS_EXCEPTIONS_HPP__
+/*
+ * IO system exceptions
+ */
+class IOException : public TerreateException {
+public:
+  IOException(Str const &message) noexcept : TerreateException(message) {}
+};
+
+class FileException : public IOException {
+public:
+  FileException(Str const &message) noexcept : IOException(message) {}
+};
+} // namespace Terreate::Exceptions
+
+#endif // __TERREATE_EXCEPTIONS_HPP__
