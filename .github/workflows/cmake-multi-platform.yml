@@ -65,7 +65,7 @@ jobs:
       with:
         path: |
           ${{ steps.strings.outputs.build-output-dir }}
-        key: cmake-cache
+        key: cmake-${{ runner.os }}
         restore-keys: |
           cmake-
 
