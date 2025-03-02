@@ -3,6 +3,7 @@
 
 #include <core/uuid.hpp>
 #include <mutex>
+#include <thread>
 #include <types.hpp>
 
 namespace Terreate::Core {
@@ -36,6 +37,7 @@ private:
   using Callback = Subscriber<EventArgs...>;
 
 private:
+  std::thread::id mPublisherThread;
   std::mutex mEventMutex;
   Map<UUID, Callback> mCallbacks;
   Map<UUID, Callback> mTriggers;
@@ -79,6 +81,10 @@ public:
    * @param: args: Arguments to be passed to the callback functions
    */
   void Publish(EventArgs... args) {
+    if (mPublisherThread == std::this_thread::get_id()) {
+      return;
+    }
+
     std::unique_lock<std::mutex> lock(mEventMutex);
     for (auto &[_, callback] : mCallbacks) {
       callback.OnEvent(std::forward<EventArgs>(args)...);
