@@ -2,7 +2,7 @@
 `main` CI status : ![build workflow](https://github.com/uPiscium/Terreate/actions/workflows/cmake-multi-platform.yml/badge.svg)\
 license : [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)\
 Terreate is a 3D game library for C++. This repository is designed for creating 3D games with OpenGL and OpenAL without the annoying of state based programming.
-- ~~[Reference (WIP)](---)~~
+- [Reference Page](https://upiscium.github.io/Terreate-Wiki/)
 
 # Dependencies
 ## Library dependence
