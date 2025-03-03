@@ -5,8 +5,6 @@
 #include <exceptions.hpp>
 #include <types.hpp>
 
-#include <iostream>
-
 namespace Terreate {
 using namespace Terreate::Types;
 
@@ -171,10 +169,75 @@ public:
 
 template <typename T> class ResourceManager {
 private:
-  Map<Core::UUID, Resource<T>> mResourceMap;
+  typedef Resource<T> Type;
+
+private:
+  Map<Str, Core::UUID> mResourceNameMap;
+  Map<Core::UUID, Type> mResourceMap;
 
 public:
-  ;
+  ResourceManager() {}
+  virtual ~ResourceManager() {}
+
+  Type &Get(Str const &name) {
+    auto it = mResourceNameMap.find(name);
+    if (it == mResourceNameMap.end()) {
+      throw Exceptions::ResourceException("Resource not found");
+    }
+    return this->Get(it->second);
+  }
+  Type const &Get(Str const &name) const {
+    auto it = mResourceNameMap.find(name);
+    if (it == mResourceNameMap.end()) {
+      throw Exceptions::ResourceException("Resource not found");
+    }
+    return this->Get(it->second);
+  }
+  Type &Get(Core::UUID const &uuid) {
+    auto it = mResourceMap.find(uuid);
+    if (it == mResourceMap.end()) {
+      throw Exceptions::ResourceException("Resource not found");
+    }
+    return it->second;
+  }
+  Type const &Get(Core::UUID const &uuid) const {
+    auto it = mResourceMap.find(uuid);
+    if (it == mResourceMap.end()) {
+      throw Exceptions::ResourceException("Resource not found");
+    }
+    return it->second;
+  }
+
+  void Load(Type const &resource, Str const &name = "") {
+    Core::UUID uuid = resource.GetUUID();
+    if (name.empty()) {
+      mResourceNameMap[uuid.ToString()] = uuid;
+    } else {
+      mResourceNameMap[name] = uuid;
+    }
+    mResourceMap[uuid] = resource;
+  }
+  void Unload(Str const &name) {
+    auto it = mResourceNameMap.find(name);
+    if (it == mResourceNameMap.end()) {
+      throw Exceptions::ResourceException("Resource not found");
+    }
+    this->Unload(it->second);
+  }
+  void Unload(Core::UUID const &uuid) {
+    auto it = mResourceMap.find(uuid);
+    if (it == mResourceMap.end()) {
+      throw Exceptions::ResourceException("Resource not found");
+    }
+    mResourceMap.erase(it);
+    for (auto it = mResourceNameMap.begin(); it != mResourceNameMap.end();
+         ++it) {
+      if (it->second == uuid) {
+        mResourceNameMap.erase(it);
+        break;
+      }
+    }
+  }
 };
 
 } // namespace Terreate
