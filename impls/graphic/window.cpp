@@ -356,35 +356,35 @@ void Window::Iconify() const {
   if (!mWindow) {
     return;
   }
-  glfwIconifyWindow(mWindow);
+  glfwSetWindowAttrib(mWindow, GLFW_ICONIFIED, GLFW_TRUE);
 }
 
 void Window::Maximize() const {
   if (!mWindow) {
     return;
   }
-  glfwMaximizeWindow(mWindow);
+  glfwSetWindowAttrib(mWindow, GLFW_MAXIMIZED, GLFW_TRUE);
 }
 
 void Window::Show() const {
   if (!mWindow) {
     return;
   }
-  glfwShowWindow(mWindow);
+  glfwSetWindowAttrib(mWindow, GLFW_VISIBLE, GLFW_TRUE);
 }
 
 void Window::Hide() const {
   if (!mWindow) {
     return;
   }
-  glfwHideWindow(mWindow);
+  glfwSetWindowAttrib(mWindow, GLFW_VISIBLE, GLFW_FALSE);
 }
 
 void Window::Focus() const {
   if (!mWindow) {
     return;
   }
-  glfwFocusWindow(mWindow);
+  glfwSetWindowAttrib(mWindow, GLFW_FOCUSED, GLFW_TRUE);
 }
 
 void Window::Restore() const {
