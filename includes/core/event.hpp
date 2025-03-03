@@ -3,7 +3,6 @@
 
 #include <core/uuid.hpp>
 #include <mutex>
-#include <thread>
 #include <types.hpp>
 
 namespace Terreate::Core {
@@ -35,9 +34,10 @@ public:
 template <typename... EventArgs> class Event final {
 private:
   using Callback = Subscriber<EventArgs...>;
+  typedef std::recursive_mutex mutex;
 
 private:
-  std::recursive_mutex mEventMutex;
+  mutex mEventMutex;
   Map<UUID, Callback> mCallbacks;
   Map<UUID, Callback> mTriggers;
 
@@ -50,7 +50,7 @@ public:
    * @param: subscriber: Callback function to be called when the event is
    */
   void Subscribe(Callback const &subscriber) {
-    std::lock_guard<std::recursive_mutex> lock(mEventMutex);
+    std::lock_guard<mutex> lock(mEventMutex);
     mCallbacks[subscriber.GetUUID()] = subscriber;
   }
   /*
@@ -58,7 +58,7 @@ public:
    * @param: subscriber: Callback function to be called when the event is
    */
   void Trigger(Callback const &subscriber) {
-    std::lock_guard<std::recursive_mutex> lock(mEventMutex);
+    std::lock_guard<mutex> lock(mEventMutex);
     mTriggers[subscriber.GetUUID()] = subscriber;
   }
   /*
@@ -66,7 +66,7 @@ public:
    * @param: callback: Callback function to be removed from the event
    */
   void Unsubscribe(Callback const &callback) {
-    std::unique_lock<std::recursive_mutex> lock(mEventMutex);
+    std::unique_lock<mutex> lock(mEventMutex);
     for (auto it = mCallbacks.begin(); it != mCallbacks.end(); ++it) {
       if (it->first == callback.GetUUID()) {
         mCallbacks.erase(it);
@@ -80,7 +80,7 @@ public:
    * @param: args: Arguments to be passed to the callback functions
    */
   void Publish(EventArgs... args) {
-    std::unique_lock<std::recursive_mutex> lock(mEventMutex);
+    std::unique_lock<mutex> lock(mEventMutex);
     for (auto &[_, callback] : mCallbacks) {
       callback.OnEvent(std::forward<EventArgs>(args)...);
     }

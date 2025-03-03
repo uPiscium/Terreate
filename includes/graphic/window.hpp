@@ -368,79 +368,57 @@ public:
    * @brief: This function returns whether window is closed or not.
    * @return: Whether window is closed or not.
    */
-  Bool IsClosed() const {
-    return mWindow == nullptr || glfwWindowShouldClose(mWindow);
-  }
+  Bool IsClosed() const;
   /*
    * @brief: This function returns whether window is fullscreen or not.
    * @return: Whether window is fullscreen or not.
    */
-  Bool IsFullScreen() const {
-    return Bool(glfwGetWindowMonitor(mWindow) != NULL);
-  }
+  Bool IsFullScreen() const;
   /*
    * @brief: This function returns whether window is windowed or not.
    * @return: Whether window is windowed or not.
    */
-  Bool IsWindowed() const {
-    return Bool(glfwGetWindowMonitor(mWindow) == NULL);
-  }
+  Bool IsWindowed() const;
   /*
    * @brief: This function returns whether window is iconified or not.
    * @return: Whether window is iconified or not.
    */
-  Bool IsIconified() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_ICONIFIED));
-  }
+  Bool IsIconified() const;
   /*
    * @brief: This function returns whether window is maximized or not.
    * @return: Whether window is maximized or not.
    */
-  Bool IsMaximized() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_MAXIMIZED));
-  }
+  Bool IsMaximized() const;
   /*
    * @brief: This function returns whether window is visible or not.
    * @return: Whether window is visible or not.
    */
-  Bool IsVisible() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_VISIBLE));
-  }
+  Bool IsVisible() const;
   /*
    * @brief: This function returns whether window is focused or not.
    * @return: Whether window is focused or not.
    */
-  Bool IsFocused() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_FOCUSED));
-  }
+  Bool IsFocused() const;
   /*
    * @brief: This function returns whether window is transparent or not.
    * @return: Whether window is transparent or not.
    */
-  Bool IsTransparent() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_TRANSPARENT_FRAMEBUFFER));
-  }
+  Bool IsTransparent() const;
   /*
    * @brief: This function returns whether window is decorated or not.
    * @return: Whether window is decorated or not.
    */
-  Bool IsDecorated() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_DECORATED));
-  }
+  Bool IsDecorated() const;
   /*
    * @brief: This function returns whether window is resizable or not.
    * @return: Whether window is resizable or not.
    */
-  Bool IsResizable() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_RESIZABLE));
-  }
+  Bool IsResizable() const;
   /*
    * @brief: This function returns whether window is floating or not.
    * @return: Whether window is floating or not.
    */
-  Bool IsFloating() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_FLOATING));
-  }
+  Bool IsFloating() const;
   /*
    * @brief: This function returns whether window is auto iconified or not.
    * @return: Whether window is auto iconified or not.
@@ -448,9 +426,7 @@ public:
    * automatically iconify and restore the previous video mode on input focus
    * loss.
    */
-  Bool IsAutoIconified() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_AUTO_ICONIFY));
-  }
+  Bool IsAutoIconified() const;
   /*
    * @brief: This function returns whether window is focus on showed or not.
    * @return: Whether window is maximized or not.
@@ -458,23 +434,17 @@ public:
    * @detail: "Focus on show" specifies whether the window will be given input
    * focus when Show() function is called.
    */
-  Bool IsFocusOnShowed() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_FOCUS_ON_SHOW));
-  }
+  Bool IsFocusOnShowed() const;
   /*
    * @brief: This function returns whether key is pressing or not.
    * @return: Whether key is pressing or not.
    */
-  Bool IsPressing(Keyboard const &key) const {
-    return Bool(glfwGetKey(mWindow, (Uint)key) == GLFW_PRESS);
-  }
+  Bool IsPressing(Keyboard const &key) const;
   /*
    * @brief: This function returns whether cursor is entering or not.
    * @return: Whether cursor is entering or not.
    */
-  Bool IsEntering() const {
-    return Bool(glfwGetWindowAttrib(mWindow, GLFW_HOVERED));
-  }
+  Bool IsEntering() const;
 
   /*
    * @brief: Enable vsync.
@@ -491,35 +461,35 @@ public:
   /*
    * @brief: This function closes window.
    */
-  void Close() const { glfwSetWindowShouldClose(mWindow, GLFW_TRUE); }
+  void Close() const;
   /*
    * @brief: This function iconifies window.
    */
-  void Iconify() const { glfwIconifyWindow(mWindow); }
+  void Iconify() const;
   /*
    * @brief: This function maximizes window.
    */
-  void Maximize() const { glfwMaximizeWindow(mWindow); }
+  void Maximize() const;
   /*
    * @brief: This function shows window.
    */
-  void Show() const { glfwShowWindow(mWindow); }
+  void Show() const;
   /*
    * @brief: This function hides window.
    */
-  void Hide() const { glfwHideWindow(mWindow); }
+  void Hide() const;
   /*
    * @brief: This function focuses window.
    */
-  void Focus() const { glfwFocusWindow(mWindow); }
+  void Focus() const;
   /*
    * @brief: This function unmaximize or uniconify window.
    */
-  void Restore() const { glfwRestoreWindow(mWindow); }
+  void Restore() const;
   /*
    * @brief: This function requests attention to window.
    */
-  void RequestAttention() const { glfwRequestWindowAttention(mWindow); }
+  void RequestAttention() const;
   /*
    * @brief: This function fills window with specified color.
    * @param: color: Fill color.
@@ -550,11 +520,7 @@ public:
   /*
    * @brief: This function swaps front and back buffers.
    */
-  void Swap() const { glfwSwapBuffers(mWindow); }
-  /*
-   * @brief: This function poll events.
-   */
-  void PollEvents() const { glfwPollEvents(); }
+  void Swap() const;
   /*
    * @brief: This function binds window to current context.
    */

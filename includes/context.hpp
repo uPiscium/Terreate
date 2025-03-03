@@ -18,8 +18,6 @@ class ContextHandler;
 
 class Context {
 private:
-  ContextHandler *mHandler;
-  std::atomic<Bool> mRunning = true;
   std::thread mContextThread;
   std::atomic<Bool> *mQuit;
   std::atomic<Ubyte> *mNumContexts;
@@ -28,6 +26,7 @@ public:
   typedef Function<Bool(Context *)> FrameFunction;
 
 public:
+  ContextHandler *handler;
   Display window;
   Event<Context *> onStart;
   Event<Context *> onEnd;
@@ -36,13 +35,10 @@ public:
   Context(Uint const &width, Uint const &height, Str const &title,
           WindowSettings const &settings, Display &shared,
           std::atomic<Bool> *quit, std::atomic<Ubyte> *numContexts,
-          ContextHandler *handler)
-      : mQuit(quit), mNumContexts(numContexts), mHandler(handler) {
-    window.Assign(width, height, title, settings, shared.Get());
-  }
+          ContextHandler *handler);
   ~Context() { this->QuitContext(); }
 
-  void QuitContext();
+  void QuitContext() { this->window->Close(); }
   void QuitApp();
 
   void Run(FrameFunction const &frameFunction);

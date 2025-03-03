@@ -4,6 +4,8 @@
 #include <exceptions.hpp>
 #include <graphictest.hpp>
 
+#include <iostream>
+
 namespace Core = Terreate::Test::Core;
 namespace Audio = Terreate::Test::Audio;
 namespace Graphic = Terreate::Test::Graphic;

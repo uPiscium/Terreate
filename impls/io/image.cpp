@@ -62,4 +62,5 @@ void Image::SaveHDR(Str const &filepath, Texture const &texture) {
   stbi_write_hdr(filepath.c_str(), texture.width, texture.height,
                  texture.channels, (Float *)texture.data.data());
 }
+
 } // namespace Terreate::IO

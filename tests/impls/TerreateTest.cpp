@@ -4,6 +4,23 @@
 
 namespace Terreate::Test {
 
+class TestInterface {
+public:
+  ~TestInterface() {
+    std::cout << "TestInterface::~TestInterface" << std::endl;
+  }
+  virtual void Test() = 0;
+};
+
+class TestImplementation : public TestInterface {
+public:
+  TestImplementation() {}
+  ~TestImplementation() {
+    std::cout << "TestImplementation::~TestImplementation" << std::endl;
+  }
+  void Test() override { std::cout << "TestImplementation::Test" << std::endl; }
+};
+
 class App {
 public:
   Bool FrameFunction(Context *context) {
@@ -71,6 +88,10 @@ void Run() {
   context4->onEnd += ContextSubscriber([&](Context *context) {
     std::cout << "Window 4 has ended" << std::endl;
   });
+
+  /* Resource<TestInterface> t = Resource<TestImplementation>::Create(); */
+  /* t->Test(); */
+  /* t.Delete(); */
 
   context1->Run(
       [&app](Context *context) { return app.FrameFunction(context); });

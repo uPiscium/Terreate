@@ -271,7 +271,7 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
 }
 
 void TestApp::Frame(Window *window) {
-  window->PollEvents();
+  glfwPollEvents();
   window->Fill(0.2, 0.2, 0.2);
   window->Clear();
 

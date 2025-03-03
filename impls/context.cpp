@@ -1,14 +1,20 @@
 #include <context.hpp>
 
+#include <iostream>
+
 namespace Terreate {
-void Context::QuitContext() {
-  mRunning.store(false);
-  mRunning.notify_all();
+Context::Context(Uint const &width, Uint const &height, Str const &title,
+                 WindowSettings const &settings, Display &shared,
+                 std::atomic<Bool> *quit, std::atomic<Ubyte> *numContexts,
+                 ContextHandler *handler)
+    : mQuit(quit), mNumContexts(numContexts) {
+  this->window = Display::Create(width, height, title, settings, shared.Get());
+  this->handler = handler;
 }
 
 void Context::QuitApp() {
   this->QuitContext();
-  mHandler->Quit();
+  this->handler->Quit();
 }
 
 void Context::Run(FrameFunction const &frameFunction) {
@@ -16,7 +22,7 @@ void Context::Run(FrameFunction const &frameFunction) {
     mNumContexts->fetch_add(1);
 
     onStart.Publish(this);
-    while (!this->window->IsClosed() && mQuit->load() && mRunning.load()) {
+    while (mQuit->load() && !this->window->IsClosed()) {
       window->SetCurrentContext();
       if (!frameFunction(this)) {
         break;
@@ -24,7 +30,6 @@ void Context::Run(FrameFunction const &frameFunction) {
     }
     onEnd.Publish(this);
 
-    this->QuitContext();
     window->Hide();
     window->Destroy();
 
@@ -32,7 +37,7 @@ void Context::Run(FrameFunction const &frameFunction) {
       mQuit->store(false);
     }
   });
-  mHandler->RegisterThread(&mContextThread);
+  this->handler->RegisterThread(&mContextThread);
 }
 
 void ContextHandler::RegisterThread(std::thread *thread) {
@@ -44,7 +49,7 @@ ContextHandler::ContextHandler() {
   Graphic::InitializeGLFW();
   WindowSettings setting;
   setting.visible = false;
-  mMasterWindow.Assign(1, 1, "Master Window", setting);
+  mMasterWindow = Display::Create(1, 1, "Master Window", setting);
   Graphic::InitializeGLAD();
   glfwMakeContextCurrent(nullptr);
 }
@@ -52,9 +57,13 @@ ContextHandler::ContextHandler() {
 ContextHandler::~ContextHandler() {
   this->Quit();
   for (auto &thread : mContextThreads) {
-    if (thread->joinable()) {
+    if ((thread != nullptr) && thread->joinable()) {
       thread->join();
     }
+  }
+
+  for (auto &context : mContexts) {
+    context.Delete();
   }
 
   mMasterWindow->Destroy();
@@ -69,8 +78,7 @@ ContextHandler::CreateContext(Uint const &width, Uint const &height,
   auto context =
       Resource<Context>::Create(width, height, title, settings, mMasterWindow,
                                 &mRunning, &mNumContexts, this);
-  mContexts.push_back(context); // TODO: [Windows] Error -> No viable
-                                // overloaded. / replace with emplace_back()?
+  mContexts.push_back(context);
   glfwMakeContextCurrent(nullptr);
   return context;
 }

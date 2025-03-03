@@ -240,8 +240,178 @@ Window::Window(Uint const &width, Uint const &height, Str const &title,
   glfwSetDropCallback(mWindow, Callbacks::DropCallbackWrapper);
 }
 
-void Window::Destroy() {
-  glfwDestroyWindow(mWindow);
-  mWindow = nullptr;
+Bool Window::IsClosed() const {
+  if (!mWindow) {
+    return true;
+  }
+  return glfwWindowShouldClose(mWindow);
 }
+
+Bool Window::IsFullScreen() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowMonitor(mWindow) != NULL);
+}
+
+Bool Window::IsWindowed() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowMonitor(mWindow) == NULL);
+}
+
+Bool Window::IsIconified() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_ICONIFIED));
+}
+
+Bool Window::IsMaximized() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_MAXIMIZED));
+}
+
+Bool Window::IsVisible() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_VISIBLE));
+}
+
+Bool Window::IsFocused() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_FOCUSED));
+}
+
+Bool Window::IsTransparent() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_TRANSPARENT_FRAMEBUFFER));
+}
+
+Bool Window::IsDecorated() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_DECORATED));
+}
+
+Bool Window::IsResizable() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_RESIZABLE));
+}
+
+Bool Window::IsFloating() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_FLOATING));
+}
+
+Bool Window::IsAutoIconified() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_AUTO_ICONIFY));
+}
+
+Bool Window::IsFocusOnShowed() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_FOCUS_ON_SHOW));
+}
+
+Bool Window::IsPressing(Keyboard const &key) const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetKey(mWindow, (Uint)key) == GLFW_PRESS);
+}
+
+Bool Window::IsEntering() const {
+  if (!mWindow) {
+    return false;
+  }
+  return Bool(glfwGetWindowAttrib(mWindow, GLFW_HOVERED));
+}
+
+void Window::Close() const {
+  if (!mWindow) {
+    return;
+  }
+  glfwSetWindowShouldClose(mWindow, GLFW_TRUE);
+}
+
+void Window::Iconify() const {
+  if (!mWindow) {
+    return;
+  }
+  glfwIconifyWindow(mWindow);
+}
+
+void Window::Maximize() const {
+  if (!mWindow) {
+    return;
+  }
+  glfwMaximizeWindow(mWindow);
+}
+
+void Window::Show() const {
+  if (!mWindow) {
+    return;
+  }
+  glfwShowWindow(mWindow);
+}
+
+void Window::Hide() const {
+  if (!mWindow) {
+    return;
+  }
+  glfwHideWindow(mWindow);
+}
+
+void Window::Focus() const {
+  if (!mWindow) {
+    return;
+  }
+  glfwFocusWindow(mWindow);
+}
+
+void Window::Restore() const {
+  if (!mWindow) {
+    return;
+  }
+  glfwRestoreWindow(mWindow);
+}
+
+void Window::RequestAttention() const {
+  if (!mWindow) {
+    return;
+  }
+  glfwRequestWindowAttention(mWindow);
+}
+
+void Window::Destroy() {
+  if (mWindow) {
+    glfwDestroyWindow(mWindow);
+    mWindow = nullptr;
+  }
+}
+
+void Window::Swap() const {
+  if (mWindow) {
+    glfwSwapBuffers(mWindow);
+  }
+}
+
 } // namespace Terreate::Graphic
