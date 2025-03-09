@@ -57,9 +57,8 @@ void Text::LoadText() {
 }
 
 void Text::LoadShader(Str const &vertexPath, Str const &fragmentPath) {
-  mShader.AddVertexShaderSource(Shader::LoadShaderSource(vertexPath));
-  mShader.AddFragmentShaderSource(Shader::LoadShaderSource(fragmentPath));
-  mShader.Compile();
+  mShader.Compile(Shader::LoadShaderSource(vertexPath),
+                  Shader::LoadShaderSource(fragmentPath));
   mShader.Link();
   mShaderLoaded = true;
 }
@@ -75,7 +74,7 @@ void Text::Render(Float const &x, Float const &y, Float const &windowWidth,
     throw Exceptions::TextError("Shader not loaded");
   }
 
-  mShader.Use();
+  mShader.Bind();
   Shader::ActivateTexture(TextureTargets::TEX_0);
   mShader.SetInt("uTexture", 0);
 
@@ -83,11 +82,11 @@ void Text::Render(Float const &x, Float const &y, Float const &windowWidth,
   mShader.SetMat4("uTransform", ortho(0.0f, windowWidth, 0.0f, windowHeight));
   mShader.SetVec3("uColor", mColor);
 
-  mFont->Use();
+  mFont->Bind();
   mBuffer.Draw(DrawMode::TRIANGLES);
-  mFont->Unuse();
+  mFont->Unbind();
 
-  mShader.Unuse();
+  mShader.Unbind();
 }
 
 Text &Text::operator=(Str const &text) {

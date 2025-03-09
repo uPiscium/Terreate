@@ -1,6 +1,7 @@
 #ifndef __TERREATE_GRAPHICS_WINDOW_HPP__
 #define __TERREATE_GRAPHICS_WINDOW_HPP__
 
+#include <bindable.hpp>
 #include <core/property.hpp>
 #include <graphic/GLdefs.hpp>
 #include <io/image.hpp>
@@ -222,7 +223,7 @@ public:
   Bool scaleToMonitor = false;
 };
 
-class Window {
+class Window : public Interface::IBindable {
 private:
   GLFWwindow *mWindow = nullptr;
 
@@ -310,7 +311,7 @@ public:
   /*
    * @brief: This function sets window as current context.
    */
-  void SetCurrentContext() const { glfwMakeContextCurrent(mWindow); }
+  void SetCurrent() const { glfwMakeContextCurrent(mWindow); }
   /*
    * @brief: This function sets window icon.
    * @param: icon: Window icon.
@@ -524,7 +525,11 @@ public:
   /*
    * @brief: This function binds window to current context.
    */
-  void Bind() const { this->SetCurrentContext(); }
+  void Bind() const override { this->SetCurrent(); }
+  /*
+   * @brief: This function unbinds window from current context.
+   */
+  void Unbind() const override { glfwMakeContextCurrent(nullptr); }
 
   operator Bool() const { return !this->IsClosed(); }
 };

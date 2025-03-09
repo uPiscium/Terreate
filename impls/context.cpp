@@ -1,7 +1,5 @@
 #include <context.hpp>
 
-#include <iostream>
-
 namespace Terreate {
 Context::Context(Uint const &width, Uint const &height, Str const &title,
                  WindowSettings const &settings, Display &shared,
@@ -23,7 +21,7 @@ void Context::Run(FrameFunction const &frameFunction) {
 
     onStart.Publish(this);
     while (mQuit->load() && !this->window->IsClosed()) {
-      window->SetCurrentContext();
+      window->SetCurrent();
       if (!frameFunction(this)) {
         break;
       }

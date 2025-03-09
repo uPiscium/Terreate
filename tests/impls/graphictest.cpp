@@ -129,7 +129,7 @@ void TestApp::SizeCallback(Window *window, int const &width,
   glViewport(0, 0, width, height);
   mWidth = (Float)width;
   mHeight = (Float)height;
-  mShader.Use();
+  mShader.Bind();
   mUniform.transform = scale(
       identity<mat4>(), vec3(1.0f / mWidth, 1.0f / mHeight, 1.0f / mDepth));
   mUBO.ReloadData(mUniform);
@@ -170,18 +170,14 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
   mInfoText.LoadShader("tests/resources/shaders/textVert.glsl",
                        "tests/resources/shaders/textFrag.glsl");
 
-  mShader.AddVertexShaderSource(
-      Shader::LoadShaderSource("tests/resources/shaders/mainVert.glsl"));
-  mShader.AddFragmentShaderSource(
+  mShader.Compile(
+      Shader::LoadShaderSource("tests/resources/shaders/mainVert.glsl"),
       Shader::LoadShaderSource("tests/resources/shaders/mainFrag.glsl"));
-  mShader.Compile();
   mShader.Link();
 
-  mScreenShader.AddVertexShaderSource(
-      Shader::LoadShaderSource("tests/resources/shaders/screenVert.glsl"));
-  mScreenShader.AddFragmentShaderSource(
+  mScreenShader.Compile(
+      Shader::LoadShaderSource("tests/resources/shaders/screenVert.glsl"),
       Shader::LoadShaderSource("tests/resources/shaders/screenFrag.glsl"));
-  mScreenShader.Compile();
   mScreenShader.Link();
 
   Map<Str, Uint> attrs = {{"iPosition", 0}, {"iUV", 1}, {"iColor", 2}};
@@ -251,11 +247,11 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
   // Uncomment if you want to break your brain...
   /* mShader.UseDepth(false); */
 
-  mShader.Use();
+  mShader.Bind();
   mShader.SetInt("uTexture", 0);
   Shader::ActivateTexture(TextureTargets::TEX_0);
 
-  mScreenShader.Use();
+  mScreenShader.Bind();
   mScreenShader.SetInt("uTexture", 0);
   Shader::ActivateTexture(TextureTargets::TEX_0);
 
@@ -293,13 +289,13 @@ void TestApp::Frame(Window *window) {
   mScreen.Fill({0, 0, 0});
   mScreen.Clear();
   mScreen.Bind();
-  mScreenShader.Use();
+  mScreenShader.Bind();
   /* mInfoFont.Use(); */
   mTexture2.Bind();
   mScreenBuffer.Draw(DrawMode::TRIANGLES);
   mTexture2.Unbind();
   /* mInfoFont.Unuse(); */
-  mScreenShader.Unuse();
+  mScreenShader.Unbind();
   mText.LoadText(WStr(L"Cube"));
   auto size = mFont.GetTextSize(WStr(L"Cube"));
   mText.Render(500 - size.first / 2.0, 500 - size.second / 2.0,
@@ -311,11 +307,11 @@ void TestApp::Frame(Window *window) {
   mSSBO.ReloadData(mSettings);
 
   window->Bind();
-  mShader.Use();
+  mShader.Bind();
   texture.Bind();
   mBuffer.Draw(DrawMode::TRIANGLES);
   texture.Unbind();
-  mShader.Unuse();
+  mShader.Unbind();
 
   mText = mTextString;
   mText.Render(0, 0, mWidth, mHeight);

@@ -1,6 +1,7 @@
 #ifndef __TERREATE_GRAPHICS_BUFFER_HPP__
 #define __TERREATE_GRAPHICS_BUFFER_HPP__
 
+#include <bindable.hpp>
 #include <core/object.hpp>
 #include <exceptions.hpp>
 #include <graphic/compute.hpp>
@@ -81,7 +82,7 @@ public:
   void Construct();
 };
 
-class Buffer {
+class Buffer : public Interface::IBindable {
 private:
   Core::Object mVAO = Core::Object();
   Core::Object mIBO = Core::Object();
@@ -192,11 +193,11 @@ public:
   /*
    * @brief: Bind the buffer
    */
-  void Bind() const { glBindVertexArray(mVAO); }
+  void Bind() const override { glBindVertexArray(mVAO); }
   /*
    * @brief: Unbind the buffer
    */
-  void Unbind() const { glBindVertexArray(0); }
+  void Unbind() const override { glBindVertexArray(0); }
   /*
    * @brief: Draw the buffer
    * @param: mode: Mode to draw

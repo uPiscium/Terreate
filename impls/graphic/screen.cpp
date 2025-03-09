@@ -49,8 +49,8 @@ void Screen::DrawOnlyBind() const {
   glDrawBuffers(mDrawBuffers.size(), mDrawBuffers.data());
 }
 
-void Screen::Bind() {
-  glGetIntegerv(GL_VIEWPORT, mInitialViewPort);
+void Screen::Bind() const {
+  /* glGetIntegerv(GL_VIEWPORT, mInitialViewPort); */
   glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer);
   glViewport(0, 0, mWidth, mHeight);
   glDrawBuffers(mDrawBuffers.size(), mDrawBuffers.data());
@@ -58,8 +58,9 @@ void Screen::Bind() {
 
 void Screen::Unbind() const {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glViewport(mInitialViewPort[0], mInitialViewPort[1], mInitialViewPort[2],
-             mInitialViewPort[3]);
+  /* glViewport(mInitialViewPort[0], mInitialViewPort[1], mInitialViewPort[2],
+   */
+  /*            mInitialViewPort[3]); */
   glDrawBuffer(GL_BACK);
 }
 

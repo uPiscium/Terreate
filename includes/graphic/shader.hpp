@@ -1,6 +1,7 @@
 #ifndef __TERREATE_GRAPHICS_SHADER_HPP__
 #define __TERREATE_GRAPHICS_SHADER_HPP__
 
+#include <bindable.hpp>
 #include <core/math.hpp>
 #include <core/object.hpp>
 #include <graphic/GLdefs.hpp>
@@ -10,34 +11,27 @@ namespace Terreate::Graphic {
 using namespace Terreate::Types;
 using namespace Terreate::Math;
 
-struct ShaderOption {
-  Bool blending = true;
-  Bool culling = false;
-  Bool depth = true;
-  Bool scissor = false;
-  Bool stencil = false;
-  BlendingFunction src = BlendingFunction::SRC_ALPHA;
-  BlendingFunction dst = BlendingFunction::ONE_MINUS_SRC_ALPHA;
-  CullingFace cullFace = CullingFace::BACK;
-  CullingMode frontFace = CullingMode::CCW;
-  DepthFunction depthFunc = DepthFunction::LESS;
-  StencilFunction stencilFunc = StencilFunction::ALWAYS;
-  Int stencilRef = 0;
-  Uint stencilMask = 0xFF;
-  StencilOperation sFail = StencilOperation::KEEP;
-  StencilOperation dpFail = StencilOperation::KEEP;
-  StencilOperation dpPass = StencilOperation::KEEP;
-};
+static Str const VERTEX_SHADER_SOURCE_DEFAULT = R"(
+#version 460 core
+void main() {
+  gl_Position = vec4(position, 1.0);
+}
+)";
 
-class Shader final {
+static Str const FRAGMENT_SHADER_SOURCE_DEFAULT = R"(
+#version 460 core
+out vec4 vColor;
+void main() {
+  vColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+)";
+
+class Shader : public Interface::IBindable {
 private:
   Bool mCompiled = false;
   Bool mLinked = false;
   Core::Object mShaderID = Core::Object();
-  Str mVertexShaderSource = "";
-  Str mFragmentShaderSource = "";
-  Str mGeometryShaderSource = "";
-  ShaderOption mOption;
+  ShaderOption mOption = ShaderOption();
 
 public:
   /*
@@ -80,7 +74,17 @@ public:
     return glGetProgramResourceIndex(mShaderID, GL_SHADER_STORAGE_BLOCK,
                                      name.c_str());
   }
+  /*
+   * @brief: Getter for shader option.
+   * @return: shader option
+   */
+  ShaderOption const &GetOption() const { return mOption; }
 
+  /*
+   * @brief: Setter for shader option.
+   * @param: option: shader option
+   */
+  void SetOption(ShaderOption const &option) { mOption = option; }
   /*
    * @brief: Setter for shader Bool uniform.
    * @param: name: name of uniform
@@ -197,60 +201,7 @@ public:
   void SetMat4(Str const &name, mat4 const &value) const {
     glUniformMatrix4fv(this->GetLocation(name), 1, GL_FALSE, &value[0][0]);
   }
-  /*
-   * @brief: Setter for blending function.
-   * @param: src: source blending function
-   * @param: dst: destination blending function
-   */
-  void SetBlending(BlendingFunction const &src, BlendingFunction const &dst);
-  /*
-   * @brief: Setter for culling face.
-   * @param: face: face to cull
-   */
-  void SetCullingFace(CullingFace const &face,
-                      CullingMode const &frontFace = CullingMode::CCW);
-  /*
-   * @brief: Setter for depth function.
-   * @param: func: depth function
-   */
-  void SetDepth(DepthFunction const &func);
-  /*
-   * @brief: Setter for stencil function.
-   * @param: func: stencil function
-   */
-  void SetStencilFunction(StencilFunction const &func, Int const &ref,
-                          Uint const &mask);
-  /*
-   * @brief: Setter for stencil operation.
-   * @param: sFail: stencil fail operation
-   * @param: dpFail: stencil depth fail operation
-   * @param: dpPass: stencil depth pass operation
-   */
-  void SetStencilOperation(StencilOperation const &sFail,
-                           StencilOperation const &dpFail,
-                           StencilOperation const &dpPass);
 
-  /*
-   * @brief: Add vertex shader source to current source.
-   * @param: source: source code to add
-   */
-  void AddVertexShaderSource(Str const &source) {
-    mVertexShaderSource += source;
-  }
-  /*
-   * @brief: Add fragment shader source to current source.
-   * @param: source: source code to add
-   */
-  void AddFragmentShaderSource(Str const &source) {
-    mFragmentShaderSource += source;
-  }
-  /*
-   * @brief: Add geometry shader source to current source.
-   * @param: source: source code to add
-   */
-  void AddGeometryShaderSource(Str const &source) {
-    mGeometryShaderSource += source;
-  }
   /*
    * @brief: This function binds uniform block index to binding point.
    * @param: name: name of uniform block
@@ -269,34 +220,10 @@ public:
                                 binding);
   }
   /*
-   * @brief: This function swiches blending on or off.
-   * @param: value: true to turn on, false to turn off
+   * @brief: Compile shader with source code.
    */
-  void UseBlending(Bool const &value) { mOption.blending = value; }
-  /*
-   * @brief: This function swiches culling on or off.
-   * @param: value: true to turn on, false to turn off
-   */
-  void UseCulling(Bool const &value) { mOption.culling = value; }
-  /*
-   * @brief: This function swiches depth testing on or off.
-   * @param: value: true to turn on, false to turn off
-   */
-  void UseDepth(Bool const &value) { mOption.depth = value; }
-  /*
-   * @brief: This function swiches scissor testing on or off.
-   * @param: value: true to turn on, false to turn off
-   */
-  void UseScissor(Bool const &value) { mOption.scissor = value; }
-  /*
-   * @brief: This function swiches stencil testing on or off.
-   * @param: value: true to turn on, false to turn off
-   */
-  void UseStencil(Bool const &value) { mOption.stencil = value; }
-  /*
-   * @brief: Compile shader.
-   */
-  void Compile();
+  void Compile(Str const &vertex, Str const &fragment,
+               Str const &geometry = "");
   /*
    * @brief: Link shader.
    */
@@ -306,11 +233,11 @@ public:
    * @sa: Compile
    * @detail: This function should be called after shader is compiled.
    */
-  void Use() const;
+  void Bind() const;
   /*
    * @brief: Unuse shader.
    */
-  void Unuse() const { glUseProgram(0); }
+  void Unbind() const { glUseProgram(0); }
 
   operator Bool() const { return mShaderID; }
 

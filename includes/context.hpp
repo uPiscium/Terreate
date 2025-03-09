@@ -61,12 +61,6 @@ private:
   void RegisterThread(std::thread *thread);
 
 public:
-  ResourceManager<Graphic::Font> font;
-  ResourceManager<Graphic::Texture> texture;
-  ResourceManager<Graphic::Shader> shader;
-  ResourceManager<Graphic::Buffer> buffer;
-
-public:
   ContextHandler();
   ~ContextHandler();
 

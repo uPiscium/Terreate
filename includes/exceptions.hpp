@@ -24,6 +24,11 @@ public:
   ResourceException(Str const &message) noexcept : TerreateException(message) {}
 };
 
+class EntityException : public TerreateException {
+public:
+  EntityException(Str const &message) noexcept : TerreateException(message) {}
+};
+
 /*
  * Core system exceptions
  */

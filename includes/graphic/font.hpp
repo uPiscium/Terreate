@@ -4,6 +4,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <bindable.hpp>
 #include <graphic/texture.hpp>
 #include <types.hpp>
 
@@ -18,7 +19,7 @@ struct CharacterData {
   Vec<Float> uv; // {x0, y0, x1, y1, z}
 };
 
-class Font {
+class Font : public Interface::IBindable {
 private:
   Shared<FT_Library> mLibrary = nullptr;
   Shared<FT_Face> mFace = nullptr;
@@ -97,11 +98,11 @@ public:
   /*
    * @brief: Uses font texture.
    */
-  void Use() const { mTexture.Bind(); }
+  void Bind() const override { mTexture.Bind(); }
   /*
    * @brief: Unuses font texture.
    */
-  void Unuse() const { mTexture.Unbind(); }
+  void Unbind() const override { mTexture.Unbind(); }
 
   operator Bool() const { return mFace != nullptr; }
 };

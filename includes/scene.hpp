@@ -8,16 +8,21 @@
 namespace Terreate {
 using namespace Terreate::Types;
 
-typedef Resource<IEntity> Entity;
+typedef Resource<Interface::IEntity> Entity;
 
-class Scene {
+class Scene : public Interface::IEntity {
 private:
-  Vec<Entity> mEntities;
+  Map<Core::UUID, Entity> mEntities;
 
 public:
   Scene() = default;
   ~Scene() = default;
+
+  void Add(Entity const &entity);
+  void Remove(Entity const &entity);
+  void Draw(Resource<Renderer> &renderer) const override;
 };
+
 } // namespace Terreate
 
 #endif // __TERREATE_SCENE_HPP__

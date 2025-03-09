@@ -1,6 +1,7 @@
 #ifndef __TERREATE_GRAPHICS_SCREEN_HPP__
 #define __TERREATE_GRAPHICS_SCREEN_HPP__
 
+#include <bindable.hpp>
 #include <core/object.hpp>
 #include <graphic/GLdefs.hpp>
 #include <graphic/texture.hpp>
@@ -9,13 +10,13 @@
 namespace Terreate::Graphic {
 using namespace Terreate::Types;
 
-class Screen {
+class Screen : public Interface::IBindable {
 private:
   Core::Object mFrameBuffer = Core::Object();
   Uint mWidth;
   Uint mHeight;
   Uint mLayers;
-  Int mInitialViewPort[4];
+  /* Int mInitialViewPort[4]; */
   Texture mTexture;
   Vec<GLenum> mDrawBuffers;
 
@@ -63,11 +64,11 @@ public:
   /*
    * @brief: Binds the screen.
    */
-  void Bind();
+  void Bind() const override;
   /*
    * @brief: Unbinds the screen.
    */
-  void Unbind() const;
+  void Unbind() const override;
   /*
    * @brief: Fill screen with color.
    * @param: color: color to fill screen with

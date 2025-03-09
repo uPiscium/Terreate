@@ -1,30 +1,22 @@
 #ifndef __TERREATE_ENTITY_HPP__
 #define __TERREATE_ENTITY_HPP__
 
+#include <core/math.hpp>
 #include <core/uuid.hpp>
-#include <types.hpp>
+#include <renderer.hpp>
+#include <resource.hpp>
+#include <transform.hpp>
 
-namespace Terreate {
-using namespace Terreate::Types;
+namespace Terreate::Interface {
 
-class IEntity {
+struct IEntity {
 public:
-  virtual ~IEntity() = default;
-  virtual Core::UUID const &GetUUID() const = 0;
-  virtual Bool operator==(IEntity const &other) const {
-    return this->GetUUID() == other.GetUUID();
-  }
-  virtual Bool operator!=(IEntity const &other) const {
-    return !(*this == other);
-  }
+  virtual Core::UUID GetUUID() const = 0;
+  virtual Transform GetTransform() const = 0;
+  virtual void SetTransform(Transform const &transform) = 0;
+  virtual void Update(Double const &tick) = 0;
+  virtual void Draw(Resource<Renderer> &renderer) const = 0;
 };
-
-class IRenderable {
-public:
-  virtual ~IRenderable() = default;
-  virtual void Render() = 0;
-};
-
-} // namespace Terreate
+} // namespace Terreate::Interface
 
 #endif // __TERREATE_ENTITY_HPP__

@@ -1,6 +1,7 @@
 #ifndef __TERREATE_GRAPHICS_TEXTURE_HPP__
 #define __TERREATE_GRAPHICS_TEXTURE_HPP__
 
+#include <bindable.hpp>
 #include <core/object.hpp>
 #include <graphic/GLdefs.hpp>
 #include <types.hpp>
@@ -30,7 +31,7 @@ enum class TextureSize {
   S32768 = 32768,
 };
 
-class Texture final {
+class Texture : public Interface::IBindable {
 private:
   Core::Object mTexture = Core::Object();
   Pair<Uint> mSize = {0u, 0u};
@@ -179,11 +180,13 @@ public:
   /*
    * @brief: Binds texture to OpenGL.
    */
-  void Bind() const { glBindTexture(GL_TEXTURE_2D_ARRAY, (TCu32)mTexture); }
+  void Bind() const override {
+    glBindTexture(GL_TEXTURE_2D_ARRAY, (TCu32)mTexture);
+  }
   /*
    * @brief: Unbinds texture from OpenGL.
    */
-  void Unbind() const { glBindTexture(GL_TEXTURE_2D_ARRAY, 0); }
+  void Unbind() const override { glBindTexture(GL_TEXTURE_2D_ARRAY, 0); }
 
   Uint const &operator[](Str const &name) const {
     return this->GetTextureIndex(name);
@@ -207,7 +210,7 @@ public:
   static Uint GetMaxLayers();
 };
 
-class CubeTexture final {
+class CubeTexture : public Interface::IBindable {
 private:
   Core::Object mTexture = Core::Object();
   Uint mWidth = 0u;
@@ -276,11 +279,11 @@ public:
   /*
    * @brief: Binds texture to OpenGL.
    */
-  void Bind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, mTexture); }
+  void Bind() const override { glBindTexture(GL_TEXTURE_CUBE_MAP, mTexture); }
   /*
    * @brief: Unbinds texture from OpenGL.
    */
-  void Unbind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, 0); }
+  void Unbind() const override { glBindTexture(GL_TEXTURE_CUBE_MAP, 0); }
 
   operator Bool() const { return mTexture; }
 };

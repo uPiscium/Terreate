@@ -159,7 +159,7 @@ enum class CullingFace {
 };
 
 // Use to select opengl culling mode.
-enum class CullingMode { CW = GL_CW, CCW = GL_CCW };
+enum class CullingFrontFace { CW = GL_CW, CCW = GL_CCW };
 
 // Use to select opengl cursor mode.
 enum class CursorMode {
@@ -550,6 +550,25 @@ enum class WrappingType {
   CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER,
   MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
   REPEAT = GL_REPEAT
+};
+
+struct ShaderOption {
+  Bool blending = true;
+  Bool culling = false;
+  Bool depth = true;
+  Bool scissor = false;
+  Bool stencil = false;
+  BlendingFunction src = BlendingFunction::SRC_ALPHA;
+  BlendingFunction dst = BlendingFunction::ONE_MINUS_SRC_ALPHA;
+  CullingFace cullFace = CullingFace::BACK;
+  CullingFrontFace frontFace = CullingFrontFace::CCW;
+  DepthFunction depthFunc = DepthFunction::LESS;
+  StencilFunction stencilFunc = StencilFunction::ALWAYS;
+  Int stencilRef = 0;
+  Uint stencilMask = 0xFF;
+  StencilOperation sFail = StencilOperation::KEEP;
+  StencilOperation dpFail = StencilOperation::KEEP;
+  StencilOperation dpPass = StencilOperation::KEEP;
 };
 
 } // namespace Terreate::Graphic
