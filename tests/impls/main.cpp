@@ -4,12 +4,6 @@
 #include <exceptions.hpp>
 #include <graphictest.hpp>
 
-#include <iostream>
-
-namespace Core = Terreate::Test::Core;
-namespace Audio = Terreate::Test::Audio;
-namespace Graphic = Terreate::Test::Graphic;
-
 int main() {
 #ifdef BUILD_CORE_TESTS // Default: OFF
   // Core tests
@@ -33,4 +27,5 @@ int main() {
 #endif // BUILD_GRAPHIC_TESTS
 
   Terreate::Test::Run();
+  return 0;
 }

@@ -55,6 +55,7 @@ private:
   Display mMasterWindow;
   std::mutex mContextMutex;
   std::mutex mThreadMutex;
+  std::mutex mViewportMutex;
 
 private:
   friend class Context;
@@ -66,6 +67,12 @@ public:
 
   Display &GetMasterDisplay() { return mMasterWindow; }
 
+  void SetViewport(Uint const &x, Uint const &y, Uint const &width,
+                   Uint const &height);
+  void SetViewport(Uint const &width, Uint const &height) {
+    this->SetViewport(0, 0, width, height);
+  }
+
   Bool IsRunning() { return mRunning.load(); }
 
   Resource<Context> CreateContext(Uint const &width, Uint const &height,
@@ -75,7 +82,6 @@ public:
   Resource<Context> CreateContext(Uint const &width, Uint const &height,
                                   Str const &title,
                                   WindowSettings const &settings);
-
   void Quit();
 };
 } // namespace Terreate

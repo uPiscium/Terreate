@@ -11,7 +11,7 @@ namespace Terreate::Interface {
 
 struct IEntity {
 public:
-  virtual Core::UUID GetUUID() const = 0;
+  virtual Core::UUID const &GetUUID() const = 0;
   virtual Transform GetTransform() const = 0;
   virtual void SetTransform(Transform const &transform) = 0;
   virtual void Update(Double const &tick) = 0;

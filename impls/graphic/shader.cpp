@@ -1,6 +1,8 @@
 #include <exceptions.hpp>
 #include <graphic/shader.hpp>
 
+#include <iostream>
+
 namespace Terreate::Graphic {
 Str GetShaderLog(Uint const &id) {
   Int status;
@@ -39,7 +41,7 @@ void CheckLinkStatus(Uint const &id) {
   Str log = GetProgramLog(id);
 
   if (log != "") {
-    log = "Shader program log: " + log;
+    std::cout << log << std::endl;
     throw Exceptions::ShaderError(log);
   }
 }
@@ -58,14 +60,14 @@ Shader::~Shader() {
 
 void Shader::Compile(Str const &vertex, Str const &fragment,
                      Str const &geometry) {
-  Str vsrc = "";
-  Str fsrc = "";
-  if (vertex == "") {
+  Str vsrc = vertex;
+  Str fsrc = fragment;
+  if (vsrc == "") {
     vsrc = VERTEX_SHADER_SOURCE_DEFAULT;
     return;
   }
 
-  if (fragment == "") {
+  if (fsrc == "") {
     fsrc = FRAGMENT_SHADER_SOURCE_DEFAULT;
     return;
   }

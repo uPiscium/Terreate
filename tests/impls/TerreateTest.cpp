@@ -22,11 +22,28 @@ public:
 };
 
 class App {
+private:
+  Str vsrc;
+  Str fsrc;
+  Resource<Renderer> renderer;
+  Point point;
+
 public:
+  App() {
+    vsrc = Graphic::Shader::LoadShaderSource(
+        "tests/resources/shaders/pointVert.glsl");
+    fsrc = Graphic::Shader::LoadShaderSource(
+        "tests/resources/shaders/pointFrag.glsl");
+    renderer = Resource<Renderer>::Create(vsrc, fsrc);
+  }
+
   Bool FrameFunction(Context *context) {
+    point = Point({0, 0, 0}, 10);
     context->window->Fill(1.0f, 1.0f, 0.0f);
     context->window->Clear();
+    point.Draw(renderer);
     context->window->Swap();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     return !context->window->IsPressing(Graphic::Keyboard::K_ESCAPE);
   }
 
@@ -59,22 +76,31 @@ void Run() {
           handler.Quit();
       });
 
-  context1->window->onKeyInput +=
-      KeySubscriber([&](Graphic::Window *window, Graphic::Key const &key) {
-        if (key.key == Graphic::Keyboard::K_ENTER && key.pressed) {
-          auto context = handler.CreateContext(400, 300, "Sub window");
-          context->onEnd += ContextSubscriber([&](Context *context) {
-            std::cout << "Sub window has ended" << std::endl;
-          });
-          context->Run(
-              [&app](Context *context) { return app.FrameFunction2(context); });
-        }
+  /* context1->window->onKeyInput += */
+  /*     KeySubscriber([&](Graphic::Window *window, Graphic::Key const &key) {
+   */
+  /*       if (key.key == Graphic::Keyboard::K_ENTER && key.pressed) { */
+  /*         auto context = handler.CreateContext(400, 300, "Sub window"); */
+  /*         context->onEnd += ContextSubscriber([&](Context *context) { */
+  /*           std::cout << "Sub window has ended" << std::endl; */
+  /*         }); */
+  /*         context->Run( */
+  /*             [&app](Context *context) { return app.FrameFunction2(context);
+   * }); */
+  /*       } */
+  /*     }); */
+
+  /* context1->window->onKeyInput += key; */
+  /* context2->window->onKeyInput += key; */
+  /* context3->window->onKeyInput += key; */
+  context4->window->onKeyInput += key;
+
+  auto fb = WindowFramebufferSizeSubscriber(
+      [&](Graphic::Window *window, Uint const &width, Uint const &height) {
+        handler.SetViewport(width, height);
       });
 
-  context1->window->onKeyInput += key;
-  context2->window->onKeyInput += key;
-  context3->window->onKeyInput += key;
-  context4->window->onKeyInput += key;
+  context4->window->onFramebufferSizeChange += fb;
 
   context1->onEnd += ContextSubscriber([&](Context *context) {
     std::cout << "Window 1 has ended" << std::endl;
@@ -94,11 +120,11 @@ void Run() {
   /* t.Delete(); */
 
   context1->Run(
-      [&app](Context *context) { return app.FrameFunction(context); });
+      [&app](Context *context) { return app.FrameFunction2(context); });
   context2->Run(
-      [&app](Context *context) { return app.FrameFunction(context); });
+      [&app](Context *context) { return app.FrameFunction2(context); });
   context3->Run(
-      [&app](Context *context) { return app.FrameFunction(context); });
+      [&app](Context *context) { return app.FrameFunction2(context); });
   context4->Run(
       [&app](Context *context) { return app.FrameFunction(context); });
 

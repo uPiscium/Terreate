@@ -49,7 +49,7 @@ ContextHandler::ContextHandler() {
   setting.visible = false;
   mMasterWindow = Display::Create(1, 1, "Master Window", setting);
   Graphic::InitializeGLAD();
-  glfwMakeContextCurrent(nullptr);
+  // glfwMakeContextCurrent(nullptr);
 }
 
 ContextHandler::~ContextHandler() {
@@ -66,6 +66,12 @@ ContextHandler::~ContextHandler() {
 
   mMasterWindow->Destroy();
   Graphic::Terminate();
+}
+
+void ContextHandler::SetViewport(Uint const &x, Uint const &y,
+                                 Uint const &width, Uint const &height) {
+  std::unique_lock<std::mutex> lock(mViewportMutex);
+  glViewport(0, 0, (Int)width, (Int)height);
 }
 
 Resource<Context>

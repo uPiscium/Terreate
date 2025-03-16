@@ -5,6 +5,7 @@ using namespace Terreate::Types;
 
 Vec<Float> const &BufferDataConstructor::GetVertexData() const {
   if (!mConstructed) {
+
     throw Exceptions::BufferError("Data not constructed.");
   }
   return mVertexData;
