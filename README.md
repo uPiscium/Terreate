@@ -20,9 +20,9 @@ These packages are used in this library.
 This library uses `cmake` to build the projects so make sure to install `cmake` before building this library. 
 
 ### on Windows
-1. Install [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)\
-   [Vulkan tutorial - Development environment](https://vulkan-tutorial.com/Development_environment) explains how to set it up in detail.
-3. 
+1. Install [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)(
+   [Vulkan tutorial - Development environment](https://vulkan-tutorial.com/Development_environment) explains how to set it up in detail.)
+2. As described in tutorial above, run the `Bin/vkcube.exe`.
 
 ### with `apt` (ex. Ubuntu)
 
