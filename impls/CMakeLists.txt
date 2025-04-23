@@ -6,13 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "C++ standard : " ${CMAKE_CXX_STANDARD})
 
-add_subdirectory(core)
-add_subdirectory(audio)
-add_subdirectory(graphic)
-add_subdirectory(io)
+# add_subdirectory(audio)
 
-add_library(${PROJECT_NAME} STATIC context.cpp)
+add_library(${PROJECT_NAME} STATIC executor.cpp uuid.cpp)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../includes/Deps/)
-target_include_directories(${PROJECT_NAME} PUBLIC ../includes)
-target_link_libraries(${PROJECT_NAME} CoreComponent AudioComponent GraphicComponent)
+target_include_directories(${PROJECT_NAME} PUBLIC ../include/deps/)
+target_include_directories(${PROJECT_NAME} PUBLIC ../include)

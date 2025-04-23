@@ -18,8 +18,8 @@ message(STATUS "OpenAL-Soft cloned.")
 add_library(${PROJECT_NAME} STATIC ALhelper.cpp buffer.cpp
                                      context.cpp source.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC CoreComponent)
-target_include_directories(${PROJECT_NAME} PUBLIC ../../includes/Deps)
-target_include_directories(${PROJECT_NAME} PUBLIC ../../includes)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../include/deps)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../include)
 set_target_properties(
   ${PROJECT_NAME} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
