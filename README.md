@@ -48,12 +48,14 @@ Install `vulkan-devel` package.
 In this example, build outputs are stored in `<REPOSITRY ROOT DIR>/build/` folder.\
 
 ## `Cmake` options
-### TERREATE_BUILD_TEST
+### `TERREATE_BUILD_TEST`
 Default: ON
+
 Specifies whether to build test code.
 
-### TERREATE_DEBUG_BUILD
+### `TERREATE_DEBUG_BUILD`
 Default: OFF
+
 Specifies whether to build in debug mode. In debug mode, `TERREATE_DEBUG_MODE` is defined.
 
 ## Windows & Linux
