@@ -20,14 +20,26 @@ These packages are used in this library.
 This library uses `cmake` to build the projects so make sure to install `cmake` before building this library. 
 
 ### on Windows
-1. Install [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)(
-   [Vulkan tutorial - Development environment](https://vulkan-tutorial.com/Development_environment) explains how to set it up in detail.)
-2. As described in tutorial above, run the `Bin/vkcube.exe`.
+Install [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)
 
-### with `apt` (ex. Ubuntu)
+> [Vulkan tutorial - Development environment](https://vulkan-tutorial.com/Development_environment) explains how to set it up in detail.
 
-### with `pacman` (ex. Arch)
+### with `apt`
+Install packages below.
+- vulkan-tools
+- libvulkan-dev
+- vulkan-validationlayers-dev
+- spirv-tools
 
+### with `dnf`
+Install packages below.
+- vulkan-tools
+- vulkan-loader-devel
+-  mesa-vulkan-devel
+-  vulkan-validation-layers-devel
+
+### with `pacman`
+Install `vulkan-devel` package.
 
 # Building project
 **Make sure you installed [cmake](https://cmake.org/) before building.**
@@ -45,7 +57,7 @@ Default: OFF
 Specifies whether to build in debug mode. In debug mode, `TERREATE_DEBUG_MODE` is defined.
 
 ## Windows & Linux
-**Make sure you installed [dependencies](#build_dependence) before building.**
+**Make sure you installed dependencies before building.**
 ```shell
 cmake -S . -B build
 cmake --build build
