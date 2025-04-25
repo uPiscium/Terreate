@@ -57,49 +57,33 @@ VkApplicationInfo VulkanTriangle::createAppInfo() {
   return appInfo;
 }
 
-std::vector<char const *> VulkanTriangle::getRequiredExtensions() {
-  uint32_t glfwExtensionCount = 0;
-  char const **glfwExtensions =
-      glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-  std::vector<char const *> extensions(glfwExtensions,
-                                       glfwExtensions + glfwExtensionCount);
-
-#ifdef TERREATE_DEBUG_BUILD
-  extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-#endif
-
-  return extensions;
-}
-
 void VulkanTriangle::createInstance() {
-  // VkInstanceCreateInfo createInfo{};
-  // createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-  // auto appInfo = this->createAppInfo();
-  // createInfo.pApplicationInfo = &appInfo;
-
-  // VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-  // if (this->checkValidationLayerSupport()) {
-  //   this->populateDebugMessengerCreateInfo(debugCreateInfo);
-  //   createInfo.enabledLayerCount =
-  //       static_cast<uint32_t>(VALIDATION_LAYERS.size());
-  //   createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
-  //   createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT
-  //   *)&debugCreateInfo;
-  // }
-
-  // auto exts = this->getRequiredExtensions();
-  // createInfo.enabledExtensionCount = static_cast<uint32_t>(exts.size());
-  // createInfo.ppEnabledExtensionNames = exts.data();
-
-  // if (vkCreateInstance(&createInfo, nullptr, &mInstance) != VK_SUCCESS) {
-  //   throw std::runtime_error("Failed to create instance!");
-  // }
-
-  // this->loadDebugUtilsMessengerEXT();
-
   mDebugger = new TestDebugger();
-  mInstance = Terreate::API::createInstance(
-      "VulkanTriangle", Terreate::API::makeVersion(1, 0, 0), {mDebugger});
+
+  VkInstanceCreateInfo createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+  auto appInfo = this->createAppInfo();
+  createInfo.pApplicationInfo = &appInfo;
+
+  if (Terreate::API::checkValidationLayerSupport()) {
+    createInfo.enabledLayerCount =
+        static_cast<uint32_t>(VALIDATION_LAYERS.size());
+    createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
+    createInfo.pNext = mDebugger->getCreateInfo();
+  }
+
+  auto exts = Terreate::API::getRequiredExts();
+  createInfo.enabledExtensionCount = static_cast<uint32_t>(exts.size());
+  createInfo.ppEnabledExtensionNames = exts.data();
+
+  if (vkCreateInstance(&createInfo, nullptr, &mInstance) != VK_SUCCESS) {
+    throw std::runtime_error("Failed to create instance!");
+  }
+
+  // Terreate::API::loadEXTfunctions(mInstance);
+
+  mInstance =
+      Terreate::API::createInstance("VulkanTriangle", {1, 0, 0}, mDebugger);
 }
 
 bool VulkanTriangle::isCompleteQueueFamily(
@@ -810,7 +794,8 @@ void VulkanTriangle::drawFrame() {
 
 void VulkanTriangle::initVulkan() {
   this->createInstance();
-  this->setupDebugMessenger();
+  // this->setupDebugMessenger();
+  mDebugger->initDebugMessenger(mInstance);
   this->createSurface();
   this->pickPhysicalDevice();
   this->createLogicalDevice();

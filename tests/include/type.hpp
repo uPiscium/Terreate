@@ -25,4 +25,13 @@ template <typename Key, typename Value>
 using umap = std::unordered_map<Key, Value>;
 template <typename Key, typename Value> using map = std::map<Key, Value>;
 
+struct Version {
+  u32 major;
+  u32 minor;
+  u32 patch;
+
+  Version(u32 major, u32 minor, u32 patch)
+      : major(major), minor(minor), patch(patch) {}
+};
+
 } // namespace Terreate::Types

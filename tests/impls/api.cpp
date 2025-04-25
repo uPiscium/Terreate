@@ -4,8 +4,13 @@
 namespace Terreate::API {
 
 DebugObject::DebugObject(VkDebugUtilsObjectNameInfoEXT const &info)
-    : objectType(info.objectType), handle(info.objectHandle),
-      name(info.pObjectName) {}
+    : objectType(info.objectType), handle(info.objectHandle) {
+  if (info.pObjectName) {
+    name = info.pObjectName;
+  } else {
+    name = "Unknown";
+  }
+}
 
 void Debugger::initDebugMessenger(VkInstance instance) {
 #ifdef TERREATE_DEBUG_BUILD
@@ -22,55 +27,49 @@ VKAPI_ATTR VkBool32 VKAPI_CALL Debugger::debugCallbackWrapper(
     VkDebugUtilsMessageTypeFlagsEXT messageType,
     VkDebugUtilsMessengerCallbackDataEXT const *pCallbackData,
     void *pUserData) {
-  // std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
-  return VK_FALSE;
-  // Debugger *debugger = static_cast<Debugger *>(pUserData);
-  // bool result = false;
-  // vec<DebugObject> debugObjects(pCallbackData->pObjects,
-  //                               pCallbackData->pObjects +
-  //                                   pCallbackData->objectCount);
-  // switch (messageSeverity) {
-  // case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-  //   result = debugger->verbose(pCallbackData->pMessage,
-  //                              (MessageType)messageType, debugObjects);
-  //   break;
-  // case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-  //   result = debugger->info(pCallbackData->pMessage,
-  //   (MessageType)messageType,
-  //                           debugObjects);
-  //   break;
-  // case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-  //   result = debugger->warning(pCallbackData->pMessage,
-  //                              (MessageType)messageType, debugObjects);
-  //   break;
-  // case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-  //   result = debugger->error(pCallbackData->pMessage,
-  //   (MessageType)messageType,
-  //                            debugObjects);
-  //   break;
-  // default:
-  //   result = false;
-  //   break;
-  // }
-  // return static_cast<VkBool32>(result);
-}
-
-VkDebugUtilsMessengerCreateInfoEXT Debugger::createDebuggerInfo() {
-  VkDebugUtilsMessengerCreateInfoEXT createInfo{};
-  createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-  createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-  createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                           VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                           VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-  createInfo.pfnUserCallback = Debugger::debugCallbackWrapper;
-  return createInfo;
+  Debugger *debugger = static_cast<Debugger *>(pUserData);
+  bool result = false;
+  vec<DebugObject> debugObjects(pCallbackData->pObjects,
+                                pCallbackData->pObjects +
+                                    pCallbackData->objectCount);
+  switch (messageSeverity) {
+  case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+    result = debugger->verbose(pCallbackData->pMessage,
+                               (MessageType)messageType, debugObjects);
+    break;
+  case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+    result = debugger->info(pCallbackData->pMessage, (MessageType)messageType,
+                            debugObjects);
+    break;
+  case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+    result = debugger->warning(pCallbackData->pMessage,
+                               (MessageType)messageType, debugObjects);
+    break;
+  case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+    result = debugger->error(pCallbackData->pMessage, (MessageType)messageType,
+                             debugObjects);
+    break;
+  default:
+    result = false; // Unknown severity is not an error.
+    break;
+  }
+  return static_cast<VkBool32>(result);
 }
 
 Debugger::Debugger() {
-  mDebugCreateInfo = Debugger::createDebuggerInfo();
+#ifdef TERREATE_DEBUG_BUILD
+  mDebugCreateInfo.sType =
+      VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+  mDebugCreateInfo.messageSeverity =
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+  mDebugCreateInfo.messageType =
+      VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+  mDebugCreateInfo.pfnUserCallback = Debugger::debugCallbackWrapper;
 
   if (checkValidationLayerSupport()) {
     mDebugCreateInfo.pUserData = this;
@@ -78,6 +77,7 @@ Debugger::Debugger() {
   } else {
     throw Exception::ValidationLayerNotSupported();
   }
+#endif
 }
 
 Debugger::~Debugger() {
@@ -103,24 +103,6 @@ void loadEXTfunctions(VkInstance instance) {
     throw Exception::DebugMessengerFunctionLoadFailure();
   }
 #endif
-}
-
-u32 makeVersion(u32 const major, u32 const minor, u32 const patch) {
-  return VK_MAKE_VERSION(major, minor, patch);
-}
-
-VkApplicationInfo createAppInfo(str const &appName, u32 const appVersion,
-                                str const &engineName, u32 const engineVersion,
-                                u32 const apiVersion) {
-  VkApplicationInfo appInfo{};
-  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-
-  appInfo.pApplicationName = appName.c_str();
-  appInfo.applicationVersion = appVersion;
-  appInfo.pEngineName = engineName.c_str();
-  appInfo.engineVersion = engineVersion;
-  appInfo.apiVersion = apiVersion;
-  return appInfo;
 }
 
 vec<char const *> getRequiredExts() {
@@ -173,11 +155,11 @@ VkInstance createInstance(VkApplicationInfo const &appInfo,
   createInfo.pNext = nullptr;
 
 #ifdef TERREATE_DEBUG_BUILD
-  auto debuggerInfo = Debugger::createDebuggerInfo();
   createInfo.enabledLayerCount =
       static_cast<uint32_t>(VALIDATION_LAYERS.size());
   createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
-  createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debuggerInfo;
+  createInfo.pNext =
+      (VkDebugUtilsMessengerCreateInfoEXT *)debugger->getCreateInfo();
 #endif
 
   auto exts = getRequiredExts();
@@ -197,9 +179,18 @@ VkInstance createInstance(VkApplicationInfo const &appInfo,
   return instance;
 }
 
-VkInstance createInstance(str const &appName, u32 appVersion,
+VkInstance createInstance(str const &appName, Version appVersion,
                           Debugger *debugger) {
-  auto appInfo = createAppInfo(appName, appVersion);
+  VkApplicationInfo appInfo{};
+  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+
+  appInfo.pApplicationName = appName.c_str();
+  appInfo.applicationVersion =
+      VK_MAKE_VERSION(appVersion.major, appVersion.minor, appVersion.patch);
+  appInfo.pEngineName = "No Engine";
+  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.apiVersion = VK_API_VERSION_1_4;
+
   VkInstanceCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
   createInfo.pApplicationInfo = &appInfo;
@@ -207,22 +198,24 @@ VkInstance createInstance(str const &appName, u32 appVersion,
   createInfo.ppEnabledLayerNames = nullptr;
   createInfo.pNext = nullptr;
 
-#ifdef TERREATE_DEBUG_BUILD
-  auto debuggerInfo = Debugger::createDebuggerInfo();
-  createInfo.enabledLayerCount =
-      static_cast<uint32_t>(VALIDATION_LAYERS.size());
-  createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
-  createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debuggerInfo;
-#endif
-
   auto exts = getRequiredExts();
   createInfo.enabledExtensionCount = static_cast<uint32_t>(exts.size());
   createInfo.ppEnabledExtensionNames = exts.data();
+
+#ifdef TERREATE_DEBUG_BUILD
+  createInfo.enabledLayerCount =
+      static_cast<uint32_t>(VALIDATION_LAYERS.size());
+  createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
+  createInfo.pNext =
+      (VkDebugUtilsMessengerCreateInfoEXT *)debugger->getCreateInfo();
+#endif
 
   VkInstance instance;
   if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
     throw Exception::InstanceCreationFailure();
   }
+
+  std::cout << "Vulkan instance created." << std::endl;
 
 #ifdef TERREATE_DEBUG_BUILD
   debugger->initDebugMessenger(instance);

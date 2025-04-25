@@ -43,23 +43,23 @@ class TestDebugger : public Debugger {
 public:
   bool verbose(str const &message, Debugger::MessageType const type,
                vec<DebugObject> const &object) override {
-    std::cout << message << std::endl;
-    return true;
+    // std::cout << message << std::endl;
+    return false;
   }
   bool info(str const &message, Debugger::MessageType const type,
             vec<DebugObject> const &object) override {
-    std::cout << message << std::endl;
-    return true;
+    // std::cout << message << std::endl;
+    return false;
   }
   bool warning(str const &message, Debugger::MessageType const type,
                vec<DebugObject> const &object) override {
     std::cout << message << std::endl;
-    return true;
+    return false;
   }
   bool error(str const &message, Debugger::MessageType const type,
              vec<DebugObject> const &object) override {
     std::cout << message << std::endl;
-    return true;
+    return false;
   }
 };
 
@@ -103,12 +103,7 @@ private:
   void initWindow();
   void loadDebugUtilsMessengerEXT();
 
-  bool checkValidationLayerSupport();
-  void populateDebugMessengerCreateInfo(
-      VkDebugUtilsMessengerCreateInfoEXT &createInfo);
-  void setupDebugMessenger();
   VkApplicationInfo createAppInfo();
-  std::vector<char const *> getRequiredExtensions();
   void createInstance();
   bool isCompleteQueueFamily(QueueFamilyIndices const &queueFamily);
 

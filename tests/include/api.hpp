@@ -51,8 +51,6 @@ public:
       VkDebugUtilsMessengerCallbackDataEXT const *pCallbackData,
       void *pUserData);
 
-  static VkDebugUtilsMessengerCreateInfoEXT createDebuggerInfo();
-
 public:
   Debugger();
   ~Debugger();
@@ -70,14 +68,9 @@ public:
 };
 
 void loadEXTfunctions(VkInstance instance);
-u32 makeVersion(u32 const major, u32 const minor, u32 const patch);
-VkApplicationInfo createAppInfo(str const &appName, u32 const appVersion,
-                                str const &engineName = "",
-                                u32 const engineVersion = makeVersion(1, 0, 0),
-                                u32 const apiVersion = VK_API_VERSION_1_4);
 vec<char const *> getRequiredExts();
 bool checkValidationLayerSupport();
 VkInstance createInstance(VkApplicationInfo const &appInfo, Debugger *debugger);
-VkInstance createInstance(str const &appName, u32 appVersion,
+VkInstance createInstance(str const &appName, Version appVersion,
                           Debugger *debugger);
 } // namespace Terreate::API
