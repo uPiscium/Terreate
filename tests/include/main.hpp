@@ -48,7 +48,7 @@ public:
   }
   bool info(str const &message, Debugger::MessageType const type,
             vec<DebugObject> const &object) override {
-    // std::cout << message << std::endl;
+    std::cout << message << std::endl;
     return false;
   }
   bool warning(str const &message, Debugger::MessageType const type,
@@ -101,7 +101,6 @@ public:
 
 private:
   void initWindow();
-  void loadDebugUtilsMessengerEXT();
 
   VkApplicationInfo createAppInfo();
   void createInstance();

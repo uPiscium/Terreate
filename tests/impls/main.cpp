@@ -32,20 +32,6 @@ void VulkanTriangle::initWindow() {
       glfwCreateWindow(WIDTH, HEIGHT, "Vulkan Triangle", nullptr, nullptr);
 }
 
-void VulkanTriangle::loadDebugUtilsMessengerEXT() {
-  trCreateDebugUtilsMessengerEXT =
-      (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-          mInstance, "vkCreateDebugUtilsMessengerEXT");
-  trDestroyDebugUtilsMessengerEXT =
-      (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-          mInstance, "vkDestroyDebugUtilsMessengerEXT");
-
-  if (!trCreateDebugUtilsMessengerEXT || !trDestroyDebugUtilsMessengerEXT) {
-    throw std::runtime_error("Could not load vkCreateDebugUtilsMessengerEXT or "
-                             "vkDestroyDebugUtilsMessengerEXT!");
-  }
-}
-
 VkApplicationInfo VulkanTriangle::createAppInfo() {
   VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -62,7 +48,7 @@ void VulkanTriangle::createInstance() {
 
   VkInstanceCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-  auto appInfo = this->createAppInfo();
+  auto appInfo = Terreate::API::createAppInfo("Vulkan Triangle", {1, 0, 0});
   createInfo.pApplicationInfo = &appInfo;
 
   if (Terreate::API::checkValidationLayerSupport()) {
@@ -80,10 +66,8 @@ void VulkanTriangle::createInstance() {
     throw std::runtime_error("Failed to create instance!");
   }
 
-  // Terreate::API::loadEXTfunctions(mInstance);
-
-  mInstance =
-      Terreate::API::createInstance("VulkanTriangle", {1, 0, 0}, mDebugger);
+  Terreate::API::loadEXTfunctions(mInstance);
+  // mInstance = Terreate::API::createInstance(appInfo, mDebugger);
 }
 
 bool VulkanTriangle::isCompleteQueueFamily(

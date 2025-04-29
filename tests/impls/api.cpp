@@ -145,6 +145,21 @@ bool checkValidationLayerSupport() {
   return true;
 }
 
+VkApplicationInfo createAppInfo(char const *appName, Version appVersion,
+                                char const *engineName, Version engineVersion,
+                                u32 apiVersion) {
+  VkApplicationInfo appInfo{};
+  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  appInfo.pApplicationName = appName;
+  appInfo.applicationVersion =
+      VK_MAKE_VERSION(appVersion.major, appVersion.minor, appVersion.patch);
+  appInfo.pEngineName = engineName;
+  appInfo.engineVersion = VK_MAKE_VERSION(
+      engineVersion.major, engineVersion.minor, engineVersion.patch);
+  appInfo.apiVersion = apiVersion;
+  return appInfo;
+}
+
 VkInstance createInstance(VkApplicationInfo const &appInfo,
                           Debugger *debugger) {
   VkInstanceCreateInfo createInfo{};
@@ -154,6 +169,10 @@ VkInstance createInstance(VkApplicationInfo const &appInfo,
   createInfo.ppEnabledLayerNames = nullptr;
   createInfo.pNext = nullptr;
 
+  auto exts = getRequiredExts();
+  createInfo.enabledExtensionCount = static_cast<uint32_t>(exts.size());
+  createInfo.ppEnabledExtensionNames = exts.data();
+
 #ifdef TERREATE_DEBUG_BUILD
   createInfo.enabledLayerCount =
       static_cast<uint32_t>(VALIDATION_LAYERS.size());
@@ -162,66 +181,23 @@ VkInstance createInstance(VkApplicationInfo const &appInfo,
       (VkDebugUtilsMessengerCreateInfoEXT *)debugger->getCreateInfo();
 #endif
 
-  auto exts = getRequiredExts();
-  createInfo.enabledExtensionCount = static_cast<uint32_t>(exts.size());
-  createInfo.ppEnabledExtensionNames = exts.data();
-
   VkInstance instance;
   if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
     throw Exception::InstanceCreationFailure();
   }
+  loadEXTfunctions(instance);
 
 #ifdef TERREATE_DEBUG_BUILD
   debugger->initDebugMessenger(instance);
 #endif
 
-  loadEXTfunctions(instance);
   return instance;
 }
 
 VkInstance createInstance(str const &appName, Version appVersion,
                           Debugger *debugger) {
-  VkApplicationInfo appInfo{};
-  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-
-  appInfo.pApplicationName = appName.c_str();
-  appInfo.applicationVersion =
-      VK_MAKE_VERSION(appVersion.major, appVersion.minor, appVersion.patch);
-  appInfo.pEngineName = "No Engine";
-  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-  appInfo.apiVersion = VK_API_VERSION_1_4;
-
-  VkInstanceCreateInfo createInfo{};
-  createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-  createInfo.pApplicationInfo = &appInfo;
-  createInfo.enabledLayerCount = 0;
-  createInfo.ppEnabledLayerNames = nullptr;
-  createInfo.pNext = nullptr;
-
-  auto exts = getRequiredExts();
-  createInfo.enabledExtensionCount = static_cast<uint32_t>(exts.size());
-  createInfo.ppEnabledExtensionNames = exts.data();
-
-#ifdef TERREATE_DEBUG_BUILD
-  createInfo.enabledLayerCount =
-      static_cast<uint32_t>(VALIDATION_LAYERS.size());
-  createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
-  createInfo.pNext =
-      (VkDebugUtilsMessengerCreateInfoEXT *)debugger->getCreateInfo();
-#endif
-
-  VkInstance instance;
-  if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
-    throw Exception::InstanceCreationFailure();
-  }
-
-  std::cout << "Vulkan instance created." << std::endl;
-
-#ifdef TERREATE_DEBUG_BUILD
-  debugger->initDebugMessenger(instance);
-#endif
-
-  loadEXTfunctions(instance);
-  return instance;
+  VkApplicationInfo appInfo = createAppInfo(
+      appName.c_str(), appVersion, "No Engine", {1, 0, 0}, VK_API_VERSION_1_4);
+  return createInstance(appInfo, debugger);
 }
 } // namespace Terreate::API

@@ -70,6 +70,10 @@ public:
 void loadEXTfunctions(VkInstance instance);
 vec<char const *> getRequiredExts();
 bool checkValidationLayerSupport();
+VkApplicationInfo createAppInfo(char const *appName, Version appVersion,
+                                char const *engineName = "No Engine",
+                                Version engineVersion = {1, 0, 0},
+                                u32 apiVersion = VK_API_VERSION_1_4);
 VkInstance createInstance(VkApplicationInfo const &appInfo, Debugger *debugger);
 VkInstance createInstance(str const &appName, Version appVersion,
                           Debugger *debugger);
