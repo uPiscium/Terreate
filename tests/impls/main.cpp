@@ -32,42 +32,10 @@ void VulkanTriangle::initWindow() {
       glfwCreateWindow(WIDTH, HEIGHT, "Vulkan Triangle", nullptr, nullptr);
 }
 
-VkApplicationInfo VulkanTriangle::createAppInfo() {
-  VkApplicationInfo appInfo{};
-  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  appInfo.pApplicationName = "Vulkan Triangle";
-  appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-  appInfo.pEngineName = "No Engine";
-  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-  appInfo.apiVersion = VK_API_VERSION_1_4;
-  return appInfo;
-}
-
 void VulkanTriangle::createInstance() {
-  mDebugger = new TestDebugger();
-
-  VkInstanceCreateInfo createInfo{};
-  createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-  auto appInfo = Terreate::API::createAppInfo("Vulkan Triangle", {1, 0, 0});
-  createInfo.pApplicationInfo = &appInfo;
-
-  if (Terreate::API::checkValidationLayerSupport()) {
-    createInfo.enabledLayerCount =
-        static_cast<uint32_t>(VALIDATION_LAYERS.size());
-    createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
-    createInfo.pNext = mDebugger->getCreateInfo();
-  }
-
-  auto exts = Terreate::API::getRequiredExts();
-  createInfo.enabledExtensionCount = static_cast<uint32_t>(exts.size());
-  createInfo.ppEnabledExtensionNames = exts.data();
-
-  if (vkCreateInstance(&createInfo, nullptr, &mInstance) != VK_SUCCESS) {
-    throw std::runtime_error("Failed to create instance!");
-  }
-
-  Terreate::API::loadEXTfunctions(mInstance);
-  // mInstance = Terreate::API::createInstance(appInfo, mDebugger);
+  // mDebugger = new TestDebugger();
+  // mInstance =
+  //     Terreate::API::createInstance("VulkanTriangle", {1, 0, 0}, mDebugger);
 }
 
 bool VulkanTriangle::isCompleteQueueFamily(
@@ -186,13 +154,14 @@ VulkanTriangle::querySwapchainSupport(VkPhysicalDevice device) {
 }
 
 void VulkanTriangle::pickPhysicalDevice() {
+  auto instance = mVulkanInstance->getInstance();
   uint32_t deviceCount = 0;
-  vkEnumeratePhysicalDevices(mInstance, &deviceCount, nullptr);
+  vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
   if (deviceCount == 0) {
     throw std::runtime_error("Failed to find GPUs with Vulkan support!");
   }
   std::vector<VkPhysicalDevice> devices(deviceCount);
-  vkEnumeratePhysicalDevices(mInstance, &deviceCount, devices.data());
+  vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
   for (auto &device : devices) {
     if (!this->checkDeviceExtensionSupport(device)) {
@@ -267,7 +236,8 @@ void VulkanTriangle::createLogicalDevice() {
 }
 
 void VulkanTriangle::createSurface() {
-  if (glfwCreateWindowSurface(mInstance, mWindow, nullptr, &mSurface) !=
+  auto instance = mVulkanInstance->getInstance();
+  if (glfwCreateWindowSurface(instance, mWindow, nullptr, &mSurface) !=
       VK_SUCCESS) {
     throw std::runtime_error("Failed to create window surface!");
   }
@@ -777,9 +747,8 @@ void VulkanTriangle::drawFrame() {
 }
 
 void VulkanTriangle::initVulkan() {
-  this->createInstance();
-  // this->setupDebugMessenger();
-  mDebugger->initDebugMessenger(mInstance);
+  // this->createInstance();
+  // mDebugger->initDebugMessenger(mInstance);
   this->createSurface();
   this->pickPhysicalDevice();
   this->createLogicalDevice();
@@ -818,17 +787,23 @@ void VulkanTriangle::cleanup() {
   }
   vkDestroySwapchainKHR(mDevice, mSwapchain, nullptr);
   vkDestroyDevice(mDevice, nullptr);
-  if (mDebugMessenger != nullptr) {
-    trDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
-  }
-  vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
-  vkDestroyInstance(mInstance, nullptr);
+  // if (mDebugMessenger != nullptr) {
+  //   trDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
+  // }
+  mDebugger.Delete();
+  auto instance = mVulkanInstance->getInstance();
+  vkDestroySurfaceKHR(instance, mSurface, nullptr);
+  // vkDestroyInstance(mInstance, nullptr);
+  mVulkanInstance.Delete();
   glfwDestroyWindow(mWindow);
   glfwTerminate();
 }
 
 VulkanTriangle::VulkanTriangle() {
   this->initWindow();
+  mDebugger = Terreate::Core::Resource<TestDebugger>::Create();
+  mVulkanInstance = Terreate::Core::Resource<VulkanInstance>::Create(
+      "VulkanTriangle", Version{1, 0, 0}, mDebugger);
   this->initVulkan();
 }
 

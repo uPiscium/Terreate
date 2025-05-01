@@ -11,6 +11,7 @@
 #include <glfw/glfw3.h>
 
 #include <api.hpp>
+#include <resource.hpp>
 #include <type.hpp>
 
 int const WIDTH = 800;
@@ -65,9 +66,10 @@ public:
 
 class VulkanTriangle {
 private:
-  TestDebugger *mDebugger;
   GLFWwindow *mWindow;
-  VkInstance mInstance;
+  Terreate::Core::Resource<TestDebugger> mDebugger;
+  Terreate::Core::Resource<VulkanInstance> mVulkanInstance;
+  // VkInstance mInstance;
   VkDebugUtilsMessengerEXT mDebugMessenger;
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   std::multimap<int, VkPhysicalDevice> mDevices;
@@ -77,9 +79,9 @@ private:
   VkSurfaceKHR mSurface;
   VkSwapchainKHR mSwapchain;
   SwapchainProperty mSwapchainProperty;
-  std::vector<VkImage> mSwapchainImages;
-  std::vector<VkImageView> mSwapchainImageViews;
-  std::vector<VkFramebuffer> mSwapchainFramebuffers;
+  vec<VkImage> mSwapchainImages;
+  vec<VkImageView> mSwapchainImageViews;
+  vec<VkFramebuffer> mSwapchainFramebuffers;
   VkRenderPass mRenderPass;
   VkPipelineLayout mPipelineLayout;
   VkPipeline mGraphicsPipeline;
@@ -102,7 +104,6 @@ public:
 private:
   void initWindow();
 
-  VkApplicationInfo createAppInfo();
   void createInstance();
   bool isCompleteQueueFamily(QueueFamilyIndices const &queueFamily);
 
@@ -114,9 +115,9 @@ private:
   void createLogicalDevice();
   void createSurface();
   VkSurfaceFormatKHR
-  pickSurfaceFormat(std::vector<VkSurfaceFormatKHR> const &availableFormats);
+  pickSurfaceFormat(vec<VkSurfaceFormatKHR> const &availableFormats);
   VkPresentModeKHR
-  pickPresentMode(std::vector<VkPresentModeKHR> const &availablePresentModes);
+  pickPresentMode(vec<VkPresentModeKHR> const &availablePresentModes);
   VkExtent2D pickExtent(VkSurfaceCapabilitiesKHR const &capabilities);
   void createSwapchain();
   void createImageViews();

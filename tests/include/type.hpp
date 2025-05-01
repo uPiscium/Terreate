@@ -1,6 +1,16 @@
 #pragma once
 
-#include <bits/stdc++.h>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 namespace Terreate::Types {
 static char const *VK_LAYER_KHRONOS_VALIDATION = "VK_LAYER_KHRONOS_validation";
@@ -24,6 +34,7 @@ template <typename T> using set = std::set<T>;
 template <typename Key, typename Value>
 using umap = std::unordered_map<Key, Value>;
 template <typename Key, typename Value> using map = std::map<Key, Value>;
+template <typename T> using shared = std::shared_ptr<T>;
 
 struct Version {
   u32 major;

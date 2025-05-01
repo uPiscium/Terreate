@@ -46,4 +46,9 @@ public:
   InstanceCreationFailure()
       : VulkanAPIError("Failed to create Vulkan instance.") {}
 };
+
+class NullReferenceException : public TerreateException {
+public:
+  NullReferenceException(str const &message) : TerreateException(message) {}
+};
 } // namespace Terreate::Exception

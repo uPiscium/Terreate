@@ -4,6 +4,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <glfw/glfw3.h>
 
+#include <resource.hpp>
 #include <type.hpp>
 
 namespace Terreate::API {
@@ -65,6 +66,37 @@ public:
                        vec<DebugObject> const &objects) = 0;
   virtual bool error(str const &message, MessageType const messageType,
                      vec<DebugObject> const &objects) = 0;
+};
+
+class VulkanInstance {
+private:
+  VkInstance mInstance;
+  Core::Resource<Debugger> mDebugger;
+
+private:
+  void loadEXTfunctions();
+  vec<char const *> getRequiredExts();
+  VkApplicationInfo createAppInfo(char const *appName, Version appVersion,
+                                  char const *engineName, Version engineVersion,
+                                  u32 apiVersion);
+
+public:
+  VulkanInstance(str const &appName, Version appVersion, str const &engineName,
+                 Version engineVersion, u32 apiVersion,
+                 Core::Resource<Debugger> debugger = nullptr);
+  VulkanInstance(str const &appName, Version appVersion, str const &engineName,
+                 Version engineVersion,
+                 Core::Resource<Debugger> debugger = nullptr);
+  VulkanInstance(str const &appName, Version appVersion,
+                 Core::Resource<Debugger> debugger = nullptr);
+  ~VulkanInstance();
+
+  VkInstance const &getInstance() const;
+  Core::Resource<Debugger> getDebugger() const;
+
+  bool isValidationLayerSupported() const;
+
+  void initInstance();
 };
 
 void loadEXTfunctions(VkInstance instance);
