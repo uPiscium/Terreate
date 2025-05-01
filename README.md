@@ -1,7 +1,9 @@
 # Terreate
 license : [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)\
 Terreate is a 3D game library for C++. This repository is designed for creating 3D games with Vulkan and OpenAL.
-- [Reference Page](https://upiscium.github.io/Terreate-Wiki/)
+> [!NOTE]
+> `Terreate` has its own wiki page that provides more details about, including a quick start guide, API definitions, and more!
+> - [Terreate wiki](https://upiscium.github.io/Terreate-Wiki/)
 
 # Dependencies
 ## Library dependence
@@ -22,6 +24,7 @@ This library uses `cmake` to build the projects so make sure to install `cmake` 
 ### on Windows
 Install [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)
 
+> [!TIP]
 > [Vulkan tutorial - Development environment](https://vulkan-tutorial.com/Development_environment) explains how to set it up in detail.
 
 ### with `apt`
@@ -42,21 +45,20 @@ Install packages below.
 Install `vulkan-devel` package.
 
 # Building project
-**Make sure you installed [cmake](https://cmake.org/) before building.**
+> [!IMPORTANT]
+> **Make sure you installed [cmake](https://cmake.org/) before building.**
 
 ## Build outputs
 In this example, build outputs are stored in `<REPOSITRY ROOT DIR>/build/` folder.\
 
 ## `Cmake` options
 ### `TERREATE_BUILD_TEST`
-Default: ON
-
-Specifies whether to build test code.
+- Default: ON
+- Specifies whether to build test code.
 
 ### `TERREATE_DEBUG_BUILD`
-Default: OFF
-
-Specifies whether to build in debug mode. In debug mode, `TERREATE_DEBUG_MODE` is defined.
+- Default: OFF
+- Specifies whether to build in debug mode. In debug mode, `TERREATE_DEBUG_MODE` is automatically defined by `cmake`.
 
 ## Windows & Linux
 **Make sure you installed dependencies before building.**
