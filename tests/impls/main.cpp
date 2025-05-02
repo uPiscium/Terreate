@@ -791,7 +791,7 @@ void VulkanTriangle::cleanup() {
   auto instance = mVulkanInstance->getInstance();
   vkDestroySurfaceKHR(instance, mSurface, nullptr);
 
-  mVulkanInstance.Delete();
+  mVulkanInstance = nullptr;
 
   glfwDestroyWindow(mWindow);
   glfwTerminate();
@@ -799,9 +799,9 @@ void VulkanTriangle::cleanup() {
 
 VulkanTriangle::VulkanTriangle() {
   this->initWindow();
-  auto debugger = Terreate::Core::Resource<TestDebugger>::Create();
-  mVulkanInstance = Terreate::Core::Resource<VulkanInstance>::Create(
-      "VulkanTriangle", Version{1, 0, 0}, debugger);
+  // auto debugger = Terreate::Core::Resource<TestDebugger>::Create();
+  mVulkanInstance = std::make_shared<VulkanInstance>(
+      "VulkanTriangle", Version{1, 0, 0}, std::make_shared<TestDebugger>());
   this->initVulkan();
 }
 

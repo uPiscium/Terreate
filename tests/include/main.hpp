@@ -67,7 +67,7 @@ public:
 class VulkanTriangle {
 private:
   GLFWwindow *mWindow;
-  Terreate::Core::Resource<VulkanInstance> mVulkanInstance;
+  shared<VulkanInstance> mVulkanInstance;
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   std::multimap<int, VkPhysicalDevice> mDevices;
   VkDevice mDevice;

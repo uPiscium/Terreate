@@ -71,7 +71,7 @@ public:
 class VulkanInstance {
 private:
   VkInstance mInstance;
-  Core::Resource<Debugger> mDebugger;
+  shared<Debugger> mDebugger;
 
 private:
   void loadEXTfunctions();
@@ -83,16 +83,15 @@ private:
 public:
   VulkanInstance(str const &appName, Version appVersion, str const &engineName,
                  Version engineVersion, u32 apiVersion,
-                 Core::Resource<Debugger> debugger = nullptr);
+                 shared<Debugger> debugger = nullptr);
   VulkanInstance(str const &appName, Version appVersion, str const &engineName,
-                 Version engineVersion,
-                 Core::Resource<Debugger> debugger = nullptr);
+                 Version engineVersion, shared<Debugger> debugger = nullptr);
   VulkanInstance(str const &appName, Version appVersion,
-                 Core::Resource<Debugger> debugger = nullptr);
+                 shared<Debugger> debugger = nullptr);
   ~VulkanInstance();
 
   VkInstance const &getInstance() const;
-  Core::Resource<Debugger> getDebugger() const;
+  shared<Debugger> getDebugger() const;
 
   bool isValidationLayerSupported() const;
 

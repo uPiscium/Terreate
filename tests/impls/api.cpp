@@ -137,8 +137,7 @@ VkApplicationInfo VulkanInstance::createAppInfo(char const *appName,
 
 VulkanInstance::VulkanInstance(str const &appName, Version appVersion,
                                str const &engineName, Version engineVersion,
-                               u32 apiVersion,
-                               Core::Resource<Debugger> debugger)
+                               u32 apiVersion, shared<Debugger> debugger)
     : mDebugger(debugger) {
   auto appInfo =
       this->createAppInfo(appName.c_str(), appVersion, engineName.c_str(),
@@ -173,23 +172,24 @@ VulkanInstance::VulkanInstance(str const &appName, Version appVersion,
 }
 
 VulkanInstance::VulkanInstance(str const &appName, Version appVersion,
-                               Core::Resource<Debugger> debugger)
+                               shared<Debugger> debugger)
     : VulkanInstance(appName, appVersion, "No Engine", {1, 0, 0},
                      VK_API_VERSION_1_4, debugger) {}
 
 VulkanInstance::VulkanInstance(str const &appName, Version appVersion,
                                str const &engineName, Version engineVersion,
-                               Core::Resource<Debugger> debugger)
+                               shared<Debugger> debugger)
     : VulkanInstance(appName, appVersion, engineName, engineVersion,
                      VK_API_VERSION_1_4, debugger) {}
 
-VulkanInstance::~VulkanInstance() { vkDestroyInstance(mInstance, nullptr); }
+VulkanInstance::~VulkanInstance() {
+  mDebugger = nullptr;
+  vkDestroyInstance(mInstance, nullptr);
+}
 
 VkInstance const &VulkanInstance::getInstance() const { return mInstance; }
 
-Core::Resource<Debugger> VulkanInstance::getDebugger() const {
-  return mDebugger;
-}
+shared<Debugger> VulkanInstance::getDebugger() const { return mDebugger; }
 
 bool VulkanInstance::isValidationLayerSupported() const {
   uint32_t layerCount;
