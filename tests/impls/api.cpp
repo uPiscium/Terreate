@@ -183,14 +183,7 @@ VulkanInstance::VulkanInstance(str const &appName, Version appVersion,
     : VulkanInstance(appName, appVersion, engineName, engineVersion,
                      VK_API_VERSION_1_4, debugger) {}
 
-VulkanInstance::~VulkanInstance() {
-#ifdef TERREATE_DEBUG_BUILD
-  if (mDebugger) {
-    mDebugger.Delete();
-  }
-#endif
-  vkDestroyInstance(mInstance, nullptr);
-}
+VulkanInstance::~VulkanInstance() { vkDestroyInstance(mInstance, nullptr); }
 
 VkInstance const &VulkanInstance::getInstance() const { return mInstance; }
 

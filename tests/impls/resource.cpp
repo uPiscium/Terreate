@@ -1,3 +1,4 @@
+
 #include <resource.hpp>
 
 namespace Terreate::Core::ResourceUtils {
@@ -35,7 +36,7 @@ void SharedCount::Delete() {
     CounterBase *temp = mCount;
     mCount = nullptr;
     temp->Dispose();
-    delete mCount;
+    delete temp;
   }
 }
 

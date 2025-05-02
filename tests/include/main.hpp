@@ -67,10 +67,7 @@ public:
 class VulkanTriangle {
 private:
   GLFWwindow *mWindow;
-  Terreate::Core::Resource<TestDebugger> mDebugger;
   Terreate::Core::Resource<VulkanInstance> mVulkanInstance;
-  // VkInstance mInstance;
-  VkDebugUtilsMessengerEXT mDebugMessenger;
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   std::multimap<int, VkPhysicalDevice> mDevices;
   VkDevice mDevice;

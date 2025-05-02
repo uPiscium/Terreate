@@ -787,23 +787,21 @@ void VulkanTriangle::cleanup() {
   }
   vkDestroySwapchainKHR(mDevice, mSwapchain, nullptr);
   vkDestroyDevice(mDevice, nullptr);
-  // if (mDebugMessenger != nullptr) {
-  //   trDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
-  // }
-  mDebugger.Delete();
+
   auto instance = mVulkanInstance->getInstance();
   vkDestroySurfaceKHR(instance, mSurface, nullptr);
-  // vkDestroyInstance(mInstance, nullptr);
+
   mVulkanInstance.Delete();
+
   glfwDestroyWindow(mWindow);
   glfwTerminate();
 }
 
 VulkanTriangle::VulkanTriangle() {
   this->initWindow();
-  mDebugger = Terreate::Core::Resource<TestDebugger>::Create();
+  auto debugger = Terreate::Core::Resource<TestDebugger>::Create();
   mVulkanInstance = Terreate::Core::Resource<VulkanInstance>::Create(
-      "VulkanTriangle", Version{1, 0, 0}, mDebugger);
+      "VulkanTriangle", Version{1, 0, 0}, debugger);
   this->initVulkan();
 }
 
