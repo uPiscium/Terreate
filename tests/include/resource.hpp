@@ -3,7 +3,7 @@
 #include <type.hpp>
 
 namespace Terreate::Core::ResourceUtils {
-using namespace Terreate::Types;
+using namespace Terreate::Type;
 template <typename S> struct ResourceTypeTraits {
   typedef S *Ptr;
   typedef S const *CPtr;
@@ -94,7 +94,7 @@ public:
 } // namespace Terreate::Core::ResourceUtils
 
 namespace Terreate::Core {
-using namespace Terreate::Types;
+using namespace Terreate::Type;
 
 template <typename T> class Resource {
 private:
@@ -137,6 +137,7 @@ public:
   void Delete() {
     if (mResourcePtr != nullptr) {
       mCounter.Delete();
+      mResourcePtr = nullptr;
     }
   }
 

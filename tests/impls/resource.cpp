@@ -33,10 +33,9 @@ u64 const &SharedCount::GetCount() const { return mCount->GetCount(); }
 
 void SharedCount::Delete() {
   if (mCount) {
-    CounterBase *temp = mCount;
+    mCount->Dispose();
+    delete mCount;
     mCount = nullptr;
-    temp->Dispose();
-    delete temp;
   }
 }
 

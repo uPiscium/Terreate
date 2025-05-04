@@ -3,7 +3,7 @@
 #include <type.hpp>
 
 namespace Terreate::Exception {
-using namespace Terreate::Types;
+using namespace Terreate::Type;
 
 class TerreateException : public std::exception {
 private:
@@ -16,6 +16,17 @@ public:
     return mMessage.c_str();
   }
   virtual str message() const noexcept { return mMessage; }
+};
+
+class NullReferenceException : public TerreateException {
+public:
+  NullReferenceException(str const &message) : TerreateException(message) {}
+};
+
+class GLFWInitializeFailure : public TerreateException {
+public:
+  GLFWInitializeFailure()
+      : TerreateException("Failed to initialize GLFW library.") {}
 };
 
 class VulkanAPIError : public TerreateException {
@@ -45,10 +56,5 @@ class InstanceCreationFailure : public VulkanAPIError {
 public:
   InstanceCreationFailure()
       : VulkanAPIError("Failed to create Vulkan instance.") {}
-};
-
-class NullReferenceException : public TerreateException {
-public:
-  NullReferenceException(str const &message) : TerreateException(message) {}
 };
 } // namespace Terreate::Exception

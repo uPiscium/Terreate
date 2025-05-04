@@ -12,7 +12,11 @@
 #include <unordered_set>
 #include <vector>
 
-namespace Terreate::Types {
+#define PROHIBIT_COPY_AND_ASSIGN(ClassName)                                    \
+  ClassName(ClassName const &) = delete;                                       \
+  ClassName &operator=(ClassName const &) = delete;
+
+namespace Terreate::Type {
 static char const *VK_LAYER_KHRONOS_VALIDATION = "VK_LAYER_KHRONOS_validation";
 static std::vector<char const *> const VALIDATION_LAYERS = {
     VK_LAYER_KHRONOS_VALIDATION};
@@ -45,4 +49,4 @@ struct Version {
       : major(major), minor(minor), patch(patch) {}
 };
 
-} // namespace Terreate::Types
+} // namespace Terreate::Type
