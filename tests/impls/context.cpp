@@ -1,6 +1,7 @@
+#include "hubptr.hpp"
 #include <context.hpp>
 
-namespace Terreate {
+namespace Terreate::Core {
 TerreateContext::TerreateContext() {
   // Initialize GLFW
   if (!glfwInit()) {
@@ -12,7 +13,23 @@ TerreateContext::TerreateContext() {
 }
 
 TerreateContext::~TerreateContext() {
+  // Destroy all Vulkan instances
+  for (auto &instance : mInstances) {
+    instance.dispose();
+  }
+
   // Terminate GLFW
   glfwTerminate();
 }
-} // namespace Terreate
+
+RefPointer<VulkanInstance>
+TerreateContext::createInstance(str const &appName, Version appVersion,
+                                str const &engineName, Version engineVersion,
+                                u32 apiVersion) {
+  auto instance = HubPointer<VulkanInstance>::create(
+      appName, appVersion, engineName, engineVersion, apiVersion);
+  auto ref = instance.ref();
+  mInstances.push_back(std::move(instance));
+  return ref;
+}
+} // namespace Terreate::Core

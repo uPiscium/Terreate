@@ -5,7 +5,6 @@
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <iostream>
 #include <limits>
 #include <map>
 #include <memory>
@@ -17,9 +16,21 @@
 #include <unordered_set>
 #include <vector>
 
+#define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_VULKAN
+#include <glfw/glfw3.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
+#include <stb/stb_image.h>
+
 #define PROHIBIT_COPY_AND_ASSIGN(ClassName)                                    \
   ClassName(ClassName const &) = delete;                                       \
   ClassName &operator=(ClassName const &) = delete;
+
+#define LOCATION_INFO()                                                        \
+  std::string(__FILE__) + "/ line: " + std::to_string(__LINE__) + " " +        \
+      __FUNCTION__;
 
 namespace Terreate::Type {
 typedef std::int8_t i8;

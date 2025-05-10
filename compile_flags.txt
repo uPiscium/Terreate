@@ -1,4 +1,4 @@
--I./include/deps/
+-I./deps/
 -I./include
 -I./tests/include/
 -std=c++20

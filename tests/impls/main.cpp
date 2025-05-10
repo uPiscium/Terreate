@@ -220,8 +220,8 @@ void VulkanTriangle::createLogicalDevice() {
 
 #ifdef TERREATE_DEBUG_BUILD
   createInfo.enabledLayerCount =
-      static_cast<uint32_t>(VALIDATION_LAYERS.size());
-  createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
+      static_cast<uint32_t>(Terreate::API::VALIDATION_LAYERS.size());
+  createInfo.ppEnabledLayerNames = Terreate::API::VALIDATION_LAYERS.data();
 #else
   createInfo.enabledLayerCount = 0;
 #endif
@@ -800,8 +800,9 @@ void VulkanTriangle::cleanup() {
 VulkanTriangle::VulkanTriangle() {
   this->initWindow();
   // auto debugger = Terreate::Core::Resource<TestDebugger>::Create();
-  mVulkanInstance = std::make_shared<VulkanInstance>(
-      "VulkanTriangle", Version{1, 0, 0}, std::make_shared<TestDebugger>());
+  mVulkanInstance = std::make_shared<Terreate::Core::VulkanInstance>(
+      "VulkanTriangle", Version{1, 0, 0}, "No Engine", Version{1, 0, 0},
+      VK_API_VERSION_1_4);
   this->initVulkan();
 }
 
@@ -810,19 +811,30 @@ VulkanTriangle::~VulkanTriangle() { this->cleanup(); }
 void VulkanTriangle::run() { this->mainLoop(); }
 
 int main() {
-  VulkanTriangle app;
+  // VulkanTriangle app;
 
-  try {
-    app.run();
-  } catch (const std::runtime_error &e) {
-    std::cerr << "Error: " << e.what() << std::endl;
-    return EXIT_FAILURE;
-  } catch (...) {
-    std::cerr << "Unknown error occurred." << std::endl;
-    return EXIT_FAILURE;
-  }
+  // try {
+  //   app.run();
+  // } catch (const std::runtime_error &e) {
+  //   std::cerr << "Error: " << e.what() << std::endl;
+  //   return EXIT_FAILURE;
+  // } catch (...) {
+  //   std::cerr << "Unknown error occurred." << std::endl;
+  //   return EXIT_FAILURE;
+  // }
 
-  std::cout << "Vulkan Triangle application finished successfully."
-            << std::endl;
-  return EXIT_SUCCESS;
+  // std::cout << "Vulkan Triangle application finished successfully."
+  //           << std::endl;
+  // return EXIT_SUCCESS;
+
+  Terreate::Context context;
+  auto instance = context.createInstance("VulkanTriangle", {1, 0, 0});
+  auto debugger = new TestDebugger();
+  instance->attachDebugger(debugger);
+
+  auto window = instance->createWindow("VulkanTriangle", 800, 600);
+
+  delete debugger;
+
+  return 0;
 }

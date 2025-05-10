@@ -10,8 +10,14 @@
 #define GLFW_INCLUDE_VULKAN
 #include <glfw/glfw3.h>
 
-#include <resource.hpp>
+#include <Terreate.hpp>
+#include <api.hpp>
+#include <context.hpp>
+#include <debugger.hpp>
+#include <instance.hpp>
 #include <type.hpp>
+
+using namespace Terreate::Type;
 
 int const WIDTH = 800;
 int const HEIGHT = 600;
@@ -37,27 +43,25 @@ struct SwapchainProperty {
   VkExtent2D extent;
 };
 
-using namespace Terreate::API;
-
-class TestDebugger : public Debugger {
+class TestDebugger : public Terreate::Core::IDebugger {
 public:
-  bool verbose(str const &message, Debugger::MessageType const type,
-               vec<DebugObject> const &object) override {
-    // std::cout << message << std::endl;
-    return false;
-  }
-  bool info(str const &message, Debugger::MessageType const type,
-            vec<DebugObject> const &object) override {
+  bool verbose(str const &message, Terreate::Core::MessageType const type,
+               vec<Terreate::Core::DebugObject> const &object) override {
     std::cout << message << std::endl;
     return false;
   }
-  bool warning(str const &message, Debugger::MessageType const type,
-               vec<DebugObject> const &object) override {
+  bool info(str const &message, Terreate::Core::MessageType const type,
+            vec<Terreate::Core::DebugObject> const &object) override {
     std::cout << message << std::endl;
     return false;
   }
-  bool error(str const &message, Debugger::MessageType const type,
-             vec<DebugObject> const &object) override {
+  bool warning(str const &message, Terreate::Core::MessageType const type,
+               vec<Terreate::Core::DebugObject> const &object) override {
+    std::cout << message << std::endl;
+    return false;
+  }
+  bool error(str const &message, Terreate::Core::MessageType const type,
+             vec<Terreate::Core::DebugObject> const &object) override {
     std::cout << message << std::endl;
     return false;
   }
@@ -66,7 +70,7 @@ public:
 class VulkanTriangle {
 private:
   GLFWwindow *mWindow;
-  shared<VulkanInstance> mVulkanInstance;
+  shared<Terreate::Core::VulkanInstance> mVulkanInstance;
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   std::multimap<int, VkPhysicalDevice> mDevices;
   VkDevice mDevice;

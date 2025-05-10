@@ -5,45 +5,31 @@
 #include <glfw/glfw3.h>
 
 #include <debugger.hpp>
-#include <resource.hpp>
 #include <type.hpp>
 
 namespace Terreate::API {
 using namespace Terreate::Type;
+
+static char const *VK_LAYER_KHRONOS_VALIDATION = "VK_LAYER_KHRONOS_validation";
+static std::vector<char const *> const VALIDATION_LAYERS = {
+    VK_LAYER_KHRONOS_VALIDATION};
+static umap<VkPhysicalDeviceType, int> const SCORES = {
+    {VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU, 10000},
+    {VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU, 1000},
+    {VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU, 100},
+    {VK_PHYSICAL_DEVICE_TYPE_CPU, 10},
+    {VK_PHYSICAL_DEVICE_TYPE_OTHER, 0}};
+static vec<char const *> const EXTS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 inline PFN_vkCreateDebugUtilsMessengerEXT trCreateDebugUtilsMessengerEXT =
     nullptr;
 inline PFN_vkDestroyDebugUtilsMessengerEXT trDestroyDebugUtilsMessengerEXT =
     nullptr;
 
-class VulkanInstance {
-private:
-  VkInstance mInstance;
-  shared<Debugger> mDebugger;
-
-private:
-  void loadEXTfunctions();
-  vec<char const *> getRequiredExts();
-  VkApplicationInfo createAppInfo(char const *appName, Version appVersion,
-                                  char const *engineName, Version engineVersion,
-                                  u32 apiVersion);
-
-public:
-  VulkanInstance(str const &appName, Version appVersion, str const &engineName,
-                 Version engineVersion, u32 apiVersion,
-                 shared<Debugger> debugger = nullptr);
-  VulkanInstance(str const &appName, Version appVersion, str const &engineName,
-                 Version engineVersion, shared<Debugger> debugger = nullptr);
-  VulkanInstance(str const &appName, Version appVersion,
-                 shared<Debugger> debugger = nullptr);
-  ~VulkanInstance();
-
-  VkInstance const &getInstance() const;
-  shared<Debugger> getDebugger() const;
-
-  bool isValidationLayerSupported() const;
-
-  void initInstance();
+struct SwapchainSupport {
+  VkSurfaceCapabilitiesKHR capabilities;
+  std::vector<VkSurfaceFormatKHR> formats;
+  std::vector<VkPresentModeKHR> presentModes;
 };
 
 void loadEXTfunctions(VkInstance instance);
@@ -53,7 +39,17 @@ VkApplicationInfo createAppInfo(char const *appName, Version appVersion,
                                 char const *engineName = "No Engine",
                                 Version engineVersion = {1, 0, 0},
                                 u32 apiVersion = VK_API_VERSION_1_4);
-VkInstance createInstance(VkApplicationInfo const &appInfo, Debugger *debugger);
-VkInstance createInstance(str const &appName, Version appVersion,
-                          Debugger *debugger);
+VkInstance createInstance(VkApplicationInfo const &appInfo);
+VkInstance
+createInstance(VkApplicationInfo const &appInfo,
+               VkDebugUtilsMessengerCreateInfoEXT const &debugCreateInfo);
+bool isDeviceExtsSupported(VkPhysicalDevice device);
+vec<VkQueueFamilyProperties> getQueueFamilyProperties(VkPhysicalDevice device);
+SwapchainSupport getSwapchainSupport(VkPhysicalDevice device,
+                                     VkSurfaceKHR surface);
+vec<VkPhysicalDevice> getPhysicalDevices(VkInstance instance);
+vec<VkImage> getSwapchainImages(VkDevice device, VkSwapchainKHR swapchain);
+VkImageView createImageView(VkDevice device, VkImage image, VkFormat format);
+VkShaderModule createShaderModule(VkDevice device, vec<i8> const &code);
+
 } // namespace Terreate::API

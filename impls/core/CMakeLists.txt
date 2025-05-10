@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "C++ standard : " ${CMAKE_CXX_STANDARD})
 
-add_subdirectory(utils)
+add_library(${PROJECT_NAME} STATIC device.cpp instance.cpp)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../include/deps/)
-target_include_directories(${PROJECT_NAME} PUBLIC ../include)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../deps)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../include)
