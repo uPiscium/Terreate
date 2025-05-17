@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
 
-namespace Terreate::Core {
+namespace Terreate::Type {
 // Chrono types
 namespace chrono = std::chrono;
 typedef chrono::milliseconds msec;
@@ -31,4 +31,4 @@ inline double getMilliSec() {
 inline ZonedTime getCurrentTime() {
   return ZonedTime{chrono::current_zone(), chrono::system_clock::now()};
 }
-} // namespace Terreate::Core
+} // namespace Terreate::Type

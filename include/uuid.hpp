@@ -3,9 +3,9 @@
 #include <cstring>
 #include <random>
 
-#include <utils/type.hpp>
+#include <type.hpp>
 
-namespace Terreate::Core {
+namespace Terreate {
 using namespace Terreate::Type;
 
 class UUID {
@@ -69,13 +69,12 @@ public:
   }
 };
 
-} // namespace Terreate::Core
+} // namespace Terreate
 
-std::ostream &operator<<(std::ostream &stream,
-                         Terreate::Core::UUID const &uuid);
+std::ostream &operator<<(std::ostream &stream, Terreate::UUID const &uuid);
 
-template <> struct std::hash<Terreate::Core::UUID> {
-  size_t operator()(Terreate::Core::UUID const &uuid) const {
+template <> struct std::hash<Terreate::UUID> {
+  size_t operator()(Terreate::UUID const &uuid) const {
     return std::hash<std::string>()(uuid.toString());
   }
 };

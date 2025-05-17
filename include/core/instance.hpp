@@ -1,16 +1,22 @@
 #pragma once
-#include <utils/type.hpp>
+#include <core/api.hpp>
+#include <type.hpp>
+#include <util/debugger.hpp>
 
 namespace Terreate::Core {
 using namespace Terreate::Type;
 
 class Instance {
 private:
-  VkInstance mInstance = VK_NULL_HANDLE;
+  VkInstance const mInstance;
 
 public:
-  Instance(char const *appName, vec<char const *> const &exts);
+  Instance();
+  Instance(VkInstance const instance);
+  Instance(Instance const &instance);
   ~Instance();
+
+  void attachDebugger(Util::IDebugger *debugger);
 
   operator VkInstance() const { return mInstance; }
 };

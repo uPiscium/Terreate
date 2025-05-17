@@ -1,10 +1,10 @@
 #include <iomanip>
 #include <iostream>
 
-#include <utils/time.hpp>
-#include <utils/uuid.hpp>
+#include <time.hpp>
+#include <uuid.hpp>
 
-namespace Terreate::Core {
+namespace Terreate {
 std::mt19937 UUID::sRandomEngine = std::mt19937(std::random_device()());
 
 void UUID::GenerateUUID() {
@@ -52,10 +52,9 @@ UUID &UUID::operator=(UUID &&other) {
   return *this;
 }
 
-} // namespace Terreate::Core
+} // namespace Terreate
 
-std::ostream &operator<<(std::ostream &stream,
-                         Terreate::Core::UUID const &uuid) {
+std::ostream &operator<<(std::ostream &stream, Terreate::UUID const &uuid) {
   stream << uuid.toString();
   return stream;
 }

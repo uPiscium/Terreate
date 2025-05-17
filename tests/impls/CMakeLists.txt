@@ -19,7 +19,8 @@ add_executable(${PROJECT_NAME}
   renderer.cpp
   swapchain.cpp
   uuid.cpp
-  window.cpp)
+  window.cpp
+)
 
 if(BUILD_AUDIO_TESTS)
   add_compile_definitions(BUILD_AUDIO_TESTS)
@@ -44,7 +45,7 @@ endif()
 find_package(Vulkan REQUIRED)
 target_link_libraries(${PROJECT_NAME} Terreate glfw Vulkan::Vulkan)
 target_include_directories(${PROJECT_NAME} PUBLIC ../include)
-target_include_directories(${PROJECT_NAME} PUBLIC ../include/deps)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../deps)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                                  ${CMAKE_BINARY_DIR}/bin)

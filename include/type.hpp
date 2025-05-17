@@ -1,11 +1,9 @@
 #pragma once
-
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <iostream>
 #include <limits>
 #include <map>
 #include <memory>
@@ -17,9 +15,17 @@
 #include <unordered_set>
 #include <vector>
 
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
+#include <stb/stb_image.h>
+
 #define PROHIBIT_COPY_AND_ASSIGN(ClassName)                                    \
   ClassName(ClassName const &) = delete;                                       \
   ClassName &operator=(ClassName const &) = delete;
+
+#define LOCATION_INFO()                                                        \
+  std::string(__FILE__) + "/ line: " + std::to_string(__LINE__) + " " +        \
+      __FUNCTION__
 
 namespace Terreate::Type {
 typedef std::int8_t i8;
@@ -59,5 +65,7 @@ struct Version {
   Version(u32 major, u32 minor, u32 patch)
       : major(major), minor(minor), patch(patch) {}
 };
+
+Version const TERREATE_VERSION = {0, 1, 0};
 
 } // namespace Terreate::Type

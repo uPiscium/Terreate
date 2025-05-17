@@ -1,13 +1,13 @@
-#pragma once
+// #pragma once
 
-#include <type.hpp>
+// #include <type.hpp>
 
-namespace Terreate::Interface {
-using namespace Terreate::Type;
+// namespace Terreate::Interface {
+// using namespace Terreate::Type;
 
-struct IBindable {
-  virtual void bind() = 0;
-  virtual void unbind() = 0;
-};
+// struct IBindable {
+//   virtual void bind() = 0;
+//   virtual void unbind() = 0;
+// };
 
-} // namespace Terreate::Interface
+// } // namespace Terreate::Interface

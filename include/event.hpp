@@ -2,8 +2,8 @@
 
 #include <mutex>
 
-#include <utils/type.hpp>
-#include <utils/uuid.hpp>
+#include <type.hpp>
+#include <uuid.hpp>
 
 namespace Terreate::Core {
 using namespace Terreate::Type;
