@@ -3,7 +3,7 @@ project(Terreate)
 option(TERREATE_DEBUG_BUILD "Build with debug flags" OFF)
 option(TERREATE_BUILD_TEST "Build test" ON)
 
-add_subdirectory(impls)
+add_subdirectory(impl)
 
 if(TERREATE_DEBUG_BUILD)
   message(STATUS "Building with debug flags")
