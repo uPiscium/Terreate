@@ -1,26 +1,52 @@
 #pragma once
-#include <core/api.hpp>
-#include <core/instance.hpp>
-#include <type.hpp>
-#include <util/debugger.hpp>
+#include "debugger.hpp"
+#include "device.hpp"
+#include "framebuffer.hpp"
+#include "pipeline.hpp"
+#include "window.hpp"
+
+#include "../decl/type.hpp"
+#include "../util/resourceptr.hpp"
 
 namespace Terreate::Core {
-using namespace Terreate::Type;
-
 class Context {
 private:
-  vec<VkInstance> mInstances;
-  map<VkInstance, VkDebugUtilsMessengerEXT> mDebugMessengers;
+  PROHIBIT_COPY_AND_ASSIGN(Context);
+
+private:
+  VkInstance mInstance = VK_NULL_HANDLE;
+  VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
+  Util::ResourcePointerOwner<Device> mDevice = nullptr;
+
+  Type::vec<Util::ResourcePointerOwner<Window>> mWindows;
+  Type::vec<Util::ResourcePointerOwner<Pipeline>> mPipelines;
+  Type::vec<Util::ResourcePointerOwner<Framebuffer>> mFramebuffers;
+
+private:
+  void loadEXTfunctions();
+  Type::vec<char const *> getRequiredExts();
+  bool checkValidationLayerSupport();
+  VkDebugUtilsMessengerCreateInfoEXT createDebugInfo();
+  VkApplicationInfo createAppInfo(char const *appName,
+                                  Type::Version appVersion);
 
 public:
-  Context();
-  ~Context();
+  Context() = default;
+  Context(Type::str const &appName, Type::Version appVersion);
+  ~Context() { this->dispose(); }
 
-  Instance createInstance(str const &appName, Version appVersion,
-                          str const &engineName = "Terreate",
-                          Version engineVersion = TERREATE_VERSION,
-                          u32 apiVersion = VK_API_VERSION_1_4);
+  Util::ResourcePointer<Device> getDevice() const { return mDevice.get(); }
 
-  void attachDebugger(VkInstance instance, VkDebugUtilsMessengerEXT debugger);
+  void attachDebugger(IDebugger *debugger);
+
+  Util::ResourcePointer<Window>
+  createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
+               WindowSettings const &settings = WindowSettings());
+  Util::ResourcePointer<Pipeline>
+  createPipeline(Util::ResourcePointer<Window> window);
+  Util::ResourcePointer<Framebuffer>
+  createFramebuffer(Util::ResourcePointer<Pipeline> pipeline);
+
+  void dispose();
 };
 } // namespace Terreate::Core
