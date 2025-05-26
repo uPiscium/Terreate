@@ -1,13 +1,10 @@
 #pragma once
-#include <core/api.hpp>
-#include <core/enum.hpp>
-#include <event.hpp>
-#include <property.hpp>
-#include <type.hpp>
+#include "../decl/enum.hpp"
+#include "../decl/type.hpp"
+#include "../util/event.hpp"
+#include "../util/property.hpp"
 
 namespace Terreate::Core {
-using namespace Terreate::Type;
-
 class Window;
 
 struct Modifier {
@@ -20,18 +17,24 @@ public:
   bool numLock = false;
 
 public:
-  Modifier(int mods_);
+  Modifier(int mods_)
+      : shift(mods_ & GLFW_MOD_SHIFT), control(mods_ & GLFW_MOD_CONTROL),
+        alt(mods_ & GLFW_MOD_ALT), super(mods_ & GLFW_MOD_SUPER),
+        capsLock(mods_ & GLFW_MOD_CAPS_LOCK),
+        numLock(mods_ & GLFW_MOD_NUM_LOCK) {}
 };
 
 struct Key {
 public:
-  Keyboard key = Keyboard::K_LAST;
-  i32 scancode = 0;
+  Type::Keyboard key = Type::Keyboard::K_LAST;
+  Type::i32 scancode = 0;
   bool pressed = 0;
   Modifier mods = 0;
 
 public:
-  Key(int key_, int scancode_, int action_, int mods_);
+  Key(int key_, int scancode_, int action_, int mods_)
+      : key((Type::Keyboard)key_), scancode(scancode_), pressed((bool)action_),
+        mods(mods_) {}
 };
 
 namespace Wrapper {
@@ -58,82 +61,95 @@ void charCallbackWrapper(GLFWwindow *window, unsigned codepoint);
 void dropCallbackWrapper(GLFWwindow *window, int count, char const **paths);
 } // namespace Wrapper
 
-typedef Event<Window *, i32 const &, i32 const &> WindowPositionEvent;
-typedef Event<Window *, i32 const &, i32 const &> WindowSizeEvent;
-typedef Event<Window *> WindowCloseEvent;
-typedef Event<Window *> WindowRefreshEvent;
-typedef Event<Window *, bool const &> WindowFocusEvent;
-typedef Event<Window *, bool const &> WindowIconifyEvent;
-typedef Event<Window *, bool const &> WindowMaximizeEvent;
-typedef Event<Window *, u32 const &, u32 const &> WindowFramebufferSizeEvent;
-typedef Event<Window *, float const &, float const &> WindowContentScaleEvent;
-typedef Event<Window *, u32 const &, u32 const &, Modifier const &>
+typedef Util::Event<Window *, Type::i32 const &, Type::i32 const &>
+    WindowPositionEvent;
+typedef Util::Event<Window *, Type::i32 const &, Type::i32 const &>
+    WindowSizeEvent;
+typedef Util::Event<Window *> WindowCloseEvent;
+typedef Util::Event<Window *> WindowRefreshEvent;
+typedef Util::Event<Window *, bool const &> WindowFocusEvent;
+typedef Util::Event<Window *, bool const &> WindowIconifyEvent;
+typedef Util::Event<Window *, bool const &> WindowMaximizeEvent;
+typedef Util::Event<Window *, Type::u32 const &, Type::u32 const &>
+    WindowFramebufferSizeEvent;
+typedef Util::Event<Window *, float const &, float const &>
+    WindowContentScaleEvent;
+typedef Util::Event<Window *, Type::u32 const &, Type::u32 const &,
+                    Modifier const &>
     MousebuttonEvent;
-typedef Event<Window *, double const &, double const &> CursorPositionEvent;
-typedef Event<Window *, bool const &> CursorEnterEvent;
-typedef Event<Window *, double const &, double const &> ScrollEvent;
-typedef Event<Window *, Key const &> KeyEvent;
-typedef Event<Window *, u32 const &> CharEvent;
-typedef Event<Window *, vec<str> const &> FileDropEvent;
+typedef Util::Event<Window *, double const &, double const &>
+    CursorPositionEvent;
+typedef Util::Event<Window *, bool const &> CursorEnterEvent;
+typedef Util::Event<Window *, double const &, double const &> ScrollEvent;
+typedef Util::Event<Window *, Key const &> KeyEvent;
+typedef Util::Event<Window *, Type::u32 const &> CharEvent;
+typedef Util::Event<Window *, Type::vec<Type::str> const &> FileDropEvent;
 
-typedef Subscriber<Window *, i32 const &, i32 const &> WindowPositionSubscriber;
-typedef Subscriber<Window *, i32 const &, i32 const &> WindowSizeSubscriber;
-typedef Subscriber<Window *> WindowCloseSubscriber;
-typedef Subscriber<Window *> WindowRefreshSubscriber;
-typedef Subscriber<Window *, bool const &> WindowFocusSubscriber;
-typedef Subscriber<Window *, bool const &> WindowIconifySubscriber;
-typedef Subscriber<Window *, bool const &> WindowMaximizeSubscriber;
-typedef Subscriber<Window *, u32 const &, u32 const &>
+typedef Util::Subscriber<Window *, Type::i32 const &, Type::i32 const &>
+    WindowPositionSubscriber;
+typedef Util::Subscriber<Window *, Type::i32 const &, Type::i32 const &>
+    WindowSizeSubscriber;
+typedef Util::Subscriber<Window *> WindowCloseSubscriber;
+typedef Util::Subscriber<Window *> WindowRefreshSubscriber;
+typedef Util::Subscriber<Window *, bool const &> WindowFocusSubscriber;
+typedef Util::Subscriber<Window *, bool const &> WindowIconifySubscriber;
+typedef Util::Subscriber<Window *, bool const &> WindowMaximizeSubscriber;
+typedef Util::Subscriber<Window *, Type::u32 const &, Type::u32 const &>
     WindowFramebufferSizeSubscriber;
-typedef Subscriber<Window *, float const &, float const &>
+typedef Util::Subscriber<Window *, float const &, float const &>
     WindowContentScaleSubscriber;
-typedef Subscriber<Window *, u32 const &, u32 const &, Modifier const &>
+typedef Util::Subscriber<Window *, Type::u32 const &, Type::u32 const &,
+                         Modifier const &>
     MousebuttonSubscriber;
-typedef Subscriber<Window *, double const &, double const &>
+typedef Util::Subscriber<Window *, double const &, double const &>
     CursorPositionSubscriber;
-typedef Subscriber<Window *, bool const &> CursorEnterSubscriber;
-typedef Subscriber<Window *, double const &, double const &> ScrollSubscriber;
-typedef Subscriber<Window *, Key const &> KeySubscriber;
-typedef Subscriber<Window *, u32 const &> CharSubscriber;
-typedef Subscriber<Window *, vec<str> const &> FileDropSubscriber;
+typedef Util::Subscriber<Window *, bool const &> CursorEnterSubscriber;
+typedef Util::Subscriber<Window *, double const &, double const &>
+    ScrollSubscriber;
+typedef Util::Subscriber<Window *, Key const &> KeySubscriber;
+typedef Util::Subscriber<Window *, Type::u32 const &> CharSubscriber;
+typedef Util::Subscriber<Window *, Type::vec<Type::str> const &>
+    FileDropSubscriber;
 
 class WindowProperties {
 private:
   // Read-only properties
-  pair<double> mScrollOffset = {0.0, 0.0};
-  vec<u32> mCodePoints;
-  vec<Key> mKeys;
-  vec<str> mDroppedFiles;
+  Type::pair<Type::i32> mFramebufferSize = {0, 0};
+  Type::pair<double> mScrollOffset = {0.0, 0.0};
+  Type::vec<Type::u32> mCodePoints;
+  Type::vec<Key> mKeys;
+  Type::vec<Type::str> mDroppedFiles;
 
   // Read-write properties
-  pair<i32> mSize;
-  pair<i32> mPosition;
-  pair<double> mCursorPosition;
-  str mClipboard;
-  str mTitle;
+  Type::pair<Type::i32> mSize;
+  Type::pair<Type::i32> mPosition;
+  Type::pair<double> mCursorPosition;
+  Type::str mClipboard;
+  Type::str mTitle;
   float mOpacity;
 
 public:
   // Read-only properties
-  Property<pair<double>> scrollOffset;
-  Property<vec<u32>> codePoints;
-  Property<vec<Key>> keys;
-  Property<vec<str>> droppedFiles;
+  Util::Property<Type::pair<Type::i32>> framebufferSize;
+  Util::Property<Type::pair<double>> scrollOffset;
+  Util::Property<Type::vec<Type::u32>> codePoints;
+  Util::Property<Type::vec<Key>> keys;
+  Util::Property<Type::vec<Type::str>> droppedFiles;
 
   // Read-write properties
-  Property<pair<i32>> size;
-  Property<pair<i32>> position;
-  Property<pair<double>> cursorPosition;
-  Property<str> clipboard;
-  Property<str> title;
-  Property<float> opacity;
+  Util::Property<Type::pair<Type::i32>> size;
+  Util::Property<Type::pair<Type::i32>> position;
+  Util::Property<Type::pair<double>> cursorPosition;
+  Util::Property<Type::str> clipboard;
+  Util::Property<Type::str> title;
+  Util::Property<float> opacity;
 
 public:
-  WindowProperties();
+  WindowProperties() = default;
   void setup(GLFWwindow *window);
 };
 
-class WindowEvent {
+struct WindowEvent {
 public:
   WindowPositionEvent onPositionChange;
   WindowSizeEvent onSizeChange;
@@ -151,8 +167,5 @@ public:
   KeyEvent onKeyInput;
   CharEvent onCharInput;
   FileDropEvent onFileDrop;
-
-public:
-  WindowEvent();
 };
 } // namespace Terreate::Core

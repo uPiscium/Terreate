@@ -1,14 +1,14 @@
 #pragma once
-#include <core/IDisposable.hpp>
-#include <core/api.hpp>
-#include <core/instance.hpp>
-#include <core/winevent.hpp>
-#include <type.hpp>
+#include "device.hpp"
+#include "swapchain.hpp"
+#include "winevent.hpp"
+
+#include "../decl/enum.hpp"
+#include "../decl/type.hpp"
+#include "../util/resourceptr.hpp"
 
 namespace Terreate::Core {
-using namespace Terreate::Type;
-
-class WindowSettings {
+struct WindowSettings {
 public:
   bool resizable = true;
   bool visible = true;
@@ -23,43 +23,26 @@ public:
   bool scaleToMonitor = false;
 
 public:
-  WindowSettings() = default;
   void apply() const;
 };
 
 class Icon final {
 private:
-  vec<GLFWimage> mImages;
-  vec<u8 *> mPointers;
+  Type::vec<GLFWimage> mImages;
+  Type::vec<Type::u8 *> mPointers;
 
 private:
   Icon(Icon const &) = delete;
   Icon &operator=(Icon const &) = delete;
 
 public:
-  /*
-   * @brief: This function creates a glfw icon.
-   */
   Icon();
   ~Icon();
 
-  /*
-   * @brief: This function returns the number of images in the icon.
-   * @return: The number of images in the icon.
-   */
-  u32 getImageCount() const;
+  Type::u32 getImageCount() const;
 
-  /*
-   * @brief: This function adds an image to the icon.
-   * @param: width: Image width.
-   * @param: height: Image height.
-   * @param: pixels: Image pixels.
-   * @detail: Pixels are copied to new allocated array and set to "glfw
-   image"
-   * instance. "glfw image" is used to render icon. Icon can have multiple of
-   * images.
-   */
-  void addImage(u32 const &width, u32 const &height, u8 const *pixels);
+  void addImage(Type::u32 const &width, Type::u32 const &height,
+                Type::u8 const *pixels);
 
   operator GLFWimage const *() const;
   operator bool() const;
@@ -69,7 +52,7 @@ class Cursor final {
 private:
   GLFWcursor *mCursor = nullptr;
   GLFWimage mImage = GLFWimage();
-  u8 *mPixels = nullptr;
+  Type::u8 *mPixels = nullptr;
   int mXHot = 0;
   int mYHot = 0;
 
@@ -78,23 +61,11 @@ private:
   Cursor &operator=(Cursor const &) = delete;
 
 public:
-  /*
-   * @brief: This function creates a glfw cursor.
-   * @param: xHot: The x-coordinate of the cursor's hot spot.
-   * @param: yHot: The y-coordinate of the cursor's hot spot.
-   */
-  Cursor(i32 const &xHot = 0, i32 const &yHot = 0);
+  Cursor(Type::i32 const &xHot = 0, Type::i32 const &yHot = 0);
   ~Cursor();
 
-  /*
-   * @brief: This function sets the image of the cursor.
-   * @param: width: Image width.
-   * @param: height: Image height.
-   * @param: pixels: Image pixels.
-   * @detail: The image is copied to new allocated array and set to "glfw
-   * image" instance. "glfw image" is used to render cursor.
-   */
-  void setImage(u32 const &width, u32 const &height, u8 const *pixels);
+  void setImage(Type::u32 const &width, Type::u32 const &height,
+                Type::u8 const *pixels);
 
   operator GLFWcursor *() const;
   operator bool() const;
@@ -109,33 +80,107 @@ private:
   StandardCursor &operator=(StandardCursor const &) = delete;
 
 public:
-  /*
-   * @brief: This function creates a glfw standard cursor.
-   * @param: shape: Cursor shape.
-   */
-  StandardCursor(CursorShape const &shape);
+  StandardCursor() = default;
+  StandardCursor(Type::CursorShape const &shape);
   ~StandardCursor();
 
   operator GLFWcursor *() const;
   operator bool() const;
 };
 
-class Window : public IDisposable {
+class Window {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(Window);
+
+private:
+  VkInstance mInstance = VK_NULL_HANDLE;
+
   GLFWwindow *mWindow = nullptr;
-  Instance mInstance;
   VkSurfaceKHR mSurface = VK_NULL_HANDLE;
-  VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
+  Util::ResourcePointerOwner<Swapchain> mSwapchain;
+
+private:
+  friend class Context; // for retrieving mSurface to pick physical device
+  VkSurfaceKHR getSurface() const { return mSurface; }
+  void attachSwapchain(Util::ResourcePointerOwner<Swapchain> &&swapchain) {
+    mSwapchain = std::move(swapchain);
+  }
 
 public:
   WindowProperties properties;
   WindowEvent events;
 
 public:
-  Window(Instance const &instance, str const &title, pair<i32> const &size,
-         WindowSettings const &settings);
-  ~Window();
+  Window(VkInstance instance, Type::str const &title,
+         Type::pair<Type::i32> const &size, WindowSettings const &settings);
+  ~Window() { this->destroy(); }
 
-  void dispose() override;
+  Util::ResourcePointer<Swapchain> getSwapchain() const {
+    return mSwapchain.get();
+  }
+  bool getMousebutton(Type::MousebuttonInput const &button) const;
+  bool getInputState(Type::InputType const &type) const;
+
+  void setIcon(Icon const &icon);
+  void setCursor(Cursor const &cursor);
+  void setCursor(StandardCursor const &cursor);
+
+  bool isClosed() const {
+    return mWindow == nullptr || glfwWindowShouldClose(mWindow);
+  }
+  bool isFullScreen() const {
+    return bool(glfwGetWindowMonitor(mWindow) != NULL);
+  }
+  bool isWindowed() const {
+    return bool(glfwGetWindowMonitor(mWindow) == NULL);
+  }
+  bool isIconified() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_ICONIFIED));
+  }
+  bool isMaximized() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_MAXIMIZED));
+  }
+  bool isVisible() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_VISIBLE));
+  }
+  bool isFocused() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_FOCUSED));
+  }
+  bool isTransparent() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_TRANSPARENT_FRAMEBUFFER));
+  }
+  bool isDecorated() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_DECORATED));
+  }
+  bool isResizable() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_RESIZABLE));
+  }
+  bool isFloating() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_FLOATING));
+  }
+  bool isAutoIconified() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_AUTO_ICONIFY));
+  }
+  bool isFocusOnShowed() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_FOCUS_ON_SHOW));
+  }
+  bool isPressing(Type::Keyboard const &key) const {
+    return bool(glfwGetKey(mWindow, (Type::u32)key) == GLFW_PRESS);
+  }
+  bool isEntering() const {
+    return bool(glfwGetWindowAttrib(mWindow, GLFW_HOVERED));
+  }
+
+  void enableVsync() const { glfwSwapInterval(1); }
+  void disableVsync() const { glfwSwapInterval(0); }
+  void destroy();
+  void close() const { glfwSetWindowShouldClose(mWindow, GLFW_TRUE); }
+  void iconify() const { glfwIconifyWindow(mWindow); }
+  void maximize() const { glfwMaximizeWindow(mWindow); }
+  void show() const { glfwShowWindow(mWindow); }
+  void hide() const { glfwHideWindow(mWindow); }
+  void focus() const { glfwFocusWindow(mWindow); }
+  void restore() const { glfwRestoreWindow(mWindow); }
+  void requestAttention() const { glfwRequestWindowAttention(mWindow); }
 };
 } // namespace Terreate::Core
