@@ -45,6 +45,7 @@ endif()
 find_package(Vulkan REQUIRED)
 target_link_libraries(${PROJECT_NAME} Terreate glfw Vulkan::Vulkan)
 target_include_directories(${PROJECT_NAME} PUBLIC ../include)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../include)
 target_include_directories(${PROJECT_NAME} PUBLIC ../../deps)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY

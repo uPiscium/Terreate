@@ -1,44 +1,51 @@
-#include "../include/main.hpp"
+#include <core/context.hpp>
+#include <core/debugger.hpp>
+#include <core/window.hpp>
+
 #include <iostream>
 
 using namespace Terreate;
-using namespace Terreate::Type;
 
-class MyDebugger : public Util::IDebugger {
+class MyDebugger : public Core::IDebugger {
 public:
-  virtual bool verbose(str const &message, Util::MessageType const type,
-                       vec<Util::DebugObject> const &object) override {
+  virtual bool verbose(Type::str const &message, Type::MessageType const type,
+                       Type::vec<Core::DebugObject> const &object) override {
     // std::cout << "Verbose: " << message << std::endl;
     return false;
   }
 
-  virtual bool info(str const &message, Util::MessageType const type,
-                    vec<Util::DebugObject> const &object) override {
+  virtual bool info(Type::str const &message, Type::MessageType const type,
+                    Type::vec<Core::DebugObject> const &object) override {
     // std::cout << "Info: " << message << std::endl;
     return false;
   }
 
-  virtual bool warning(str const &message, Util::MessageType const type,
-                       vec<Util::DebugObject> const &object) override {
+  virtual bool warning(Type::str const &message, Type::MessageType const type,
+                       Type::vec<Core::DebugObject> const &object) override {
     std::cout << "Warning: " << message << std::endl;
     return false;
   }
 
-  virtual bool error(str const &message, Util::MessageType const type,
-                     vec<Util::DebugObject> const &object) override {
+  virtual bool error(Type::str const &message, Type::MessageType const type,
+                     Type::vec<Core::DebugObject> const &object) override {
     std::cout << "Error: " << message << std::endl;
     return false;
   }
 };
 
 int main() {
-  Core::Context context;
-  Core::Instance instance = context.createInstance(
-      "Terreate", Core::Version(1, 0, 0), "Terreate Engine",
-      Core::Version(1, 0, 0), VK_API_VERSION_1_4);
+  Core::Context ctx("Terreate", Type::Version(0, 1, 0));
 
   auto *debugger = new MyDebugger();
-  instance.attachDebugger(debugger);
+  ctx.attachDebugger(debugger);
+
+  auto window = ctx.createWindow("Terreate", {1280, 720},
+                                 Core::WindowSettings{.resizable = false});
+  auto pipeline = ctx.createPipeline(window);
+  auto framebuffer = ctx.createFramebuffer(pipeline);
+  auto commandPool = ctx.createCommandPool(pipeline);
+  auto commandBuffer = commandPool->createCommandBuffer();
+
   delete debugger;
 
   return 0;
