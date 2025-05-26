@@ -11,6 +11,7 @@ message(STATUS "Component: " ${PROJECT_NAME})
 
 add_library(
   ${PROJECT_NAME} STATIC
+  command.cpp
   context.cpp
   debugger.cpp
   device.cpp

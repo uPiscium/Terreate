@@ -84,18 +84,6 @@ inline Bitflag<T> operator^(Bitflag<T> lhs, Bitflag<T> rhs) {
   lhs ^= rhs;
   return lhs;
 }
-template <enum_type T> inline Bitflag<T> operator|(T lhs, T rhs) {
-  return Bitflag<T>(static_cast<typename Bitflag<T>::underlying_type>(lhs) |
-                    static_cast<typename Bitflag<T>::underlying_type>(rhs));
-}
-template <enum_type T> inline Bitflag<T> operator&(T lhs, T rhs) {
-  return Bitflag<T>(static_cast<typename Bitflag<T>::underlying_type>(lhs) &
-                    static_cast<typename Bitflag<T>::underlying_type>(rhs));
-}
-template <enum_type T> inline Bitflag<T> operator^(T lhs, T rhs) {
-  return Bitflag<T>(static_cast<typename Bitflag<T>::underlying_type>(lhs) ^
-                    static_cast<typename Bitflag<T>::underlying_type>(rhs));
-}
 
 template <enum_type T> inline bool operator==(Bitflag<T> lhs, Bitflag<T> rhs) {
   return static_cast<typename Bitflag<T>::underlying_type>(lhs) ==

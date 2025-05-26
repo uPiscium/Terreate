@@ -1,4 +1,5 @@
 #pragma once
+#include "command.hpp"
 #include "debugger.hpp"
 #include "device.hpp"
 #include "framebuffer.hpp"
@@ -21,6 +22,7 @@ private:
   Type::vec<Util::ResourcePointerOwner<Window>> mWindows;
   Type::vec<Util::ResourcePointerOwner<Pipeline>> mPipelines;
   Type::vec<Util::ResourcePointerOwner<Framebuffer>> mFramebuffers;
+  Type::vec<Util::ResourcePointerOwner<CommandPool>> mCommandPools;
 
 private:
   void loadEXTfunctions();
@@ -46,6 +48,8 @@ public:
   createPipeline(Util::ResourcePointer<Window> window);
   Util::ResourcePointer<Framebuffer>
   createFramebuffer(Util::ResourcePointer<Pipeline> pipeline);
+  Util::ResourcePointer<CommandPool>
+  createCommandPool(Util::ResourcePointer<Pipeline> pipeline);
 
   void dispose();
 };

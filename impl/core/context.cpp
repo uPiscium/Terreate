@@ -181,7 +181,23 @@ Context::createFramebuffer(Util::ResourcePointer<Pipeline> pipeline) {
   return mFramebuffers.back().get();
 }
 
+Util::ResourcePointer<CommandPool>
+Context::createCommandPool(Util::ResourcePointer<Pipeline> pipeline) {
+  if (!mDevice) {
+    throw Exception::NullReferenceException(
+        "Device is not initialized. Please create a window first.");
+  }
+
+  auto commandPool = Util::createResource<CommandPool>(pipeline);
+  mCommandPools.emplace_back(std::move(commandPool));
+  return mCommandPools.back().get();
+}
+
 void Context::dispose() {
+  for (auto &commandPool : mCommandPools) {
+    commandPool.dispose();
+  }
+
   for (auto &framebuffer : mFramebuffers) {
     framebuffer.dispose();
   }
