@@ -18,47 +18,22 @@ These packages are used in this library.
   > OpenAL Soft is an LGPL-licensed, cross-platform, software implementation of the OpenAL 3D audio API. It's forked from the open-sourced Windows version available originally from openal.org's SVN repository (now defunct). OpenAL provides capabilities for playing audio in a virtual 3D environment. Distance attenuation, doppler shift, and directional sound emitters are among the features handled by the API. More advanced effects, including air absorption, occlusion, and environmental reverb, are available through the EFX extension. It also facilitates streaming audio, multi-channel buffers, and audio capture.\
   *from OpenAL-soft README.md*
 
-## Build dependence
-This library uses `cmake` to build the projects so make sure to install `cmake` before building this library. 
-
-### on Windows
-Install [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)
-
-> [!TIP]
-> [Vulkan tutorial - Development environment](https://vulkan-tutorial.com/Development_environment) explains how to set it up in detail.
-
-### with `apt`
-Install packages below.
-- vulkan-tools
-- libvulkan-dev
-- vulkan-validationlayers-dev
-- spirv-tools
-
-### with `dnf`
-Install packages below.
-- vulkan-tools
-- vulkan-loader-devel
--  mesa-vulkan-devel
--  vulkan-validation-layers-devel
-
-### with `pacman`
-Install `vulkan-devel` package.
-
 # Building project
-> [!IMPORTANT]
-> **Make sure you installed [cmake](https://cmake.org/) before building.**
+**Make sure you installed [cmake](https://cmake.org/) before building.**
 
 ## Build outputs
 In this example, build outputs are stored in `<REPOSITRY ROOT DIR>/build/` folder.\
 
 ## `Cmake` options
 ### `TERREATE_BUILD_TEST`
-- Default: ON
-- Specifies whether to build test code.
+Default: ON
+
+Specifies whether to build test code.
 
 ### `TERREATE_DEBUG_BUILD`
-- Default: OFF
-- Specifies whether to build in debug mode. In debug mode, `TERREATE_DEBUG_MODE` is automatically defined by `cmake`.
+Default: OFF
+
+Specifies whether to build in debug mode. In debug mode, `TERREATE_DEBUG_MODE` is defined.
 
 ## Windows & Linux
 **Make sure you installed dependencies before building.**
@@ -69,10 +44,14 @@ cmake --build build
 
 ## `nix` installed env
 ```shell
-nix develop // if you have direnv this line is not needed.
+nix develop // or `direnv allow` if you have direnv.
 cmake -S . -B build
 cmake --build build
 ```
+
+## Link
+- [*Prev - Dependencies*](./deps.md)
+- [*Next - Create window*](../guide/window.md)
 
 # Licensing
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)\
