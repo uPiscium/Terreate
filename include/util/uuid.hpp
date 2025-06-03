@@ -1,5 +1,5 @@
 #pragma once
-#include "../decl/type.hpp"
+#include "../common/type.hpp"
 
 #include <cstring>
 #include <random>

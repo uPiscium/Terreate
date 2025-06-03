@@ -1,5 +1,5 @@
 #pragma once
-#include "../decl/type.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Core {
 template <typename T>
@@ -15,6 +15,9 @@ private:
 public:
   Bitflag() : mFlags(0) {}
   Bitflag(T flag) : mFlags(static_cast<underlying_type>(flag)) {}
+  Bitflag(int flags) : mFlags(static_cast<underlying_type>(flags)) {}
+  Bitflag(Bitflag<T> const &other)
+      : mFlags(static_cast<underlying_type>(other)) {}
 
   Bitflag &operator~() {
     mFlags = ~mFlags;
@@ -44,11 +47,16 @@ public:
     mFlags ^= static_cast<underlying_type>(other);
     return *this;
   }
+
   Bitflag &operator=(T flag) {
     return Bitflag(static_cast<underlying_type>(flag));
   }
   Bitflag &operator=(Bitflag<T> const &other) {
     mFlags = static_cast<underlying_type>(other);
+    return *this;
+  }
+  Bitflag &operator=(underlying_type flags) {
+    mFlags = flags;
     return *this;
   }
 

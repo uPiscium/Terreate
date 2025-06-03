@@ -1,4 +1,4 @@
-#include "../../include/decl/time.hpp"
+#include "../../include/common/time.hpp"
 #include "../../include/util/uuid.hpp"
 
 #include <iomanip>

@@ -1,7 +1,7 @@
 #pragma once
 #include "uuid.hpp"
 
-#include "../decl/type.hpp"
+#include "../common/type.hpp"
 
 #include <mutex>
 

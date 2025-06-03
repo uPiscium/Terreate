@@ -1,6 +1,6 @@
 #pragma once
-#include "../decl/exception.hpp"
-#include "../decl/type.hpp"
+#include "../common/exception.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Util {
 template <typename T> class Property {

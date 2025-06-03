@@ -1,6 +1,6 @@
 #pragma once
-#include "../decl/exception.hpp"
-#include "../decl/type.hpp"
+#include "../common/exception.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Util {
 template <typename T> class ResourcePointer {
@@ -26,6 +26,12 @@ private:
   }
 
   T *get() const {
+    if (!mResource) {
+      Type::str msg =
+          "Resource type: " + Type::getTypeName<T>() + " pointer is null";
+      throw Exception::NullReferenceException(msg);
+    }
+
     if (*mResource) {
       return *mResource;
     }
@@ -62,7 +68,9 @@ public:
     return *this;
   }
 
-  operator bool() const { return *mResource != nullptr; }
+  operator bool() const {
+    return mResource != nullptr && *mResource != nullptr;
+  }
 };
 
 template <typename T, typename Deleter = std::default_delete<T>>
@@ -78,6 +86,12 @@ private:
 
 private:
   T *get(int) const {
+    if (!mResource) {
+      Type::str msg =
+          "Resource type: " + Type::getTypeName<T>() + " pointer is null";
+      throw Exception::NullReferenceException(msg);
+    }
+
     if (*mResource) {
       return *mResource;
     }
@@ -161,4 +175,5 @@ template <typename T, typename... Args>
 ResourcePointerOwner<T> createResource(Args &&...args) {
   return ResourcePointerOwner<T>::create(std::forward<Args>(args)...);
 }
+
 } // namespace Terreate::Util
