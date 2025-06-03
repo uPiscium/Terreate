@@ -1,5 +1,3 @@
--I./includes/Deps/
--I./includes/
--I./tests/includes/
--I/home/linuxbrew/.linuxbrew/include/c++/v1/
+-I./deps
+-I./include
 -std=c++20

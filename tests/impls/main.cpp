@@ -1,36 +1,129 @@
-﻿#include <TerreateTest.hpp>
-#include <audiotest.hpp>
-#include <coretest.hpp>
-#include <exceptions.hpp>
-#include <graphictest.hpp>
+#include <core/context.hpp>
+#include <core/debugger.hpp>
+#include <core/window.hpp>
 
+#include "../include/_main.hpp"
 #include <iostream>
 
-namespace Core = Terreate::Test::Core;
-namespace Audio = Terreate::Test::Audio;
-namespace Graphic = Terreate::Test::Graphic;
+using namespace Terreate;
 
-int main() {
-#ifdef BUILD_CORE_TESTS // Default: OFF
-  // Core tests
-  Core::TestEvent();
-  Core::TestExecutor();
-  Core::TestNullable();
-  Core::TestObject();
-  Core::TestProperty();
-  Core::TestUUID();
-#endif // BUILD_CORE_TESTS
+class MyDebugger : public Core::IDebugger {
+public:
+  virtual bool verbose(Type::str const &message, Type::MessageType const type,
+                       Type::vec<Core::DebugObject> const &object) override {
+    // std::cout << "Verbose: " << message << std::endl;
+    return false;
+  }
 
-#ifdef BUILD_AUDIO_TESTS // Default: OFF
-  // Audio tests
-  Audio::TestAudio();
-#endif // BUILD_AUDIO_TESTS
+  virtual bool info(Type::str const &message, Type::MessageType const type,
+                    Type::vec<Core::DebugObject> const &object) override {
+    // std::cout << "Info: " << message << std::endl;
+    return false;
+  }
 
-#ifdef BUILD_GRAPHIC_TESTS // Default: ON
-  // Graphic tests
-  /* std::thread graphicThread(Graphic::Run); */
-  /* graphicThread.join(); */
-#endif // BUILD_GRAPHIC_TESTS
+  virtual bool warning(Type::str const &message, Type::MessageType const type,
+                       Type::vec<Core::DebugObject> const &object) override {
+    std::cout << "Warning: " << message << std::endl;
+    return false;
+  }
 
-  Terreate::Test::Run();
+  virtual bool error(Type::str const &message, Type::MessageType const type,
+                     Type::vec<Core::DebugObject> const &object) override {
+    std::cout << "Error: " << message << std::endl;
+    return false;
+  }
+};
+
+#include <fstream>
+Type::vec<Type::byte> readFile(std::string const &filename) {
+  std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+  if (!file.is_open()) {
+    throw std::runtime_error("Failed to open file: " + filename);
+  }
+
+  size_t fileSize = (size_t)file.tellg();
+  Type::vec<Type::byte> buffer(fileSize);
+  file.seekg(0);
+  file.read((char *)buffer.data(), fileSize);
+  file.close();
+  return buffer;
 }
+
+int test1() {
+  Core::Context ctx("Terreate", Type::Version(0, 1, 0));
+
+  auto *debugger = new MyDebugger();
+  ctx.attachDebugger(debugger);
+
+  auto window = ctx.createWindow("Terreate", {800, 600},
+                                 Core::WindowSettings{.resizable = false});
+  auto graphicQueue = ctx.createGraphicQueue();
+  auto presentQueue = ctx.createPresentQueue();
+  auto pipeline = ctx.createPipeline(window);
+  auto framebuffer = ctx.createFramebuffer(pipeline);
+  auto commandPool = ctx.createCommandPool(pipeline);
+  auto commandBuffer = commandPool->createCommandBuffer();
+  auto semaphoreImageAvailable = ctx.createSemaphore();
+  auto semaphoreRenderFinished = ctx.createSemaphore();
+  auto fenceInFlight = ctx.createFence();
+
+  auto vertShaderCode = readFile("tests/resources/shader/vert.spv");
+  auto fragShaderCode = readFile("tests/resources/shader/frag.spv");
+
+  pipeline->attachCompiledShaderSources(vertShaderCode, fragShaderCode);
+
+  while (!window->isClosed()) {
+    glfwPollEvents();
+
+    fenceInFlight->wait();
+    fenceInFlight->reset();
+    Type::u32 imageIndex = pipeline->getNextImageIndex(semaphoreImageAvailable);
+
+    commandBuffer->reset();
+    commandBuffer->begin();
+    commandBuffer->setRenderPass((*framebuffer)[imageIndex], {0, 0, 0, 1},
+                                 Type::SubpassContent::INLINE);
+    auto framebufferSize = pipeline->getSwapchain()->getProperty().extent;
+    commandBuffer->setViewport(0, 0, framebufferSize.width,
+                               framebufferSize.height, 0.0f, 1.0f);
+    commandBuffer->setScissor(0, 0, framebufferSize.width,
+                              framebufferSize.height);
+    commandBuffer->drawBuffer(3, 1, 0, 0); // Draw a triangle
+    commandBuffer->end();
+
+    graphicQueue->queue({commandBuffer},
+                        {Type::PipelineStage::COLOR_ATTACHMENT_OUTPUT_BIT},
+                        {semaphoreImageAvailable}, {semaphoreRenderFinished});
+    graphicQueue->submit(fenceInFlight);
+    presentQueue->present(pipeline->getSwapchain(), {imageIndex},
+                          semaphoreRenderFinished);
+  }
+
+  delete debugger;
+
+  return 0;
+}
+
+void test2() {
+#ifdef TERREATE_DEBUG_BUILD
+  std::cout << "Running in debug mode." << std::endl;
+#else
+  std::cout << "Running in release mode." << std::endl;
+#endif
+
+  VulkanTriangle app;
+
+  try {
+    app.run();
+  } catch (const std::runtime_error &e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+  } catch (...) {
+    std::cerr << "Unknown error occurred." << std::endl;
+  }
+
+  std::cout << "Vulkan Triangle application finished successfully."
+            << std::endl;
+}
+
+int main() { test1(); }
