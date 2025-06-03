@@ -1,5 +1,5 @@
 #pragma once
-#include "../decl/type.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Core {
 static char const *VK_LAYER_KHRONOS_VALIDATION = "VK_LAYER_KHRONOS_validation";

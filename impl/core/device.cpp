@@ -1,6 +1,6 @@
+#include "../../include/common/exception.hpp"
 #include "../../include/core/device.hpp"
 #include "../../include/core/vk.hpp"
-#include "../../include/decl/exception.hpp"
 
 namespace Terreate::Core {
 QueueFamilyIndices Device::findQueue(VkPhysicalDevice device,

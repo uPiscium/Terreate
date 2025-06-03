@@ -1,9 +1,10 @@
 #pragma once
 #include "device.hpp"
 #include "swapchain.hpp"
+#include "sync.hpp"
+#include "vkobj.hpp"
 
-#include "../decl/type.hpp"
-#include "../util/resourceptr.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Core {
 class Pipeline {
@@ -11,8 +12,8 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(Pipeline);
 
 private:
-  Util::ResourcePointer<Device> mDevice;
-  Util::ResourcePointer<Swapchain> mSwapchain;
+  VkObjectRef<Device> mDevice;
+  VkObjectRef<Swapchain> mSwapchain;
 
   Type::vec<Type::byte> mVertShaderCode;
   Type::vec<Type::byte> mFragShaderCode;
@@ -28,16 +29,18 @@ private:
   void compileShader(Type::str const &vert, Type::str const &frag);
 
 public:
-  Pipeline(Util::ResourcePointer<Device> device,
-           Util::ResourcePointer<Swapchain> swapchain)
+  Pipeline(VkObjectRef<Device> device, VkObjectRef<Swapchain> swapchain)
       : mDevice(device), mSwapchain(swapchain) {
     this->createRenderPass();
   }
   ~Pipeline() { this->dispose(); }
 
-  Util::ResourcePointer<Device> getDevice() const { return mDevice; }
-  Util::ResourcePointer<Swapchain> getSwapchain() const { return mSwapchain; }
+  VkObjectRef<Device> getDevice() const { return mDevice; }
+  VkObjectRef<Swapchain> getSwapchain() const { return mSwapchain; }
   VkPipelineLayout getLayout() const { return mPipelineLayout; }
+  Type::u32 getNextImageIndex(VkObjectRef<Semaphore> semaphore) const {
+    return mSwapchain->getNextImageIndex(semaphore);
+  }
 
   void attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
                                    Type::vec<Type::byte> const &frag);

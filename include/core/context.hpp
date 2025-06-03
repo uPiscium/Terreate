@@ -4,10 +4,12 @@
 #include "device.hpp"
 #include "framebuffer.hpp"
 #include "pipeline.hpp"
+#include "queue.hpp"
+#include "sync.hpp"
+#include "vkobj.hpp"
 #include "window.hpp"
 
-#include "../decl/type.hpp"
-#include "../util/resourceptr.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Core {
 class Context {
@@ -17,12 +19,16 @@ private:
 private:
   VkInstance mInstance = VK_NULL_HANDLE;
   VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
-  Util::ResourcePointerOwner<Device> mDevice = nullptr;
+  VkObject<Device> mDevice = nullptr;
 
-  Type::vec<Util::ResourcePointerOwner<Window>> mWindows;
-  Type::vec<Util::ResourcePointerOwner<Pipeline>> mPipelines;
-  Type::vec<Util::ResourcePointerOwner<Framebuffer>> mFramebuffers;
-  Type::vec<Util::ResourcePointerOwner<CommandPool>> mCommandPools;
+  Type::vec<VkObject<Window>> mWindows;
+  Type::vec<VkObject<GraphicQueue>> mGraphicQueues;
+  Type::vec<VkObject<PresentQueue>> mPresentQueues;
+  Type::vec<VkObject<Pipeline>> mPipelines;
+  Type::vec<VkObject<Framebuffer>> mFramebuffers;
+  Type::vec<VkObject<CommandPool>> mCommandPools;
+  Type::vec<VkObject<Semaphore>> mSemaphores;
+  Type::vec<VkObject<Fence>> mFences;
 
 private:
   void loadEXTfunctions();
@@ -35,22 +41,27 @@ private:
 public:
   Context() = default;
   Context(Type::str const &appName, Type::Version appVersion);
+  Context(Context &&other) noexcept;
   ~Context() { this->dispose(); }
 
-  Util::ResourcePointer<Device> getDevice() const { return mDevice.get(); }
+  VkInstance getInstance() { return mInstance; }
+  VkObjectRef<Device> getDevice() const { return mDevice.ref(); }
 
   void attachDebugger(IDebugger *debugger);
 
-  Util::ResourcePointer<Window>
+  VkObjectRef<Window>
   createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
                WindowSettings const &settings = WindowSettings());
-  Util::ResourcePointer<Pipeline>
-  createPipeline(Util::ResourcePointer<Window> window);
-  Util::ResourcePointer<Framebuffer>
-  createFramebuffer(Util::ResourcePointer<Pipeline> pipeline);
-  Util::ResourcePointer<CommandPool>
-  createCommandPool(Util::ResourcePointer<Pipeline> pipeline);
+  VkObjectRef<GraphicQueue> createGraphicQueue();
+  VkObjectRef<PresentQueue> createPresentQueue();
+  VkObjectRef<Pipeline> createPipeline(VkObjectRef<Window> window);
+  VkObjectRef<Framebuffer> createFramebuffer(VkObjectRef<Pipeline> pipeline);
+  VkObjectRef<CommandPool> createCommandPool(VkObjectRef<Pipeline> pipeline);
+  VkObjectRef<Semaphore> createSemaphore();
+  VkObjectRef<Fence> createFence();
 
   void dispose();
+
+  Context &operator=(Context &&other) noexcept;
 };
 } // namespace Terreate::Core

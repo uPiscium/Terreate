@@ -1,5 +1,5 @@
+#include "../../include/common/exception.hpp"
 #include "../../include/core/pipeline.hpp"
-#include "../../include/decl/exception.hpp"
 
 namespace Terreate::Core {
 VkShaderModule Pipeline::createShaderModule(Type::vec<Type::byte> const &code) {

@@ -1,7 +1,7 @@
+#include "../../include/common/exception.hpp"
 #include "../../include/core/context.hpp"
 #include "../../include/core/swapchain.hpp"
 #include "../../include/core/vk.hpp"
-#include "../../include/decl/exception.hpp"
 
 namespace Terreate::Core {
 void Context::loadEXTfunctions() {
@@ -14,9 +14,10 @@ void Context::loadEXTfunctions() {
           mInstance, "vkDestroyDebugUtilsMessengerEXT");
 
   if (!trCreateDebugUtilsMessengerEXT || !trDestroyDebugUtilsMessengerEXT) {
-    str msg = "Failed to load debug messenger functions. Make sure the project "
-              "is built with TERREATE_DEBUG_BUILD=ON.";
-    throw DebugMessengerFunctionLoadFailure(msg);
+    Type::str msg =
+        "Failed to load debug messenger functions. Make sure the project "
+        "is built with TERREATE_DEBUG_BUILD=ON.";
+    throw Exception::DebugMessengerFunctionLoadFailure(msg);
   }
 #endif
 }
@@ -108,7 +109,8 @@ Context::Context(Type::str const &appName, Type::Version appVersion) {
 
 #ifdef TERREATE_DEBUG_BUILD
   auto debuggerInfo = this->createDebugInfo();
-  createInfo.enabledLayerCount = static_cast<u32>(VALIDATION_LAYERS.size());
+  createInfo.enabledLayerCount =
+      static_cast<Type::u32>(VALIDATION_LAYERS.size());
   createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
   createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debuggerInfo;
 #endif
@@ -137,66 +139,122 @@ void Context::attachDebugger(IDebugger *debugger) {
 
   if (trCreateDebugUtilsMessengerEXT(mInstance, &createInfo, nullptr,
                                      &mDebugMessenger) != VK_SUCCESS) {
-    str msg = "Failed to create debug messenger. Make sure the Vulkan SDK is "
-              "installed and configured correctly.";
-    throw DebugMessengerCreationFailure(msg);
+    Type::str msg =
+        "Failed to create debug messenger. Make sure the Vulkan SDK is "
+        "installed and configured correctly.";
+    throw Exception::DebugMessengerCreationFailure(msg);
   }
 #endif
 }
 
-Util::ResourcePointer<Window>
-Context::createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
-                      WindowSettings const &settings) {
-  auto window = Util::createResource<Window>(mInstance, title, size, settings);
+VkObjectRef<Window> Context::createWindow(Type::str const &title,
+                                          Type::pair<Type::i32> const &size,
+                                          WindowSettings const &settings) {
+  auto window = makeVkObject<Window>(mInstance, title, size, settings);
   mWindows.emplace_back(std::move(window));
-  auto ref = mWindows.back().get();
+  auto ref = mWindows.back().ref();
   if (!mDevice) {
-    mDevice = Util::createResource<Device>(mInstance, ref->getSurface());
+    mDevice = makeVkObject<Device>(mInstance, ref->getSurface());
   }
 
-  auto swapchain = Util::createResource<Swapchain>(
+  auto swapchain = makeVkObject<Swapchain>(
       mDevice.get(), ref->properties.framebufferSize, ref->getSurface());
   ref->attachSwapchain(std::move(swapchain));
 
   return ref;
 }
 
-Util::ResourcePointer<Pipeline>
-Context::createPipeline(Util::ResourcePointer<Window> window) {
+VkObjectRef<GraphicQueue> Context::createGraphicQueue() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto pipeline =
-      Util::createResource<Pipeline>(mDevice.get(), window->getSwapchain());
+  auto graphicQueue = makeVkObject<GraphicQueue>(mDevice.get());
+  mGraphicQueues.emplace_back(std::move(graphicQueue));
+  return mGraphicQueues.back().ref();
+}
+
+VkObjectRef<PresentQueue> Context::createPresentQueue() {
+  if (!mDevice) {
+    throw Exception::NullReferenceException(
+        "Device is not initialized. Please create a window first.");
+  }
+
+  auto presentQueue = makeVkObject<PresentQueue>(mDevice.get());
+  mPresentQueues.emplace_back(std::move(presentQueue));
+  return mPresentQueues.back().ref();
+}
+
+VkObjectRef<Pipeline> Context::createPipeline(VkObjectRef<Window> window) {
+  if (!mDevice) {
+    throw Exception::NullReferenceException(
+        "Device is not initialized. Please create a window first.");
+  }
+
+  auto pipeline = makeVkObject<Pipeline>(mDevice.get(), window->getSwapchain());
   mPipelines.emplace_back(std::move(pipeline));
-  return mPipelines.back().get();
+  return mPipelines.back().ref();
 }
 
-Util::ResourcePointer<Framebuffer>
-Context::createFramebuffer(Util::ResourcePointer<Pipeline> pipeline) {
-  auto framebuffer = Util::createResource<Framebuffer>(pipeline);
+VkObjectRef<Framebuffer>
+Context::createFramebuffer(VkObjectRef<Pipeline> pipeline) {
+  auto framebuffer = makeVkObject<Framebuffer>(pipeline);
   mFramebuffers.emplace_back(std::move(framebuffer));
-  return mFramebuffers.back().get();
+  return mFramebuffers.back().ref();
 }
 
-Util::ResourcePointer<CommandPool>
-Context::createCommandPool(Util::ResourcePointer<Pipeline> pipeline) {
+VkObjectRef<CommandPool>
+Context::createCommandPool(VkObjectRef<Pipeline> pipeline) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto commandPool = Util::createResource<CommandPool>(pipeline);
+  auto commandPool = makeVkObject<CommandPool>(pipeline);
   mCommandPools.emplace_back(std::move(commandPool));
-  return mCommandPools.back().get();
+  return mCommandPools.back().ref();
+}
+
+VkObjectRef<Semaphore> Context::createSemaphore() {
+  if (!mDevice) {
+    throw Exception::NullReferenceException(
+        "Device is not initialized. Please create a window first.");
+  }
+
+  auto semaphore = makeVkObject<Semaphore>(mDevice.get());
+  mSemaphores.emplace_back(std::move(semaphore));
+  return mSemaphores.back().ref();
+}
+
+VkObjectRef<Fence> Context::createFence() {
+  if (!mDevice) {
+    throw Exception::NullReferenceException(
+        "Device is not initialized. Please create a window first.");
+  }
+
+  auto fence = makeVkObject<Fence>(mDevice.get());
+  mFences.emplace_back(std::move(fence));
+  return mFences.back().ref();
 }
 
 void Context::dispose() {
+  vkDeviceWaitIdle(*mDevice);
+
+  for (auto &fence : mFences) {
+    fence.dispose();
+  }
+  mFences.clear();
+
+  for (auto &semaphore : mSemaphores) {
+    semaphore.dispose();
+  }
+  mSemaphores.clear();
+
   for (auto &commandPool : mCommandPools) {
     commandPool.dispose();
   }
+  mCommandPools.clear();
 
   for (auto &framebuffer : mFramebuffers) {
     framebuffer.dispose();
@@ -207,6 +265,16 @@ void Context::dispose() {
     pipeline.dispose();
   }
   mPipelines.clear();
+
+  for (auto &presentQueue : mPresentQueues) {
+    presentQueue.dispose();
+  }
+  mPresentQueues.clear();
+
+  for (auto &graphicQueue : mGraphicQueues) {
+    graphicQueue.dispose();
+  }
+  mGraphicQueues.clear();
 
   for (auto &window : mWindows) {
     window.dispose();
@@ -229,4 +297,5 @@ void Context::dispose() {
 
   glfwTerminate();
 }
+
 } // namespace Terreate::Core

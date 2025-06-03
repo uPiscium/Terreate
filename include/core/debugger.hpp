@@ -1,6 +1,6 @@
 #pragma once
-#include "../decl/enum.hpp"
-#include "../decl/type.hpp"
+#include "../common/enum.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Core {
 struct DebugObject {

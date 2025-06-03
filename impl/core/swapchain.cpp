@@ -126,17 +126,31 @@ void Swapchain::createImageViews() {
 
     if (vkCreateImageView(*mDevice, &createInfo, nullptr,
                           &mSwapchainImageViews[i]) != VK_SUCCESS) {
-      throw std::runtime_error("Failed to create image view.");
+      throw Exception::ImageViewCreationFailure(
+          "Failed to create image view for swapchain image.");
     }
   }
 }
 
-Swapchain::Swapchain(Util::ResourcePointer<Device> device,
+Swapchain::Swapchain(VkObjectRef<Device> device,
                      Type::pair<Type::i32> framebufferSize,
                      VkSurfaceKHR surface)
     : mDevice(device) {
   this->createSwapchain(framebufferSize, surface);
   this->createImageViews();
+}
+
+Type::u32 Swapchain::getNextImageIndex(VkObjectRef<Semaphore> semaphore) const {
+  VkSemaphore semaphoreHandle = VK_NULL_HANDLE;
+  if (semaphore) {
+    semaphoreHandle = *semaphore;
+  }
+
+  Type::u32 imageIndex;
+  VkResult result =
+      vkAcquireNextImageKHR(*mDevice, mSwapchain, UINT64_MAX, semaphoreHandle,
+                            VK_NULL_HANDLE, &imageIndex);
+  return imageIndex;
 }
 
 void Swapchain::destroy() {

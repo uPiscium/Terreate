@@ -1,8 +1,9 @@
 #pragma once
 #include "device.hpp"
+#include "sync.hpp"
+#include "vkobj.hpp"
 
-#include "../decl/type.hpp"
-#include "../util/resourceptr.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Core {
 struct SwapchainProperty {
@@ -26,7 +27,7 @@ private:
   void createImageViews();
 
 private:
-  Util::ResourcePointer<Device> mDevice;
+  VkObjectRef<Device> mDevice;
 
   VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
   Type::vec<VkImage> mSwapchainImages;
@@ -34,16 +35,19 @@ private:
   SwapchainProperty mSwapchainProperty;
 
 public:
-  Swapchain(Util::ResourcePointer<Device> device,
-            Type::pair<Type::i32> framebufferSize, VkSurfaceKHR surface);
+  Swapchain(VkObjectRef<Device> device, Type::pair<Type::i32> framebufferSize,
+            VkSurfaceKHR surface);
   ~Swapchain() { this->destroy(); }
 
-  Util::ResourcePointer<Device> getDevice() const { return mDevice; }
+  VkObjectRef<Device> getDevice() const { return mDevice; }
   SwapchainProperty const &getProperty() const { return mSwapchainProperty; }
   Type::vec<VkImageView> const &getImageViews() const {
     return mSwapchainImageViews;
   }
+  Type::u32 getNextImageIndex(VkObjectRef<Semaphore> semaphore) const;
 
   void destroy();
+
+  operator VkSwapchainKHR() const { return mSwapchain; }
 };
 } // namespace Terreate::Core

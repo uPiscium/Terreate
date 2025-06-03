@@ -2,11 +2,11 @@
 #include "device.hpp"
 #include "framebuffer.hpp"
 #include "pipeline.hpp"
+#include "vkobj.hpp"
 
-#include "../decl/enum.hpp"
-#include "../decl/type.hpp"
+#include "../common/enum.hpp"
+#include "../common/type.hpp"
 #include "../util/bitflag.hpp"
-#include "../util/resourceptr.hpp"
 #include "vulkan/vulkan_core.h"
 
 namespace Terreate::Core {
@@ -17,19 +17,19 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(CommandPool);
 
 private:
-  Util::ResourcePointer<Pipeline> mPipeline;
-  Util::ResourcePointer<Device> mDevice;
+  VkObjectRef<Pipeline> mPipeline;
+  VkObjectRef<Device> mDevice;
 
   VkCommandPool mCommandPool = VK_NULL_HANDLE;
-  Type::vec<Util::ResourcePointerOwner<CommandBuffer>> mCommandBuffers;
+  Type::vec<VkObject<CommandBuffer>> mCommandBuffers;
 
 public:
-  CommandPool(Util::ResourcePointer<Pipeline> pipeline);
+  CommandPool(VkObjectRef<Pipeline> pipeline);
   ~CommandPool() { this->dispose(); }
 
-  Util::ResourcePointer<Device> getDevice() const { return mDevice; }
+  VkObjectRef<Device> getDevice() const { return mDevice; }
 
-  Util::ResourcePointer<CommandBuffer>
+  VkObjectRef<CommandBuffer>
   createCommandBuffer(Type::CommandBufferLevel const &level =
                           Type::CommandBufferLevel::PRIMARY);
   void dispose();
@@ -50,8 +50,8 @@ private:
   };
 
 private:
-  Util::ResourcePointer<Pipeline> mPipeline;
-  Util::ResourcePointer<Device> mDevice;
+  VkObjectRef<Pipeline> mPipeline;
+  VkObjectRef<Device> mDevice;
   VkCommandPool mCommandPool;
 
   bool mIsRecording = false;
@@ -64,17 +64,13 @@ private:
   DrawSetting mDrawSetting;
 
 private:
-  void begin(Bitflag<Type::CommandBufferUsage> flags,
-             VkCommandBufferInheritanceInfo *inherit = nullptr);
-  void end();
-
 public:
-  CommandBuffer(Util::ResourcePointer<Pipeline> pipeline, VkCommandPool pool,
+  CommandBuffer(VkObjectRef<Pipeline> pipeline, VkCommandPool pool,
                 Type::CommandBufferLevel const &level =
                     Type::CommandBufferLevel::PRIMARY);
   ~CommandBuffer() { this->dispose(); }
 
-  Util::ResourcePointer<Device> getDevice() const { return mDevice; }
+  VkObjectRef<Device> getDevice() const { return mDevice; }
 
   void setRenderPass(VkFramebuffer framebuffer,
                      Type::vec<float> const &clearColor,
@@ -83,10 +79,13 @@ public:
                    float minDepth, float maxDepth);
   void setScissor(Type::i32 offsetX, Type::i32 offsetY, Type::u32 width,
                   Type::u32 height);
+
+  void begin(Bitflag<Type::CommandBufferUsage> flags = 0,
+             VkCommandBufferInheritanceInfo *inherit = nullptr);
+  void end();
   void drawBuffer(Type::u64 verexCount, Type::u64 instanceCount,
                   Type::u64 firstVertex = 0, Type::u64 firstInstance = 0);
-  void compile(Bitflag<Type::CommandBufferUsage> flags,
-               VkCommandBufferInheritanceInfo *inherit = nullptr);
+  void reset();
   void dispose();
 
   operator VkCommandBuffer() const { return mCommandBuffer; }

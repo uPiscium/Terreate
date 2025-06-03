@@ -1,11 +1,11 @@
 #pragma once
 #include "device.hpp"
 #include "swapchain.hpp"
+#include "vkobj.hpp"
 #include "winevent.hpp"
 
-#include "../decl/enum.hpp"
-#include "../decl/type.hpp"
-#include "../util/resourceptr.hpp"
+#include "../common/enum.hpp"
+#include "../common/type.hpp"
 
 namespace Terreate::Core {
 struct WindowSettings {
@@ -97,12 +97,12 @@ private:
 
   GLFWwindow *mWindow = nullptr;
   VkSurfaceKHR mSurface = VK_NULL_HANDLE;
-  Util::ResourcePointerOwner<Swapchain> mSwapchain;
+  VkObject<Swapchain> mSwapchain;
 
 private:
   friend class Context; // for retrieving mSurface to pick physical device
   VkSurfaceKHR getSurface() const { return mSurface; }
-  void attachSwapchain(Util::ResourcePointerOwner<Swapchain> &&swapchain) {
+  void attachSwapchain(VkObject<Swapchain> &&swapchain) {
     mSwapchain = std::move(swapchain);
   }
 
@@ -115,9 +115,7 @@ public:
          Type::pair<Type::i32> const &size, WindowSettings const &settings);
   ~Window() { this->destroy(); }
 
-  Util::ResourcePointer<Swapchain> getSwapchain() const {
-    return mSwapchain.get();
-  }
+  VkObjectRef<Swapchain> getSwapchain() const { return mSwapchain.ref(); }
   bool getMousebutton(Type::MousebuttonInput const &button) const;
   bool getInputState(Type::InputType const &type) const;
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "../decl/enum.hpp"
-#include "../decl/type.hpp"
+#include "../common/enum.hpp"
+#include "../common/type.hpp"
 #include "../util/event.hpp"
 #include "../util/property.hpp"
 

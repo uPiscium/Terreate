@@ -1,8 +1,8 @@
+#include "../../include/common/exception.hpp"
 #include "../../include/core/command.hpp"
-#include "../../include/decl/exception.hpp"
 
 namespace Terreate::Core {
-CommandPool::CommandPool(Util::ResourcePointer<Pipeline> pipeline)
+CommandPool::CommandPool(VkObjectRef<Pipeline> pipeline)
     : mPipeline(pipeline), mDevice(pipeline->getDevice()) {
   VkCommandPoolCreateInfo poolInfo{};
   poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -16,12 +16,12 @@ CommandPool::CommandPool(Util::ResourcePointer<Pipeline> pipeline)
   }
 }
 
-Util::ResourcePointer<CommandBuffer>
+VkObjectRef<CommandBuffer>
 CommandPool::createCommandBuffer(Type::CommandBufferLevel const &level) {
   auto commandBuffer =
-      Util::createResource<CommandBuffer>(mPipeline, mCommandPool, level);
+      makeVkObject<CommandBuffer>(mPipeline, mCommandPool, level);
   mCommandBuffers.push_back(std::move(commandBuffer));
-  return mCommandBuffers.back().get();
+  return mCommandBuffers.back().ref();
 }
 
 void CommandPool::dispose() {
@@ -33,33 +33,7 @@ void CommandPool::dispose() {
   }
 }
 
-void CommandBuffer::begin(Bitflag<Type::CommandBufferUsage> flags,
-                          VkCommandBufferInheritanceInfo *inherit) {
-  VkCommandBufferBeginInfo beginInfo{};
-  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-  beginInfo.flags =
-      (VkCommandBufferUsageFlags)((Type::CommandBufferUsage)flags);
-  if (inherit) {
-    beginInfo.pInheritanceInfo = inherit;
-  } else {
-    beginInfo.pInheritanceInfo = nullptr;
-  }
-
-  if (vkBeginCommandBuffer(mCommandBuffer, &beginInfo) != VK_SUCCESS) {
-    throw Exception::CommandBufferRecordingFailure(
-        "Failed to begin recording command buffer.");
-  }
-}
-
-void CommandBuffer::end() {
-  if (vkEndCommandBuffer(mCommandBuffer) != VK_SUCCESS) {
-    throw Exception::CommandBufferRecordingFailure(
-        "Failed to end recording command buffer.");
-  }
-}
-
-CommandBuffer::CommandBuffer(Util::ResourcePointer<Pipeline> pipeline,
-                             VkCommandPool pool,
+CommandBuffer::CommandBuffer(VkObjectRef<Pipeline> pipeline, VkCommandPool pool,
                              Type::CommandBufferLevel const &level)
     : mPipeline(pipeline), mDevice(pipeline->getDevice()), mCommandPool(pool) {
   VkCommandBufferAllocateInfo allocInfo{};
@@ -80,66 +54,133 @@ void CommandBuffer::setRenderPass(VkFramebuffer framebuffer,
                                   Type::SubpassContent content) {
   if (!mIsRecording) {
     throw Exception::CommandBufferRecordingFailure(
-        "Command buffer is not ready to record. Call begin() function before "
-        "calling.");
+        "Command buffer is not recording. Call begin() before setting render "
+        "pass.");
+  }
+  if (mCommandBuffer == VK_NULL_HANDLE) {
+    throw Exception::CommandBufferRecordingFailure(
+        "Command buffer is not allocated. Cannot set render pass.");
   }
 
-  mRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-  mRenderPassInfo.renderPass = *mPipeline;
-  mRenderPassInfo.framebuffer = framebuffer;
-  mRenderPassInfo.renderArea.offset = {0, 0};
-  mRenderPassInfo.renderArea.extent =
-      mPipeline->getSwapchain()->getProperty().extent;
   VkClearValue color = {
       {{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}}};
-  mRenderPassInfo.clearValueCount = 1;
-  mRenderPassInfo.pClearValues = &color;
+  VkRenderPassBeginInfo beginInfo{};
+  beginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+  beginInfo.renderPass = *mPipeline;
+  beginInfo.framebuffer = framebuffer;
+  beginInfo.renderArea.offset = {0, 0};
+  beginInfo.renderArea.extent = mPipeline->getSwapchain()->getProperty().extent;
+  beginInfo.clearValueCount = 1;
+  beginInfo.pClearValues = &color;
 
-  mContent = (VkSubpassContents)content;
+  vkCmdBeginRenderPass(mCommandBuffer, &beginInfo, (VkSubpassContents)content);
+  vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    *mPipeline);
 }
 
 void CommandBuffer::setViewport(float x0, float y0, float width, float height,
                                 float minDepth, float maxDepth) {
   if (!mIsRecording) {
     throw Exception::CommandBufferRecordingFailure(
-        "Command buffer is not ready to record. Call begin() function before "
-        "calling.");
+        "Command buffer is not recording. Call begin() before setting "
+        "viewport.");
+  }
+  if (mCommandBuffer == VK_NULL_HANDLE) {
+    throw Exception::CommandBufferRecordingFailure(
+        "Command buffer is not allocated. Cannot set viewport.");
   }
 
-  mViewport.x = x0;
-  mViewport.y = y0;
-  mViewport.width = width;
-  mViewport.height = height;
-  mViewport.minDepth = minDepth;
-  mViewport.maxDepth = maxDepth;
+  VkViewport viewport{};
+  viewport.x = x0;
+  viewport.y = y0;
+  viewport.width = width;
+  viewport.height = height;
+  viewport.minDepth = minDepth;
+  viewport.maxDepth = maxDepth;
+  vkCmdSetViewport(mCommandBuffer, 0, 1, &viewport);
 }
 
 void CommandBuffer::setScissor(Type::i32 offsetX, Type::i32 offsetY,
                                Type::u32 width, Type::u32 height) {
-  mScissor.offset = {offsetX, offsetY};
-  mScissor.extent = {width, height};
+  if (!mIsRecording) {
+    throw Exception::CommandBufferRecordingFailure(
+        "Command buffer is not recording. Call begin() before setting "
+        "scissor.");
+  }
+  if (mCommandBuffer == VK_NULL_HANDLE) {
+    throw Exception::CommandBufferRecordingFailure(
+        "Command buffer is not allocated. Cannot set scissor.");
+  }
+
+  VkRect2D scissor{};
+  scissor.offset.x = offsetX;
+  scissor.offset.y = offsetY;
+  scissor.extent.width = width;
+  scissor.extent.height = height;
+  vkCmdSetScissor(mCommandBuffer, 0, 1, &scissor);
+}
+
+void CommandBuffer::begin(Bitflag<Type::CommandBufferUsage> flags,
+                          VkCommandBufferInheritanceInfo *inherit) {
+  VkCommandBufferBeginInfo beginInfo{};
+  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  beginInfo.flags =
+      (VkCommandBufferUsageFlags)((Type::CommandBufferUsage)flags);
+  if (inherit) {
+    beginInfo.pInheritanceInfo = inherit;
+  } else {
+    beginInfo.pInheritanceInfo = nullptr;
+  }
+
+  if (vkBeginCommandBuffer(mCommandBuffer, &beginInfo) != VK_SUCCESS) {
+    throw Exception::CommandBufferRecordingFailure(
+        "Failed to begin recording command buffer.");
+  }
+
+  mIsRecording = true;
+}
+
+void CommandBuffer::end() {
+  vkCmdEndRenderPass(mCommandBuffer);
+  if (vkEndCommandBuffer(mCommandBuffer) != VK_SUCCESS) {
+    throw Exception::CommandBufferRecordingFailure(
+        "Failed to end recording command buffer.");
+  }
+
+  mIsRecording = false;
 }
 
 void CommandBuffer::drawBuffer(Type::u64 verexCount, Type::u64 instanceCount,
                                Type::u64 firstVertex, Type::u64 firstInstance) {
-  mDrawSetting.verexCount = verexCount;
-  mDrawSetting.instanceCount = instanceCount;
-  mDrawSetting.firstVertex = firstVertex;
-  mDrawSetting.firstInstance = firstInstance;
+  if (!mIsRecording) {
+    throw Exception::CommandBufferRecordingFailure(
+        "Command buffer is not recording. Call begin() before drawing.");
+  }
+  if (mCommandBuffer == VK_NULL_HANDLE) {
+    throw Exception::CommandBufferRecordingFailure(
+        "Command buffer is not allocated. Cannot draw.");
+  }
+
+  vkCmdDraw(mCommandBuffer, verexCount, instanceCount, firstVertex,
+            firstInstance);
 }
 
-void CommandBuffer::compile(Bitflag<Type::CommandBufferUsage> flags,
-                            VkCommandBufferInheritanceInfo *inherit) {
-  this->begin(flags, inherit);
-  vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    *mPipeline);
-  vkCmdBeginRenderPass(mCommandBuffer, &mRenderPassInfo, mContent);
-  vkCmdSetViewport(mCommandBuffer, 0, 1, &mViewport);
-  vkCmdSetScissor(mCommandBuffer, 0, 1, &mScissor);
-  vkCmdDraw(mCommandBuffer, mDrawSetting.verexCount, mDrawSetting.instanceCount,
-            mDrawSetting.firstVertex, mDrawSetting.instanceCount);
-  vkCmdEndRenderPass(mCommandBuffer);
-  this->end();
+void CommandBuffer::reset() {
+  if (mCommandBuffer == VK_NULL_HANDLE) {
+    throw Exception::SyncObjectResetFailure(
+        "Command buffer is not allocated. Cannot reset.");
+  }
+
+  if (vkResetCommandBuffer(mCommandBuffer, 0) != VK_SUCCESS) {
+    throw Exception::SyncObjectResetFailure("Failed to reset command buffer.");
+  }
+
+  mIsRecording = false;
+  mRenderPassInfo = {};
+  mContent = VK_SUBPASS_CONTENTS_INLINE;
+  mViewport = {};
+  mScissor = {};
+  mDrawSetting = {};
 }
 
 void CommandBuffer::dispose() {

@@ -1,8 +1,8 @@
+#include "../../include/common/exception.hpp"
 #include "../../include/core/framebuffer.hpp"
-#include "../../include/decl/exception.hpp"
 
 namespace Terreate::Core {
-Framebuffer::Framebuffer(Util::ResourcePointer<Pipeline> pipeline)
+Framebuffer::Framebuffer(VkObjectRef<Pipeline> pipeline)
     : mDevice(pipeline->getDevice()) {
   auto const &extent = pipeline->getSwapchain()->getProperty().extent;
   auto const &imageViews = pipeline->getSwapchain()->getImageViews();

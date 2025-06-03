@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.20)
 include(FetchContent)
 project(TRcore LANGUAGES CXX)
 
+if(TERREATE_DEBUG_BUILD)
+  message(STATUS "Building with debug flags")
+  add_compile_options(-g -O0 -Wall -fsanitize=address)
+  add_link_options(-fsanitize=address)
+  add_compile_definitions(TERREATE_DEBUG_BUILD)
+else()
+  message(STATUS "Building with release flags")
+  add_compile_options(-O3 -Wall)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -17,7 +27,9 @@ add_library(
   device.cpp
   framebuffer.cpp
   pipeline.cpp
+  queue.cpp
   swapchain.cpp
+  sync.cpp
   window.cpp
   winevent.cpp
 )
