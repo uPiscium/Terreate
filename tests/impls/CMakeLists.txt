@@ -9,6 +9,7 @@ option(BUILD_AUDIO_TESTS "Build the audio tests" OFF)
 option(BUILD_GRAPHICS_TESTS "Build the graphics tests" ON)
 
 add_executable(${PROJECT_NAME}
+  _main.cpp
   api.cpp
   context.cpp
   debugger.cpp

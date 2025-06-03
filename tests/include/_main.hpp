@@ -41,23 +41,23 @@ struct SwapchainProperty {
 class TestDebugger : public Terreate::Core::IDebugger {
 public:
   bool
-  verbose(std::string const &message, Terreate::Core::MessageType const type,
+  verbose(std::string const &message, Terreate::Type::MessageType const type,
           std::vector<Terreate::Core::DebugObject> const &object) override {
     std::cout << message << std::endl;
     return false;
   }
-  bool info(std::string const &message, Terreate::Core::MessageType const type,
+  bool info(std::string const &message, Terreate::Type::MessageType const type,
             std::vector<Terreate::Core::DebugObject> const &object) override {
     std::cout << message << std::endl;
     return false;
   }
   bool
-  warning(std::string const &message, Terreate::Core::MessageType const type,
+  warning(std::string const &message, Terreate::Type::MessageType const type,
           std::vector<Terreate::Core::DebugObject> const &object) override {
     std::cout << message << std::endl;
     return false;
   }
-  bool error(std::string const &message, Terreate::Core::MessageType const type,
+  bool error(std::string const &message, Terreate::Type::MessageType const type,
              std::vector<Terreate::Core::DebugObject> const &object) override {
     std::cout << message << std::endl;
     return false;
@@ -66,10 +66,13 @@ public:
 
 class VulkanTriangle {
 private:
+  Terreate::Core::Context *mContext;
+
   GLFWwindow *mWindow;
   VkInstance mInstance;
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   std::multimap<int, VkPhysicalDevice> mDevices;
+  VkDebugUtilsMessengerEXT mDebugMessenger;
   VkDevice mDevice;
   VkQueue mGraphicsQueue;
   VkQueue mPresentQueue;

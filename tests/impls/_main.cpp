@@ -6,6 +6,36 @@
 #include <stdexcept>
 
 #include "../include/_main.hpp"
+#include <core/debugger.hpp>
+#include <core/vk.hpp>
+
+std::vector<char const *> getRequiredExts() {
+  uint32_t glfwExtensionCount = 0;
+  char const **glfwExtensions =
+      glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+  std::vector<char const *> extensions(glfwExtensions,
+                                       glfwExtensions + glfwExtensionCount);
+#ifdef TERREATE_DEBUG_BUILD
+  extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+
+  return extensions;
+}
+
+VkDebugUtilsMessengerCreateInfoEXT createDebugInfo() {
+  VkDebugUtilsMessengerCreateInfoEXT createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+  createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+  createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                           VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                           VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+  createInfo.pfnUserCallback = Terreate::Core::debugCallbackWrapper;
+  createInfo.pUserData = nullptr; // Optional
+  createInfo.pNext = nullptr;     // Optional
+  return createInfo;
+}
 
 std::vector<char> VulkanTriangle::readFile(std::string const &filename) {
   std::ifstream file(filename, std::ios::ate | std::ios::binary);
@@ -33,9 +63,40 @@ void VulkanTriangle::initWindow() {
 }
 
 void VulkanTriangle::createInstance() {
-  // mDebugger = new TestDebugger();
-  // mInstance =
-  //     Terreate::API::createInstance("VulkanTriangle", {1, 0, 0}, mDebugger);
+  // VkApplicationInfo appInfo{};
+  // appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  // appInfo.pApplicationName = "Vulkan Triangle";
+  // appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+  // appInfo.pEngineName = "Terreate";
+  // appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+  // appInfo.apiVersion = VK_API_VERSION_1_0;
+
+  // VkInstanceCreateInfo createInfo{};
+  // createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+  // createInfo.pApplicationInfo = &appInfo;
+  // createInfo.enabledLayerCount = 0;
+  // createInfo.ppEnabledLayerNames = nullptr;
+  // createInfo.pNext = nullptr;
+
+  // #ifdef TERREATE_DEBUG_BUILD
+  // auto debuggerInfo = createDebugInfo();
+  // createInfo.enabledLayerCount =
+  //     static_cast<uint32_t>(Terreate::Core::VALIDATION_LAYERS.size());
+  // createInfo.ppEnabledLayerNames = Terreate::Core::VALIDATION_LAYERS.data();
+  // createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debuggerInfo;
+  // #endif
+
+  // auto exts = getRequiredExts();
+  // createInfo.enabledExtensionCount = static_cast<uint32_t>(exts.size());
+  // createInfo.ppEnabledExtensionNames = exts.data();
+
+  // if (vkCreateInstance(&createInfo, nullptr, &mInstance) != VK_SUCCESS) {
+  //   throw std::runtime_error("Failed to create Vulkan instance!");
+  // }
+  mContext = new Terreate::Core::Context("Vulkan Triangle",
+                                         Terreate::Type::Version(1, 0, 0));
+  mContext->attachDebugger(new TestDebugger());
+  mInstance = mContext->getInstance();
 }
 
 bool VulkanTriangle::isCompleteQueueFamily(
@@ -154,14 +215,13 @@ VulkanTriangle::querySwapchainSupport(VkPhysicalDevice device) {
 }
 
 void VulkanTriangle::pickPhysicalDevice() {
-  auto instance = mVulkanInstance->getInstance();
   uint32_t deviceCount = 0;
-  vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+  vkEnumeratePhysicalDevices(mInstance, &deviceCount, nullptr);
   if (deviceCount == 0) {
     throw std::runtime_error("Failed to find GPUs with Vulkan support!");
   }
   std::vector<VkPhysicalDevice> devices(deviceCount);
-  vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+  vkEnumeratePhysicalDevices(mInstance, &deviceCount, devices.data());
 
   for (auto &device : devices) {
     if (!this->checkDeviceExtensionSupport(device)) {
@@ -220,8 +280,8 @@ void VulkanTriangle::createLogicalDevice() {
 
 #ifdef TERREATE_DEBUG_BUILD
   createInfo.enabledLayerCount =
-      static_cast<uint32_t>(Terreate::API::VALIDATION_LAYERS.size());
-  createInfo.ppEnabledLayerNames = Terreate::API::VALIDATION_LAYERS.data();
+      static_cast<uint32_t>(Terreate::Core::VALIDATION_LAYERS.size());
+  createInfo.ppEnabledLayerNames = Terreate::Core::VALIDATION_LAYERS.data();
 #else
   createInfo.enabledLayerCount = 0;
 #endif
@@ -236,8 +296,7 @@ void VulkanTriangle::createLogicalDevice() {
 }
 
 void VulkanTriangle::createSurface() {
-  auto instance = mVulkanInstance->getInstance();
-  if (glfwCreateWindowSurface(instance, mWindow, nullptr, &mSurface) !=
+  if (glfwCreateWindowSurface(mInstance, mWindow, nullptr, &mSurface) !=
       VK_SUCCESS) {
     throw std::runtime_error("Failed to create window surface!");
   }
@@ -291,6 +350,8 @@ void VulkanTriangle::createSwapchain() {
   VkSurfaceFormatKHR surfaceFormat = this->pickSurfaceFormat(details.formats);
   VkPresentModeKHR presentMode = this->pickPresentMode(details.presentModes);
   VkExtent2D extent = this->pickExtent(details.capabilities);
+  std::cout << "Swapchain extent: " << extent.width << "x" << extent.height
+            << std::endl;
 
   uint32_t const &minImgCount = details.capabilities.minImageCount;
   uint32_t const &maxImgCount = details.capabilities.maxImageCount;
@@ -595,6 +656,9 @@ void VulkanTriangle::createFramebuffers() {
     framebufferInfo.width = mSwapchainProperty.extent.width;
     framebufferInfo.height = mSwapchainProperty.extent.height;
     framebufferInfo.layers = 1;
+    std::cout << "Framebuffer " << i
+              << " size: " << mSwapchainProperty.extent.width << "x"
+              << mSwapchainProperty.extent.height << std::endl;
 
     if (vkCreateFramebuffer(mDevice, &framebufferInfo, nullptr,
                             &mSwapchainFramebuffers[i]) != VK_SUCCESS) {
@@ -747,8 +811,7 @@ void VulkanTriangle::drawFrame() {
 }
 
 void VulkanTriangle::initVulkan() {
-  // this->createInstance();
-  // mDebugger->initDebugMessenger(mInstance);
+  this->createInstance();
   this->createSurface();
   this->pickPhysicalDevice();
   this->createLogicalDevice();
@@ -788,10 +851,7 @@ void VulkanTriangle::cleanup() {
   vkDestroySwapchainKHR(mDevice, mSwapchain, nullptr);
   vkDestroyDevice(mDevice, nullptr);
 
-  auto instance = mVulkanInstance->getInstance();
-  vkDestroySurfaceKHR(instance, mSurface, nullptr);
-
-  mVulkanInstance = nullptr;
+  vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
 
   glfwDestroyWindow(mWindow);
   glfwTerminate();
@@ -799,42 +859,9 @@ void VulkanTriangle::cleanup() {
 
 VulkanTriangle::VulkanTriangle() {
   this->initWindow();
-  // auto debugger = Terreate::Core::Resource<TestDebugger>::Create();
-  mVulkanInstance = std::make_shared<Terreate::Core::VulkanInstance>(
-      "VulkanTriangle", Version{1, 0, 0}, "No Engine", Version{1, 0, 0},
-      VK_API_VERSION_1_4);
   this->initVulkan();
 }
 
 VulkanTriangle::~VulkanTriangle() { this->cleanup(); }
 
 void VulkanTriangle::run() { this->mainLoop(); }
-
-int main() {
-  // VulkanTriangle app;
-
-  // try {
-  //   app.run();
-  // } catch (const std::runtime_error &e) {
-  //   std::cerr << "Error: " << e.what() << std::endl;
-  //   return EXIT_FAILURE;
-  // } catch (...) {
-  //   std::cerr << "Unknown error occurred." << std::endl;
-  //   return EXIT_FAILURE;
-  // }
-
-  // std::cout << "Vulkan Triangle application finished successfully."
-  //           << std::endl;
-  // return EXIT_SUCCESS;
-
-  Terreate::Context context;
-  auto instance = context.createInstance("VulkanTriangle", {1, 0, 0});
-  auto debugger = new TestDebugger();
-  instance->attachDebugger(debugger);
-
-  auto window = instance->createWindow("VulkanTriangle", 800, 600);
-
-  delete debugger;
-
-  return 0;
-}
