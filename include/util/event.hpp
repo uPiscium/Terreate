@@ -32,6 +32,7 @@ public:
 template <typename... EventArgs> class Event final {
 private:
   using Callback = Subscriber<EventArgs...>;
+  typedef std::recursive_mutex mutex;
 
 private:
   std::mutex mEventMutex;

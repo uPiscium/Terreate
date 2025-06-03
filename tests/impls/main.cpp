@@ -2,9 +2,8 @@
 #include <core/debugger.hpp>
 #include <core/window.hpp>
 
-#include <iostream>
-
 #include "../include/_main.hpp"
+#include <iostream>
 
 using namespace Terreate;
 
