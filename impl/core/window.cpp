@@ -105,13 +105,6 @@ Window::Window(VkInstance instance, Type::str const &title,
   }
   glfwSetWindowUserPointer(mWindow, this);
 
-  if (glfwCreateWindowSurface(instance, mWindow, nullptr, &mSurface) !=
-      VK_SUCCESS) {
-    char const *log = nullptr;
-    glfwGetError(&log);
-    throw Exception::SurfaceCreationFailure(log);
-  }
-
   glfwSetWindowSizeCallback(mWindow, Wrapper::windowSizeCallbackWrapper);
   glfwSetWindowPosCallback(mWindow, Wrapper::windowPositionCallbackWrapper);
   glfwSetWindowCloseCallback(mWindow, Wrapper::windowCloseCallbackWrapper);
@@ -132,20 +125,37 @@ Window::Window(VkInstance instance, Type::str const &title,
   glfwSetCharCallback(mWindow, Wrapper::charCallbackWrapper);
   glfwSetDropCallback(mWindow, Wrapper::dropCallbackWrapper);
 
-  this->properties.setup(mWindow);
+  mProperties.setup(mWindow);
+}
+
+void Window::setIcon(Icon const &icon) {
+  if (icon) {
+    glfwSetWindowIcon(mWindow, icon.getImageCount(), icon);
+  } else {
+    glfwSetWindowIcon(mWindow, 0, nullptr);
+  }
+}
+
+void Window::setCursor(Cursor const &cursor) {
+  if (cursor) {
+    glfwSetCursor(mWindow, cursor);
+  } else {
+    glfwSetCursor(mWindow, nullptr);
+  }
+}
+
+void Window::setCursor(StandardCursor const &cursor) {
+  if (cursor) {
+    glfwSetCursor(mWindow, cursor);
+  } else {
+    glfwSetCursor(mWindow, nullptr);
+  }
 }
 
 void Window::destroy() {
-  if (mSwapchain) {
-    mSwapchain.dispose();
-  }
   if (mWindow != nullptr) {
     glfwDestroyWindow(mWindow);
     mWindow = nullptr;
-  }
-  if (mSurface != VK_NULL_HANDLE) {
-    vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
-    mSurface = VK_NULL_HANDLE;
   }
 }
 } // namespace Terreate::Core

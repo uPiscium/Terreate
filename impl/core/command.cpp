@@ -2,8 +2,7 @@
 #include "../../include/core/command.hpp"
 
 namespace Terreate::Core {
-CommandPool::CommandPool(VkObjectRef<Pipeline> pipeline)
-    : mPipeline(pipeline), mDevice(pipeline->getDevice()) {
+CommandPool::CommandPool(VkObjectRef<IDevice> device) : mDevice(device) {
   VkCommandPoolCreateInfo poolInfo{};
   poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
   poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -16,10 +15,10 @@ CommandPool::CommandPool(VkObjectRef<Pipeline> pipeline)
   }
 }
 
-VkObjectRef<CommandBuffer>
+VkObjectRef<ICommandBuffer>
 CommandPool::createCommandBuffer(Type::CommandBufferLevel const &level) {
-  auto commandBuffer =
-      makeVkObject<CommandBuffer>(mPipeline, mCommandPool, level);
+  VkObject<ICommandBuffer> commandBuffer =
+      makeVkObject<CommandBuffer>(mDevice, mCommandPool, level);
   mCommandBuffers.push_back(std::move(commandBuffer));
   return mCommandBuffers.back().ref();
 }
@@ -33,9 +32,9 @@ void CommandPool::dispose() {
   }
 }
 
-CommandBuffer::CommandBuffer(VkObjectRef<Pipeline> pipeline, VkCommandPool pool,
+CommandBuffer::CommandBuffer(VkObjectRef<IDevice> device, VkCommandPool pool,
                              Type::CommandBufferLevel const &level)
-    : mPipeline(pipeline), mDevice(pipeline->getDevice()), mCommandPool(pool) {
+    : mDevice(device), mCommandPool(pool) {
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   allocInfo.commandPool = mCommandPool;
@@ -49,7 +48,10 @@ CommandBuffer::CommandBuffer(VkObjectRef<Pipeline> pipeline, VkCommandPool pool,
   }
 }
 
-void CommandBuffer::setRenderPass(VkFramebuffer framebuffer,
+void CommandBuffer::setRenderPass(VkObjectRef<ISwapchain> swapchain,
+                                  VkObjectRef<IPipeline> pipeline,
+                                  VkObjectRef<IRenderPass> renderpass,
+                                  VkObjectRef<IFramebuffer> framebuffer,
                                   Type::vec<float> const &clearColor,
                                   Type::SubpassContent content) {
   if (!mIsRecording) {
@@ -66,16 +68,15 @@ void CommandBuffer::setRenderPass(VkFramebuffer framebuffer,
       {{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}}};
   VkRenderPassBeginInfo beginInfo{};
   beginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-  beginInfo.renderPass = *mPipeline;
-  beginInfo.framebuffer = framebuffer;
+  beginInfo.renderPass = *renderpass;
+  beginInfo.framebuffer = *framebuffer;
   beginInfo.renderArea.offset = {0, 0};
-  beginInfo.renderArea.extent = mPipeline->getSwapchain()->getProperty().extent;
+  beginInfo.renderArea.extent = swapchain->getProperty().extent;
   beginInfo.clearValueCount = 1;
   beginInfo.pClearValues = &color;
 
   vkCmdBeginRenderPass(mCommandBuffer, &beginInfo, (VkSubpassContents)content);
-  vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    *mPipeline);
+  vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *pipeline);
 }
 
 void CommandBuffer::setViewport(float x0, float y0, float width, float height,

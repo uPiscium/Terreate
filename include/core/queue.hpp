@@ -7,7 +7,13 @@
 #include "../common/type.hpp"
 
 namespace Terreate::Core {
-class GraphicQueue {
+class IQueue {
+public:
+  virtual ~IQueue() = default;
+  virtual operator VkQueue() const = 0;
+};
+
+class GraphicQueue : public IQueue {
 private:
   PROHIBIT_COPY_AND_ASSIGN(GraphicQueue);
 
@@ -20,7 +26,7 @@ private:
   };
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkQueue mQueue = VK_NULL_HANDLE;
   Type::vec<SubmitInfo> mSubmitInfos;
 
@@ -28,40 +34,36 @@ private:
   Type::vec<VkSubmitInfo> createSubmitInfos();
 
 public:
-  GraphicQueue(VkObjectRef<Device> device);
-  ~GraphicQueue() { this->dispose(); }
+  GraphicQueue(VkObjectRef<IDevice> device);
+  ~GraphicQueue() override { this->dispose(); }
 
-  VkObjectRef<Device> getDevice() const { return mDevice; }
-
-  void queue(Type::vec<VkObjectRef<CommandBuffer>> commandBuffers,
+  void queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
              Type::vec<Type::PipelineStage> waitStages = {},
-             Type::vec<VkObjectRef<Semaphore>> waitSemaphores = {},
-             Type::vec<VkObjectRef<Semaphore>> signalSemaphores = {});
-  void submit(VkObjectRef<Fence> fence = nullptr);
+             Type::vec<VkObjectRef<ISemaphore>> waitSemaphores = {},
+             Type::vec<VkObjectRef<ISemaphore>> signalSemaphores = {});
+  void submit(VkObjectRef<IFence> fence = nullptr);
   void dispose();
 
-  operator VkQueue() const { return mQueue; }
+  operator VkQueue() const override { return mQueue; }
 };
 
-class PresentQueue {
+class PresentQueue : public IQueue {
 private:
   PROHIBIT_COPY_AND_ASSIGN(PresentQueue);
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkQueue mQueue = VK_NULL_HANDLE;
 
 public:
-  PresentQueue(VkObjectRef<Device> device);
-  ~PresentQueue() { this->dispose(); }
+  PresentQueue(VkObjectRef<IDevice> device);
+  ~PresentQueue() override { this->dispose(); }
 
-  VkObjectRef<Device> getDevice() const { return mDevice; }
-
-  void present(VkObjectRef<Swapchain> swapchain,
+  void present(VkObjectRef<ISwapchain> swapchain,
                Type::vec<Type::u32> imageIndices,
-               VkObjectRef<Semaphore> waitSemaphore = nullptr);
+               VkObjectRef<ISemaphore> waitSemaphore = nullptr);
   void dispose();
 
-  operator VkQueue() const { return mQueue; }
+  operator VkQueue() const override { return mQueue; }
 };
 } // namespace Terreate::Core

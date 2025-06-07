@@ -50,10 +50,8 @@ public:
     mVulkanObjectRef = nullptr;
     return *this;
   }
-  VkObjectRef &operator=(VkObjectRef const &other) {
-    if (this != &other) {
-      mVulkanObjectRef = other.mVulkanObjectRef;
-    }
+  template <typename U> VkObjectRef &operator=(VkObjectRef<U> const &other) {
+    mVulkanObjectRef = other.mVulkanObjectRef;
     return *this;
   }
 
@@ -64,21 +62,35 @@ template <typename T> class VkObject {
 private:
   PROHIBIT_COPY_AND_ASSIGN(VkObject);
 
+  template <typename U>
+  friend class VkObject; // Allow VkObjectRef to access private members
+
 private:
   Type::unique<T> mVulkanObject = nullptr;
 
 public:
   VkObject() = default;
   VkObject(std::nullptr_t) : mVulkanObject(nullptr) {}
-  VkObject(T *vulkanObject) : mVulkanObject(vulkanObject) {
+  template <typename U>
+  VkObject(U *vulkanObject) : mVulkanObject(static_cast<T *>(vulkanObject)) {
     if (mVulkanObject == nullptr) {
       throw Exception::NullReferenceException("Vulkan object cannot be null.");
     }
   }
-  explicit VkObject(Type::unique<T> &&vulkanObject)
-      : mVulkanObject(std::move(vulkanObject)) {}
-  VkObject(VkObject &&other) noexcept
-      : mVulkanObject(std::move(other.mVulkanObject)) {}
+  template <typename U>
+  explicit VkObject(Type::unique<U> &&vulkanObject)
+      : mVulkanObject(std::move(vulkanObject)) {
+    if (mVulkanObject == nullptr) {
+      throw Exception::NullReferenceException("Vulkan object cannot be null.");
+    }
+  }
+  template <typename U>
+  VkObject(VkObject<U> &&other)
+      : mVulkanObject(static_cast<T *>(other.mVulkanObject.release())) {
+    if (mVulkanObject == nullptr) {
+      throw Exception::NullReferenceException("Vulkan object cannot be null.");
+    }
+  }
   virtual ~VkObject() = default;
 
   VkObjectRef<T> ref() const {
@@ -109,10 +121,8 @@ public:
     mVulkanObject.reset();
     return *this;
   }
-  VkObject &operator=(VkObject &&other) noexcept {
-    if (this != &other) {
-      mVulkanObject = std::move(other.mVulkanObject);
-    }
+  template <typename U> VkObject &operator=(VkObject<U> &&other) {
+    mVulkanObject.reset(other.mVulkanObject.release());
     return *this;
   }
 
@@ -125,7 +135,7 @@ public:
 };
 
 template <typename T, typename... Args>
-VkObject<T> makeVkObject(Args &&...args) {
-  return VkObject<T>::create(std::forward<Args>(args)...);
+inline VkObject<T> makeVkObject(Args &&...args) {
+  return VkObject<T>(new T(std::forward<Args>(args)...));
 }
 } // namespace Terreate::Core

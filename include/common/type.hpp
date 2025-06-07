@@ -51,6 +51,9 @@ template <typename... Args> using function = std::function<Args...>;
 
 template <typename T> str getTypeName() { return typeid(T).name(); }
 
+template <typename base, typename derived>
+concept extends = std::is_base_of_v<base, derived>;
+
 struct Version {
   int major;
   int minor;

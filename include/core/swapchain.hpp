@@ -1,5 +1,6 @@
 #pragma once
 #include "device.hpp"
+#include "surface.hpp"
 #include "sync.hpp"
 #include "vkobj.hpp"
 
@@ -11,7 +12,19 @@ struct SwapchainProperty {
   VkExtent2D extent;
 };
 
-class Swapchain {
+class ISwapchain {
+public:
+  virtual ~ISwapchain() = default;
+  virtual Type::vec<VkImageView> const &getImageViews() const = 0;
+  virtual SwapchainProperty const &getProperty() const = 0;
+  virtual Type::u32
+  getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const = 0;
+  virtual void recreate(Type::pair<Type::i32> framebufferSize,
+                        VkObjectRef<ISurface> surface) = 0;
+  virtual operator VkSwapchainKHR() const = 0;
+};
+
+class Swapchain : public ISwapchain {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Swapchain);
 
@@ -23,11 +36,11 @@ private:
   VkExtent2D pickExtent(Type::pair<Type::i32> framebufferSize,
                         VkSurfaceCapabilitiesKHR const &capabilities);
   void createSwapchain(Type::pair<Type::i32> framebufferSize,
-                       VkSurfaceKHR surface);
+                       VkObjectRef<ISurface> surface);
   void createImageViews();
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
 
   VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
   Type::vec<VkImage> mSwapchainImages;
@@ -35,19 +48,22 @@ private:
   SwapchainProperty mSwapchainProperty;
 
 public:
-  Swapchain(VkObjectRef<Device> device, Type::pair<Type::i32> framebufferSize,
-            VkSurfaceKHR surface);
-  ~Swapchain() { this->destroy(); }
+  Swapchain(VkObjectRef<IDevice> device, Type::pair<Type::i32> framebufferSize,
+            VkObjectRef<ISurface> surface);
+  ~Swapchain() { this->dispose(); }
 
-  VkObjectRef<Device> getDevice() const { return mDevice; }
-  SwapchainProperty const &getProperty() const { return mSwapchainProperty; }
-  Type::vec<VkImageView> const &getImageViews() const {
+  SwapchainProperty const &getProperty() const override {
+    return mSwapchainProperty;
+  }
+  Type::vec<VkImageView> const &getImageViews() const override {
     return mSwapchainImageViews;
   }
-  Type::u32 getNextImageIndex(VkObjectRef<Semaphore> semaphore) const;
+  Type::u32 getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const override;
 
-  void destroy();
+  void recreate(Type::pair<Type::i32> framebufferSize,
+                VkObjectRef<ISurface> surface) override {}
+  void dispose();
 
-  operator VkSwapchainKHR() const { return mSwapchain; }
+  operator VkSwapchainKHR() const override { return mSwapchain; }
 };
 } // namespace Terreate::Core

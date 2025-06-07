@@ -177,10 +177,10 @@ void Device::createLogicalDevice(VkSurfaceKHR surface) {
   }
 }
 
-Device::Device(VkInstance instance, VkSurfaceKHR surface)
+Device::Device(VkInstance instance, VkObjectRef<ISurface> surface)
     : mInstance(instance) {
-  this->pickPhysicalDevice(surface);
-  this->createLogicalDevice(surface);
+  this->pickPhysicalDevice(*surface);
+  this->createLogicalDevice(*surface);
 }
 
 void Device::dispose() {

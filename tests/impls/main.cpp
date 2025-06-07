@@ -58,33 +58,37 @@ int test1() {
 
   auto window = ctx.createWindow("Terreate", {800, 600},
                                  Core::WindowSettings{.resizable = false});
+  auto surface = ctx.createSurface(window);
   auto graphicQueue = ctx.createGraphicQueue();
   auto presentQueue = ctx.createPresentQueue();
-  auto pipeline = ctx.createPipeline(window);
-  auto framebuffer = ctx.createFramebuffer(pipeline);
-  auto commandPool = ctx.createCommandPool(pipeline);
+  auto swapchain = ctx.createSwapchain(window, surface);
+  auto renderPass = ctx.createRenderPass(swapchain);
+
+  auto pipeline = ctx.createPipeline(renderPass);
+  auto vertShaderCode = readFile("tests/resources/shader/vert.spv");
+  auto fragShaderCode = readFile("tests/resources/shader/frag.spv");
+  pipeline->attachCompiledShaderSources(vertShaderCode, fragShaderCode);
+
+  auto framebuffer = ctx.createFramebuffer(renderPass, swapchain);
+  auto commandPool = ctx.createCommandPool();
   auto commandBuffer = commandPool->createCommandBuffer();
   auto semaphoreImageAvailable = ctx.createSemaphore();
   auto semaphoreRenderFinished = ctx.createSemaphore();
   auto fenceInFlight = ctx.createFence();
-
-  auto vertShaderCode = readFile("tests/resources/shader/vert.spv");
-  auto fragShaderCode = readFile("tests/resources/shader/frag.spv");
-
-  pipeline->attachCompiledShaderSources(vertShaderCode, fragShaderCode);
 
   while (!window->isClosed()) {
     glfwPollEvents();
 
     fenceInFlight->wait();
     fenceInFlight->reset();
-    Type::u32 imageIndex = pipeline->getNextImageIndex(semaphoreImageAvailable);
+    Type::u32 imageIndex =
+        swapchain->getNextImageIndex(semaphoreImageAvailable);
 
     commandBuffer->reset();
     commandBuffer->begin();
-    commandBuffer->setRenderPass((*framebuffer)[imageIndex], {0, 0, 0, 1},
-                                 Type::SubpassContent::INLINE);
-    auto framebufferSize = pipeline->getSwapchain()->getProperty().extent;
+    commandBuffer->setRenderPass(swapchain, pipeline, renderPass, framebuffer,
+                                 {0, 0, 0, 1}, Type::SubpassContent::INLINE);
+    auto framebufferSize = swapchain->getProperty().extent;
     commandBuffer->setViewport(0, 0, framebufferSize.width,
                                framebufferSize.height, 0.0f, 1.0f);
     commandBuffer->setScissor(0, 0, framebufferSize.width,
@@ -96,8 +100,7 @@ int test1() {
                         {Type::PipelineStage::COLOR_ATTACHMENT_OUTPUT_BIT},
                         {semaphoreImageAvailable}, {semaphoreRenderFinished});
     graphicQueue->submit(fenceInFlight);
-    presentQueue->present(pipeline->getSwapchain(), {imageIndex},
-                          semaphoreRenderFinished);
+    presentQueue->present(swapchain, {imageIndex}, semaphoreRenderFinished);
   }
 
   delete debugger;
