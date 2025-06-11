@@ -161,20 +161,20 @@ void Pipeline::compileShader(Type::str const &vert, Type::str const &frag) {
                                     Type::vec<Type::byte>());
 }
 
-void Pipeline::attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
-                                           Type::vec<Type::byte> const &frag) {
-  mVertShaderCode = vert;
-  mFragShaderCode = frag;
-  this->createPipeline();
-}
-
-void Pipeline::dispose() {
+Pipeline::~Pipeline() {
   if (mGraphicsPipeline != VK_NULL_HANDLE) {
     vkDestroyPipeline(*mDevice, mGraphicsPipeline, nullptr);
   }
   if (mPipelineLayout != VK_NULL_HANDLE) {
     vkDestroyPipelineLayout(*mDevice, mPipelineLayout, nullptr);
   }
+}
+
+void Pipeline::attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
+                                           Type::vec<Type::byte> const &frag) {
+  mVertShaderCode = vert;
+  mFragShaderCode = frag;
+  this->createPipeline();
 }
 
 } // namespace Terreate::Core

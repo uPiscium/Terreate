@@ -56,7 +56,7 @@ CommandBuffer::~CommandBuffer() {
 
 void CommandBuffer::setRenderPass(VkObjectRef<RenderPass> renderPass,
                                   VkObjectRef<Swapchain> swapchain,
-                                  VkObjectRef<Pipeline> pipeline,
+                                  VkObjectRef<IPipeline> pipeline,
                                   VkFramebuffer framebuffer,
                                   Type::vec<float> const &clearColor,
                                   Type::SubpassContent content) {

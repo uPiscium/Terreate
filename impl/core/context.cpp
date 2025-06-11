@@ -4,6 +4,7 @@
 #include "../../include/core/vk.hpp"
 #include "core/command.hpp"
 #include "core/framebuffer.hpp"
+#include "core/pipeline.hpp"
 
 namespace Terreate::Core {
 void Context::loadEXTfunctions() {
@@ -220,7 +221,7 @@ Context::createRenderPass(VkObjectRef<Swapchain> swapchain) {
   return mRenderPasses.back().ref();
 }
 
-VkObjectRef<Pipeline>
+VkObjectRef<IPipeline>
 Context::createPipeline(VkObjectRef<Swapchain> swapchain,
                         VkObjectRef<RenderPass> renderPass) {
   if (!mDevice) {
@@ -228,7 +229,8 @@ Context::createPipeline(VkObjectRef<Swapchain> swapchain,
         "Device is not initialized. Please create a window first.");
   }
 
-  auto pipeline = makeVkObject<Pipeline>(mDevice.get(), swapchain, renderPass);
+  VkObject<IPipeline> pipeline =
+      makeVkObject<Pipeline>(mDevice.get(), swapchain, renderPass);
   mPipelines.emplace_back(std::move(pipeline));
   return mPipelines.back().ref();
 }
@@ -242,8 +244,7 @@ Context::createFramebuffer(VkObjectRef<RenderPass> renderPass,
   return mFramebuffers.back().ref();
 }
 
-VkObjectRef<ICommandPool>
-Context::createCommandPool(VkObjectRef<Pipeline> pipeline) {
+VkObjectRef<ICommandPool> Context::createCommandPool() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");

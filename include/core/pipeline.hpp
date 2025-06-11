@@ -8,7 +8,24 @@
 #include "../common/type.hpp"
 
 namespace Terreate::Core {
-class Pipeline {
+class IPipeline {
+public:
+  virtual ~IPipeline() = default;
+
+  virtual VkPipelineLayout getLayout() const = 0;
+  virtual Type::u32
+  getNextImageIndex(VkObjectRef<Semaphore> semaphore) const = 0;
+
+  virtual void
+  attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
+                              Type::vec<Type::byte> const &frag) = 0;
+  virtual void attachShaderSources(Type::str const &vert,
+                                   Type::str const &frag) = 0;
+
+  virtual operator VkPipeline() const = 0;
+};
+
+class Pipeline : public IPipeline {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Pipeline);
 
@@ -32,24 +49,20 @@ public:
   Pipeline(VkObjectRef<Device> device, VkObjectRef<Swapchain> swapchain,
            VkObjectRef<RenderPass> renderPass)
       : mDevice(device), mSwapchain(swapchain), mRenderPass(renderPass) {}
-  ~Pipeline() { this->dispose(); }
+  ~Pipeline();
 
-  VkObjectRef<Device> getDevice() const { return mDevice; }
-  VkObjectRef<Swapchain> getSwapchain() const { return mSwapchain; }
-  VkPipelineLayout getLayout() const { return mPipelineLayout; }
-  Type::u32 getNextImageIndex(VkObjectRef<Semaphore> semaphore) const {
+  VkPipelineLayout getLayout() const override { return mPipelineLayout; }
+  Type::u32 getNextImageIndex(VkObjectRef<Semaphore> semaphore) const override {
     return mSwapchain->getNextImageIndex(semaphore);
   }
 
   void attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
-                                   Type::vec<Type::byte> const &frag);
-  void attachShaderSources(Type::str const &vert, Type::str const &frag) {
+                                   Type::vec<Type::byte> const &frag) override;
+  void attachShaderSources(Type::str const &vert,
+                           Type::str const &frag) override {
     this->compileShader(vert, frag);
   }
 
-  void dispose();
-
-  operator VkRenderPass() const { return *mRenderPass; }
-  operator VkPipeline() const { return mGraphicsPipeline; }
+  operator VkPipeline() const override { return mGraphicsPipeline; }
 };
 } // namespace Terreate::Core

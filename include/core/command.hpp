@@ -18,7 +18,7 @@ public:
 
   virtual void setRenderPass(VkObjectRef<RenderPass> renderPass,
                              VkObjectRef<Swapchain> swapchain,
-                             VkObjectRef<Pipeline> pipeline,
+                             VkObjectRef<IPipeline> pipeline,
                              VkFramebuffer framebuffer,
                              Type::vec<float> const &clearColor,
                              Type::SubpassContent content) = 0;
@@ -106,7 +106,7 @@ public:
 
   void setRenderPass(VkObjectRef<RenderPass> renderPass,
                      VkObjectRef<Swapchain> swapchain,
-                     VkObjectRef<Pipeline> pipeline, VkFramebuffer framebuffer,
+                     VkObjectRef<IPipeline> pipeline, VkFramebuffer framebuffer,
                      Type::vec<float> const &clearColor,
                      Type::SubpassContent content) override;
   void setViewport(float x0, float y0, float width, float height,
