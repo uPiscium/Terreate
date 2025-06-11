@@ -5,6 +5,8 @@
 #include "framebuffer.hpp"
 #include "pipeline.hpp"
 #include "queue.hpp"
+#include "renderpass.hpp"
+#include "surface.hpp"
 #include "sync.hpp"
 #include "vkobj.hpp"
 #include "window.hpp"
@@ -22,11 +24,14 @@ private:
   VkObject<Device> mDevice = nullptr;
 
   Type::vec<VkObject<Window>> mWindows;
+  Type::vec<VkObject<Surface>> mSurfaces;
+  Type::vec<VkObject<Swapchain>> mSwapchains;
   Type::vec<VkObject<GraphicQueue>> mGraphicQueues;
   Type::vec<VkObject<PresentQueue>> mPresentQueues;
+  Type::vec<VkObject<RenderPass>> mRenderPasses;
   Type::vec<VkObject<Pipeline>> mPipelines;
   Type::vec<VkObject<Framebuffer>> mFramebuffers;
-  Type::vec<VkObject<CommandPool>> mCommandPools;
+  Type::vec<VkObject<ICommandPool>> mCommandPools;
   Type::vec<VkObject<Semaphore>> mSemaphores;
   Type::vec<VkObject<Fence>> mFences;
 
@@ -52,11 +57,16 @@ public:
   VkObjectRef<Window>
   createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
                WindowSettings const &settings = WindowSettings());
+  VkObjectRef<Surface> createSurface(VkObjectRef<Window> window);
+  VkObjectRef<Swapchain> createSwapchain(VkObjectRef<Window> window,
+                                         VkObjectRef<Surface> surface);
   VkObjectRef<GraphicQueue> createGraphicQueue();
   VkObjectRef<PresentQueue> createPresentQueue();
-  VkObjectRef<Pipeline> createPipeline(VkObjectRef<Window> window);
+  VkObjectRef<RenderPass> createRenderPass(VkObjectRef<Swapchain> swapchain);
+  VkObjectRef<Pipeline> createPipeline(VkObjectRef<Swapchain> swapchain,
+                                       VkObjectRef<RenderPass> renderPass);
   VkObjectRef<Framebuffer> createFramebuffer(VkObjectRef<Pipeline> pipeline);
-  VkObjectRef<CommandPool> createCommandPool(VkObjectRef<Pipeline> pipeline);
+  VkObjectRef<ICommandPool> createCommandPool(VkObjectRef<Pipeline> pipeline);
   VkObjectRef<Semaphore> createSemaphore();
   VkObjectRef<Fence> createFence();
 

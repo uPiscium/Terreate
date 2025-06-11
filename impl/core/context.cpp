@@ -2,6 +2,7 @@
 #include "../../include/core/context.hpp"
 #include "../../include/core/swapchain.hpp"
 #include "../../include/core/vk.hpp"
+#include "core/command.hpp"
 
 namespace Terreate::Core {
 void Context::loadEXTfunctions() {
@@ -152,16 +153,36 @@ VkObjectRef<Window> Context::createWindow(Type::str const &title,
                                           WindowSettings const &settings) {
   auto window = makeVkObject<Window>(mInstance, title, size, settings);
   mWindows.emplace_back(std::move(window));
-  auto ref = mWindows.back().ref();
+  return mWindows.back().ref();
+}
+
+VkObjectRef<Surface> Context::createSurface(VkObjectRef<Window> window) {
+  if (!mInstance) {
+    throw Exception::NullReferenceException(
+        "Instance is not initialized. Please create a window first.");
+  }
+
+  auto surface = makeVkObject<Surface>(mInstance, window);
+  mSurfaces.emplace_back(std::move(surface));
+
   if (!mDevice) {
-    mDevice = makeVkObject<Device>(mInstance, ref->getSurface());
+    mDevice = makeVkObject<Device>(mInstance, *mSurfaces.back().ref());
+  }
+
+  return mSurfaces.back().ref();
+}
+
+VkObjectRef<Swapchain> Context::createSwapchain(VkObjectRef<Window> window,
+                                                VkObjectRef<Surface> surface) {
+  if (!mDevice) {
+    throw Exception::NullReferenceException(
+        "Device is not initialized. Please create a window first.");
   }
 
   auto swapchain = makeVkObject<Swapchain>(
-      mDevice.get(), ref->properties.framebufferSize, ref->getSurface());
-  ref->attachSwapchain(std::move(swapchain));
-
-  return ref;
+      mDevice.get(), window->properties.framebufferSize, *surface);
+  mSwapchains.emplace_back(std::move(swapchain));
+  return mSwapchains.back().ref();
 }
 
 VkObjectRef<GraphicQueue> Context::createGraphicQueue() {
@@ -186,13 +207,27 @@ VkObjectRef<PresentQueue> Context::createPresentQueue() {
   return mPresentQueues.back().ref();
 }
 
-VkObjectRef<Pipeline> Context::createPipeline(VkObjectRef<Window> window) {
+VkObjectRef<RenderPass>
+Context::createRenderPass(VkObjectRef<Swapchain> swapchain) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto pipeline = makeVkObject<Pipeline>(mDevice.get(), window->getSwapchain());
+  auto renderPass = makeVkObject<RenderPass>(swapchain);
+  mRenderPasses.emplace_back(std::move(renderPass));
+  return mRenderPasses.back().ref();
+}
+
+VkObjectRef<Pipeline>
+Context::createPipeline(VkObjectRef<Swapchain> swapchain,
+                        VkObjectRef<RenderPass> renderPass) {
+  if (!mDevice) {
+    throw Exception::NullReferenceException(
+        "Device is not initialized. Please create a window first.");
+  }
+
+  auto pipeline = makeVkObject<Pipeline>(mDevice.get(), swapchain, renderPass);
   mPipelines.emplace_back(std::move(pipeline));
   return mPipelines.back().ref();
 }
@@ -204,14 +239,14 @@ Context::createFramebuffer(VkObjectRef<Pipeline> pipeline) {
   return mFramebuffers.back().ref();
 }
 
-VkObjectRef<CommandPool>
+VkObjectRef<ICommandPool>
 Context::createCommandPool(VkObjectRef<Pipeline> pipeline) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto commandPool = makeVkObject<CommandPool>(pipeline);
+  VkObject<ICommandPool> commandPool = makeVkObject<CommandPool>(mDevice.get());
   mCommandPools.emplace_back(std::move(commandPool));
   return mCommandPools.back().ref();
 }
@@ -266,6 +301,11 @@ void Context::dispose() {
   }
   mPipelines.clear();
 
+  for (auto &renderPass : mRenderPasses) {
+    renderPass.dispose();
+  }
+  mRenderPasses.clear();
+
   for (auto &presentQueue : mPresentQueues) {
     presentQueue.dispose();
   }
@@ -275,6 +315,16 @@ void Context::dispose() {
     graphicQueue.dispose();
   }
   mGraphicQueues.clear();
+
+  for (auto &swapchain : mSwapchains) {
+    swapchain.dispose();
+  }
+  mSwapchains.clear();
+
+  for (auto &surface : mSurfaces) {
+    surface.dispose();
+  }
+  mSurfaces.clear();
 
   for (auto &window : mWindows) {
     window.dispose();
