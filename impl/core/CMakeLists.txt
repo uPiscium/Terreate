@@ -28,6 +28,8 @@ add_library(
   framebuffer.cpp
   pipeline.cpp
   queue.cpp
+  renderpass.cpp
+  surface.cpp
   swapchain.cpp
   sync.cpp
   window.cpp
