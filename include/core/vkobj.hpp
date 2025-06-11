@@ -63,6 +63,8 @@ public:
 template <typename T> class VkObject {
 private:
   PROHIBIT_COPY_AND_ASSIGN(VkObject);
+  template <typename U>
+  friend class VkObject; // Allow VkObjectRef to access private members
 
 private:
   Type::unique<T> mVulkanObject = nullptr;
@@ -70,14 +72,17 @@ private:
 public:
   VkObject() = default;
   VkObject(std::nullptr_t) : mVulkanObject(nullptr) {}
-  VkObject(T *vulkanObject) : mVulkanObject(vulkanObject) {
+  template <typename U>
+  VkObject(U *vulkanObject) : mVulkanObject(vulkanObject) {
     if (mVulkanObject == nullptr) {
       throw Exception::NullReferenceException("Vulkan object cannot be null.");
     }
   }
-  explicit VkObject(Type::unique<T> &&vulkanObject)
+  template <typename U>
+  explicit VkObject(Type::unique<U> &&vulkanObject)
       : mVulkanObject(std::move(vulkanObject)) {}
-  VkObject(VkObject &&other) noexcept
+  template <typename U>
+  VkObject(VkObject<U> &&other) noexcept
       : mVulkanObject(std::move(other.mVulkanObject)) {}
   virtual ~VkObject() = default;
 
@@ -109,7 +114,13 @@ public:
     mVulkanObject.reset();
     return *this;
   }
-  VkObject &operator=(VkObject &&other) noexcept {
+  template <typename U> VkObject &operator=(U *vulkanObject) {
+    if (mVulkanObject.get() != vulkanObject) {
+      mVulkanObject.reset(vulkanObject);
+    }
+    return *this;
+  }
+  template <typename U> VkObject &operator=(VkObject<U> &&other) noexcept {
     if (this != &other) {
       mVulkanObject = std::move(other.mVulkanObject);
     }
