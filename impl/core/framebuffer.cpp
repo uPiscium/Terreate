@@ -2,17 +2,19 @@
 #include "../../include/core/framebuffer.hpp"
 
 namespace Terreate::Core {
-Framebuffer::Framebuffer(VkObjectRef<Pipeline> pipeline)
-    : mDevice(pipeline->getDevice()) {
-  auto const &extent = pipeline->getSwapchain()->getProperty().extent;
-  auto const &imageViews = pipeline->getSwapchain()->getImageViews();
+Framebuffer::Framebuffer(VkObjectRef<Device> device,
+                         VkObjectRef<RenderPass> renderPass,
+                         VkObjectRef<Swapchain> swapchain)
+    : mDevice(device) {
+  auto const &extent = swapchain->getProperty().extent;
+  auto const &imageViews = swapchain->getImageViews();
   mFramebuffers.resize(imageViews.size());
   for (size_t i = 0; i < imageViews.size(); ++i) {
     VkImageView attachments[] = {imageViews[i]};
 
     VkFramebufferCreateInfo framebufferInfo{};
     framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    framebufferInfo.renderPass = *pipeline;
+    framebufferInfo.renderPass = *renderPass;
     framebufferInfo.attachmentCount = 1;
     framebufferInfo.pAttachments = attachments;
     framebufferInfo.width = extent.width;
@@ -27,7 +29,7 @@ Framebuffer::Framebuffer(VkObjectRef<Pipeline> pipeline)
   }
 }
 
-void Framebuffer::dispose() {
+Framebuffer::~Framebuffer() {
   for (auto framebuffer : mFramebuffers) {
     vkDestroyFramebuffer(*mDevice, framebuffer, nullptr);
   }

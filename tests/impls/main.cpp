@@ -64,7 +64,7 @@ int test1() {
   auto presentQueue = ctx.createPresentQueue();
   auto renderPass = ctx.createRenderPass(swapchain);
   auto pipeline = ctx.createPipeline(swapchain, renderPass);
-  auto framebuffer = ctx.createFramebuffer(pipeline);
+  auto framebuffer = ctx.createFramebuffer(renderPass, swapchain);
   auto commandPool = ctx.createCommandPool(pipeline);
   auto commandBuffer = commandPool->createCommandBuffer();
   auto semaphoreImageAvailable = ctx.createSemaphore();

@@ -3,6 +3,7 @@
 #include "../../include/core/swapchain.hpp"
 #include "../../include/core/vk.hpp"
 #include "core/command.hpp"
+#include "core/framebuffer.hpp"
 
 namespace Terreate::Core {
 void Context::loadEXTfunctions() {
@@ -232,9 +233,11 @@ Context::createPipeline(VkObjectRef<Swapchain> swapchain,
   return mPipelines.back().ref();
 }
 
-VkObjectRef<Framebuffer>
-Context::createFramebuffer(VkObjectRef<Pipeline> pipeline) {
-  auto framebuffer = makeVkObject<Framebuffer>(pipeline);
+VkObjectRef<IFramebuffer>
+Context::createFramebuffer(VkObjectRef<RenderPass> renderPass,
+                           VkObjectRef<Swapchain> swapchain) {
+  VkObject<IFramebuffer> framebuffer =
+      makeVkObject<Framebuffer>(mDevice.get(), renderPass, swapchain);
   mFramebuffers.emplace_back(std::move(framebuffer));
   return mFramebuffers.back().ref();
 }

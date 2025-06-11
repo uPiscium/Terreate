@@ -1,12 +1,20 @@
 #pragma once
 #include "device.hpp"
-#include "pipeline.hpp"
+#include "renderpass.hpp"
+#include "swapchain.hpp"
 #include "vkobj.hpp"
 
 #include "../common/type.hpp"
 
 namespace Terreate::Core {
-class Framebuffer {
+class IFramebuffer {
+public:
+  virtual ~IFramebuffer() = default;
+  virtual Type::vec<VkFramebuffer> const &getFramebuffers() const = 0;
+  virtual VkFramebuffer operator[](Type::u64 const &index) const = 0;
+};
+
+class Framebuffer : public IFramebuffer {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Framebuffer);
 
@@ -15,17 +23,15 @@ private:
   Type::vec<VkFramebuffer> mFramebuffers;
 
 public:
-  Framebuffer(VkObjectRef<Pipeline> pipeline);
-  ~Framebuffer() { this->dispose(); }
+  Framebuffer(VkObjectRef<Device> device, VkObjectRef<RenderPass> renderPass,
+              VkObjectRef<Swapchain> swapchain);
+  ~Framebuffer() override;
 
-  VkObjectRef<Device> getDevice() const { return mDevice; }
-  Type::vec<VkFramebuffer> const &getFramebuffers() const {
+  Type::vec<VkFramebuffer> const &getFramebuffers() const override {
     return mFramebuffers;
   }
 
-  void dispose();
-
-  VkFramebuffer operator[](Type::u64 const &index) const {
+  VkFramebuffer operator[](Type::u64 const &index) const override {
     return mFramebuffers[index];
   }
 };
