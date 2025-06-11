@@ -96,15 +96,6 @@ private:
   VkInstance mInstance = VK_NULL_HANDLE;
 
   GLFWwindow *mWindow = nullptr;
-  VkSurfaceKHR mSurface = VK_NULL_HANDLE;
-  VkObject<Swapchain> mSwapchain;
-
-private:
-  friend class Context; // for retrieving mSurface to pick physical device
-  VkSurfaceKHR getSurface() const { return mSurface; }
-  void attachSwapchain(VkObject<Swapchain> &&swapchain) {
-    mSwapchain = std::move(swapchain);
-  }
 
 public:
   WindowProperties properties;
@@ -115,7 +106,6 @@ public:
          Type::pair<Type::i32> const &size, WindowSettings const &settings);
   ~Window() { this->destroy(); }
 
-  VkObjectRef<Swapchain> getSwapchain() const { return mSwapchain.ref(); }
   bool getMousebutton(Type::MousebuttonInput const &button) const;
   bool getInputState(Type::InputType const &type) const;
 
@@ -180,5 +170,7 @@ public:
   void focus() const { glfwFocusWindow(mWindow); }
   void restore() const { glfwRestoreWindow(mWindow); }
   void requestAttention() const { glfwRequestWindowAttention(mWindow); }
+
+  operator GLFWwindow *() const { return mWindow; }
 };
 } // namespace Terreate::Core

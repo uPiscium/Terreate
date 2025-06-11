@@ -105,13 +105,6 @@ Window::Window(VkInstance instance, Type::str const &title,
   }
   glfwSetWindowUserPointer(mWindow, this);
 
-  if (glfwCreateWindowSurface(instance, mWindow, nullptr, &mSurface) !=
-      VK_SUCCESS) {
-    char const *log = nullptr;
-    glfwGetError(&log);
-    throw Exception::SurfaceCreationFailure(log);
-  }
-
   glfwSetWindowSizeCallback(mWindow, Wrapper::windowSizeCallbackWrapper);
   glfwSetWindowPosCallback(mWindow, Wrapper::windowPositionCallbackWrapper);
   glfwSetWindowCloseCallback(mWindow, Wrapper::windowCloseCallbackWrapper);
@@ -136,16 +129,9 @@ Window::Window(VkInstance instance, Type::str const &title,
 }
 
 void Window::destroy() {
-  if (mSwapchain) {
-    mSwapchain.dispose();
-  }
   if (mWindow != nullptr) {
     glfwDestroyWindow(mWindow);
     mWindow = nullptr;
-  }
-  if (mSurface != VK_NULL_HANDLE) {
-    vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
-    mSurface = VK_NULL_HANDLE;
   }
 }
 } // namespace Terreate::Core
