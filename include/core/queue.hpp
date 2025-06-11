@@ -33,7 +33,7 @@ public:
 
   VkObjectRef<Device> getDevice() const { return mDevice; }
 
-  void queue(Type::vec<VkObjectRef<CommandBuffer>> commandBuffers,
+  void queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
              Type::vec<Type::PipelineStage> waitStages = {},
              Type::vec<VkObjectRef<Semaphore>> waitSemaphores = {},
              Type::vec<VkObjectRef<Semaphore>> signalSemaphores = {});

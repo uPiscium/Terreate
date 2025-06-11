@@ -58,9 +58,12 @@ int test1() {
 
   auto window = ctx.createWindow("Terreate", {800, 600},
                                  Core::WindowSettings{.resizable = false});
+  auto surface = ctx.createSurface(window);
+  auto swapchain = ctx.createSwapchain(window, surface);
   auto graphicQueue = ctx.createGraphicQueue();
   auto presentQueue = ctx.createPresentQueue();
-  auto pipeline = ctx.createPipeline(window);
+  auto renderPass = ctx.createRenderPass(swapchain);
+  auto pipeline = ctx.createPipeline(swapchain, renderPass);
   auto framebuffer = ctx.createFramebuffer(pipeline);
   auto commandPool = ctx.createCommandPool(pipeline);
   auto commandBuffer = commandPool->createCommandBuffer();
@@ -82,7 +85,8 @@ int test1() {
 
     commandBuffer->reset();
     commandBuffer->begin();
-    commandBuffer->setRenderPass((*framebuffer)[imageIndex], {0, 0, 0, 1},
+    commandBuffer->setRenderPass(renderPass, swapchain, pipeline,
+                                 (*framebuffer)[imageIndex], {0, 0, 0, 1},
                                  Type::SubpassContent::INLINE);
     auto framebufferSize = pipeline->getSwapchain()->getProperty().extent;
     commandBuffer->setViewport(0, 0, framebufferSize.width,

@@ -42,7 +42,7 @@ GraphicQueue::GraphicQueue(VkObjectRef<Device> device) : mDevice(device) {
   }
 }
 
-void GraphicQueue::queue(Type::vec<VkObjectRef<CommandBuffer>> commandBuffers,
+void GraphicQueue::queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
                          Type::vec<Type::PipelineStage> waitStages,
                          Type::vec<VkObjectRef<Semaphore>> waitSemaphores,
                          Type::vec<VkObjectRef<Semaphore>> signalSemaphores) {
