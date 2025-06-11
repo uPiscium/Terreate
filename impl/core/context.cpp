@@ -5,6 +5,7 @@
 #include "core/command.hpp"
 #include "core/framebuffer.hpp"
 #include "core/pipeline.hpp"
+#include "core/renderpass.hpp"
 
 namespace Terreate::Core {
 void Context::loadEXTfunctions() {
@@ -209,21 +210,21 @@ VkObjectRef<PresentQueue> Context::createPresentQueue() {
   return mPresentQueues.back().ref();
 }
 
-VkObjectRef<RenderPass>
+VkObjectRef<IRenderPass>
 Context::createRenderPass(VkObjectRef<Swapchain> swapchain) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto renderPass = makeVkObject<RenderPass>(swapchain);
+  VkObject<IRenderPass> renderPass = makeVkObject<RenderPass>(swapchain);
   mRenderPasses.emplace_back(std::move(renderPass));
   return mRenderPasses.back().ref();
 }
 
 VkObjectRef<IPipeline>
 Context::createPipeline(VkObjectRef<Swapchain> swapchain,
-                        VkObjectRef<RenderPass> renderPass) {
+                        VkObjectRef<IRenderPass> renderPass) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
@@ -236,7 +237,7 @@ Context::createPipeline(VkObjectRef<Swapchain> swapchain,
 }
 
 VkObjectRef<IFramebuffer>
-Context::createFramebuffer(VkObjectRef<RenderPass> renderPass,
+Context::createFramebuffer(VkObjectRef<IRenderPass> renderPass,
                            VkObjectRef<Swapchain> swapchain) {
   VkObject<IFramebuffer> framebuffer =
       makeVkObject<Framebuffer>(mDevice.get(), renderPass, swapchain);

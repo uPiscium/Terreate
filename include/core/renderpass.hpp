@@ -4,7 +4,13 @@
 #include "vkobj.hpp"
 
 namespace Terreate::Core {
-class RenderPass {
+class IRenderPass {
+public:
+  virtual ~IRenderPass() = default;
+  virtual operator VkRenderPass() const = 0;
+};
+
+class RenderPass : public IRenderPass {
 private:
   PROHIBIT_COPY_AND_ASSIGN(RenderPass);
 
@@ -21,12 +27,8 @@ public:
       : mDevice(swapchain->getDevice()), mSwapchain(swapchain) {
     this->createRenderPass();
   }
-  ~RenderPass() { this->dispose(); }
+  ~RenderPass() override;
 
-  VkRenderPass getRenderPass() const { return mRenderPass; }
-
-  void dispose();
-
-  operator VkRenderPass() const { return mRenderPass; }
+  operator VkRenderPass() const override { return mRenderPass; }
 };
 } // namespace Terreate::Core

@@ -32,7 +32,7 @@ private:
 private:
   VkObjectRef<Device> mDevice;
   VkObjectRef<Swapchain> mSwapchain;
-  VkObjectRef<RenderPass> mRenderPass;
+  VkObjectRef<IRenderPass> mRenderPass;
 
   Type::vec<Type::byte> mVertShaderCode;
   Type::vec<Type::byte> mFragShaderCode;
@@ -47,7 +47,7 @@ private:
 
 public:
   Pipeline(VkObjectRef<Device> device, VkObjectRef<Swapchain> swapchain,
-           VkObjectRef<RenderPass> renderPass)
+           VkObjectRef<IRenderPass> renderPass)
       : mDevice(device), mSwapchain(swapchain), mRenderPass(renderPass) {}
   ~Pipeline();
 

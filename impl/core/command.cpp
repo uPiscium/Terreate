@@ -54,7 +54,7 @@ CommandBuffer::~CommandBuffer() {
   }
 }
 
-void CommandBuffer::setRenderPass(VkObjectRef<RenderPass> renderPass,
+void CommandBuffer::setRenderPass(VkObjectRef<IRenderPass> renderPass,
                                   VkObjectRef<Swapchain> swapchain,
                                   VkObjectRef<IPipeline> pipeline,
                                   VkFramebuffer framebuffer,

@@ -3,6 +3,8 @@
 #include <core/window.hpp>
 
 #include "../include/_main.hpp"
+
+#include <fstream>
 #include <iostream>
 
 using namespace Terreate;
@@ -34,7 +36,6 @@ public:
   }
 };
 
-#include <fstream>
 Type::vec<Type::byte> readFile(std::string const &filename) {
   std::ifstream file(filename, std::ios::ate | std::ios::binary);
 

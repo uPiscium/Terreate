@@ -28,7 +28,7 @@ private:
   Type::vec<VkObject<Swapchain>> mSwapchains;
   Type::vec<VkObject<GraphicQueue>> mGraphicQueues;
   Type::vec<VkObject<PresentQueue>> mPresentQueues;
-  Type::vec<VkObject<RenderPass>> mRenderPasses;
+  Type::vec<VkObject<IRenderPass>> mRenderPasses;
   Type::vec<VkObject<IPipeline>> mPipelines;
   Type::vec<VkObject<IFramebuffer>> mFramebuffers;
   Type::vec<VkObject<ICommandPool>> mCommandPools;
@@ -62,11 +62,11 @@ public:
                                          VkObjectRef<Surface> surface);
   VkObjectRef<GraphicQueue> createGraphicQueue();
   VkObjectRef<PresentQueue> createPresentQueue();
-  VkObjectRef<RenderPass> createRenderPass(VkObjectRef<Swapchain> swapchain);
+  VkObjectRef<IRenderPass> createRenderPass(VkObjectRef<Swapchain> swapchain);
   VkObjectRef<IPipeline> createPipeline(VkObjectRef<Swapchain> swapchain,
-                                        VkObjectRef<RenderPass> renderPass);
+                                        VkObjectRef<IRenderPass> renderPass);
   VkObjectRef<IFramebuffer>
-  createFramebuffer(VkObjectRef<RenderPass> renderPass,
+  createFramebuffer(VkObjectRef<IRenderPass> renderPass,
                     VkObjectRef<Swapchain> swapchain);
   VkObjectRef<ICommandPool> createCommandPool();
   VkObjectRef<Semaphore> createSemaphore();

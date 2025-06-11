@@ -3,7 +3,7 @@
 
 namespace Terreate::Core {
 Framebuffer::Framebuffer(VkObjectRef<Device> device,
-                         VkObjectRef<RenderPass> renderPass,
+                         VkObjectRef<IRenderPass> renderPass,
                          VkObjectRef<Swapchain> swapchain)
     : mDevice(device) {
   auto const &extent = swapchain->getProperty().extent;

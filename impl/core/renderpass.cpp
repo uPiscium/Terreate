@@ -45,7 +45,7 @@ void RenderPass::createRenderPass() {
   }
 }
 
-void RenderPass::dispose() {
+RenderPass::~RenderPass() {
   if (mRenderPass != VK_NULL_HANDLE) {
     vkDestroyRenderPass(*mDevice, mRenderPass, nullptr);
     mRenderPass = VK_NULL_HANDLE;

@@ -23,7 +23,7 @@ private:
   Type::vec<VkFramebuffer> mFramebuffers;
 
 public:
-  Framebuffer(VkObjectRef<Device> device, VkObjectRef<RenderPass> renderPass,
+  Framebuffer(VkObjectRef<Device> device, VkObjectRef<IRenderPass> renderPass,
               VkObjectRef<Swapchain> swapchain);
   ~Framebuffer() override;
 
