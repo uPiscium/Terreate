@@ -8,20 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(BUILD_AUDIO_TESTS "Build the audio tests" OFF)
 option(BUILD_GRAPHICS_TESTS "Build the graphics tests" ON)
 
-add_executable(${PROJECT_NAME}
-  _main.cpp
-  api.cpp
-  context.cpp
-  debugger.cpp
-  device.cpp
-  hubptr.cpp
-  instance.cpp
-  main.cpp
-  renderer.cpp
-  swapchain.cpp
-  uuid.cpp
-  window.cpp
-)
+add_executable(${PROJECT_NAME} main.cpp)
 
 if(BUILD_AUDIO_TESTS)
   add_compile_definitions(BUILD_AUDIO_TESTS)

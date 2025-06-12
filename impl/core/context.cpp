@@ -1,26 +1,19 @@
 #include "../../include/common/exception.hpp"
 #include "../../include/core/context.hpp"
-#include "../../include/core/swapchain.hpp"
-#include "../../include/core/vk.hpp"
-#include "core/command.hpp"
-#include "core/framebuffer.hpp"
-#include "core/pipeline.hpp"
-#include "core/renderpass.hpp"
-#include "core/surface.hpp"
-#include "core/sync.hpp"
-#include "core/window.hpp"
+#include "../../include/vulkan/vk.hpp"
 
 namespace Terreate::Core {
 void Context::loadEXTfunctions() {
 #ifdef TERREATE_DEBUG_BUILD
-  trCreateDebugUtilsMessengerEXT =
+  Vulkan::trCreateDebugUtilsMessengerEXT =
       (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
           mInstance, "vkCreateDebugUtilsMessengerEXT");
-  trDestroyDebugUtilsMessengerEXT =
+  Vulkan::trDestroyDebugUtilsMessengerEXT =
       (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
           mInstance, "vkDestroyDebugUtilsMessengerEXT");
 
-  if (!trCreateDebugUtilsMessengerEXT || !trDestroyDebugUtilsMessengerEXT) {
+  if (!Vulkan::trCreateDebugUtilsMessengerEXT ||
+      !Vulkan::trDestroyDebugUtilsMessengerEXT) {
     Type::str msg =
         "Failed to load debug messenger functions. Make sure the project "
         "is built with TERREATE_DEBUG_BUILD=ON.";
@@ -49,7 +42,7 @@ bool Context::checkValidationLayerSupport() {
   Type::vec<VkLayerProperties> availableLayers(layerCount);
   vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-  for (char const *layerName : VALIDATION_LAYERS) {
+  for (char const *layerName : Vulkan::VALIDATION_LAYERS) {
     bool layerFound = false;
 
     for (auto const &layerProp : availableLayers) {
@@ -78,7 +71,7 @@ VkDebugUtilsMessengerCreateInfoEXT Context::createDebugInfo() {
   createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
                            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
                            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-  createInfo.pfnUserCallback = debugCallbackWrapper;
+  createInfo.pfnUserCallback = Core::debugCallbackWrapper;
   createInfo.pUserData = nullptr; // Optional
   createInfo.pNext = nullptr;     // Optional
   return createInfo;
@@ -117,8 +110,8 @@ Context::Context(Type::str const &appName, Type::Version appVersion) {
 #ifdef TERREATE_DEBUG_BUILD
   auto debuggerInfo = this->createDebugInfo();
   createInfo.enabledLayerCount =
-      static_cast<Type::u32>(VALIDATION_LAYERS.size());
-  createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
+      static_cast<Type::u32>(Vulkan::VALIDATION_LAYERS.size());
+  createInfo.ppEnabledLayerNames = Vulkan::VALIDATION_LAYERS.data();
   createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debuggerInfo;
 #endif
 
@@ -136,7 +129,7 @@ Context::Context(Type::str const &appName, Type::Version appVersion) {
   this->loadEXTfunctions();
 }
 
-void Context::attachDebugger(IDebugger *debugger) {
+void Context::attachDebugger(Core::IDebugger *debugger) {
 #ifdef TERREATE_DEBUG_BUILD
   if (!debugger)
     return;
@@ -144,8 +137,8 @@ void Context::attachDebugger(IDebugger *debugger) {
   VkDebugUtilsMessengerCreateInfoEXT createInfo = this->createDebugInfo();
   createInfo.pUserData = debugger;
 
-  if (trCreateDebugUtilsMessengerEXT(mInstance, &createInfo, nullptr,
-                                     &mDebugMessenger) != VK_SUCCESS) {
+  if (Vulkan::trCreateDebugUtilsMessengerEXT(mInstance, &createInfo, nullptr,
+                                             &mDebugMessenger) != VK_SUCCESS) {
     Type::str msg =
         "Failed to create debug messenger. Make sure the Vulkan SDK is "
         "installed and configured correctly.";
@@ -154,133 +147,139 @@ void Context::attachDebugger(IDebugger *debugger) {
 #endif
 }
 
-VkObjectRef<IWindow> Context::createWindow(Type::str const &title,
-                                           Type::pair<Type::i32> const &size,
-                                           WindowSettings const &settings) {
-  VkObject<IWindow> window =
-      makeVkObject<Window>(mInstance, title, size, settings);
+Vulkan::VkObjectRef<Vulkan::IWindow>
+Context::createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
+                      Vulkan::WindowSettings const &settings) {
+  Vulkan::VkObject<Vulkan::IWindow> window =
+      makeVkObject<Vulkan::Window>(mInstance, title, size, settings);
   mWindows.emplace_back(std::move(window));
   return mWindows.back().ref();
 }
 
-VkObjectRef<ISurface> Context::createSurface(VkObjectRef<IWindow> window) {
+Vulkan::VkObjectRef<Vulkan::ISurface>
+Context::createSurface(Vulkan::VkObjectRef<Vulkan::IWindow> window) {
   if (!mInstance) {
     throw Exception::NullReferenceException(
         "Instance is not initialized. Please create a window first.");
   }
 
-  VkObject<ISurface> surface = makeVkObject<Surface>(mInstance, window);
+  Vulkan::VkObject<Vulkan::ISurface> surface =
+      makeVkObject<Vulkan::Surface>(mInstance, window);
   mSurfaces.emplace_back(std::move(surface));
 
   if (!mDevice) {
-    mDevice = makeVkObject<Device>(mInstance, mSurfaces.back().ref());
+    mDevice = makeVkObject<Vulkan::Device>(mInstance, mSurfaces.back().ref());
   }
 
   return mSurfaces.back().ref();
 }
 
-VkObjectRef<ISwapchain>
-Context::createSwapchain(VkObjectRef<IWindow> window,
-                         VkObjectRef<ISurface> surface) {
+Vulkan::VkObjectRef<Vulkan::ISwapchain>
+Context::createSwapchain(Vulkan::VkObjectRef<Vulkan::IWindow> window,
+                         Vulkan::VkObjectRef<Vulkan::ISurface> surface) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<ISwapchain> swapchain = makeVkObject<Swapchain>(
-      mDevice.ref(), window->getProperties().framebufferSize, surface);
+  Vulkan::VkObject<Vulkan::ISwapchain> swapchain =
+      makeVkObject<Vulkan::Swapchain>(
+          mDevice.ref(), window->getProperties().framebufferSize, surface);
   mSwapchains.emplace_back(std::move(swapchain));
   return mSwapchains.back().ref();
 }
 
-VkObjectRef<IGraphicQueue> Context::createGraphicQueue() {
+Vulkan::VkObjectRef<Vulkan::IGraphicQueue> Context::createGraphicQueue() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<IGraphicQueue> graphicQueue =
-      makeVkObject<GraphicQueue>(mDevice.ref());
+  Vulkan::VkObject<Vulkan::IGraphicQueue> graphicQueue =
+      makeVkObject<Vulkan::GraphicQueue>(mDevice.ref());
   mGraphicQueues.emplace_back(std::move(graphicQueue));
   return mGraphicQueues.back().ref();
 }
 
-VkObjectRef<IPresentQueue> Context::createPresentQueue() {
+Vulkan::VkObjectRef<Vulkan::IPresentQueue> Context::createPresentQueue() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<IPresentQueue> presentQueue =
-      makeVkObject<PresentQueue>(mDevice.ref());
+  Vulkan::VkObject<Vulkan::IPresentQueue> presentQueue =
+      makeVkObject<Vulkan::PresentQueue>(mDevice.ref());
   mPresentQueues.emplace_back(std::move(presentQueue));
   return mPresentQueues.back().ref();
 }
 
-VkObjectRef<IRenderPass>
-Context::createRenderPass(VkObjectRef<ISwapchain> swapchain) {
+Vulkan::VkObjectRef<Vulkan::IRenderPass>
+Context::createRenderPass(Vulkan::VkObjectRef<Vulkan::ISwapchain> swapchain) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<IRenderPass> renderPass =
-      makeVkObject<RenderPass>(mDevice.ref(), swapchain);
+  Vulkan::VkObject<Vulkan::IRenderPass> renderPass =
+      makeVkObject<Vulkan::RenderPass>(mDevice.ref(), swapchain);
   mRenderPasses.emplace_back(std::move(renderPass));
   return mRenderPasses.back().ref();
 }
 
-VkObjectRef<IPipeline>
-Context::createPipeline(VkObjectRef<IRenderPass> renderPass) {
+Vulkan::VkObjectRef<Vulkan::IPipeline>
+Context::createPipeline(Vulkan::VkObjectRef<Vulkan::IRenderPass> renderPass) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<IPipeline> pipeline =
-      makeVkObject<Pipeline>(mDevice.ref(), renderPass);
+  Vulkan::VkObject<Vulkan::IPipeline> pipeline =
+      makeVkObject<Vulkan::Pipeline>(mDevice.ref(), renderPass);
   mPipelines.emplace_back(std::move(pipeline));
   return mPipelines.back().ref();
 }
 
-VkObjectRef<IFramebuffer>
-Context::createFramebuffer(VkObjectRef<IRenderPass> renderPass,
-                           VkObjectRef<ISwapchain> swapchain) {
-  VkObject<IFramebuffer> framebuffer =
-      makeVkObject<Framebuffer>(mDevice.ref(), renderPass, swapchain);
+Vulkan::VkObjectRef<Vulkan::IFramebuffer>
+Context::createFramebuffer(Vulkan::VkObjectRef<Vulkan::IRenderPass> renderPass,
+                           Vulkan::VkObjectRef<Vulkan::ISwapchain> swapchain) {
+  Vulkan::VkObject<Vulkan::IFramebuffer> framebuffer =
+      makeVkObject<Vulkan::Framebuffer>(mDevice.ref(), renderPass, swapchain);
   mFramebuffers.emplace_back(std::move(framebuffer));
   return mFramebuffers.back().ref();
 }
 
-VkObjectRef<ICommandPool> Context::createCommandPool() {
+Vulkan::VkObjectRef<Vulkan::ICommandPool> Context::createCommandPool() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<ICommandPool> commandPool = makeVkObject<CommandPool>(mDevice.ref());
+  Vulkan::VkObject<Vulkan::ICommandPool> commandPool =
+      makeVkObject<Vulkan::CommandPool>(mDevice.ref());
   mCommandPools.emplace_back(std::move(commandPool));
   return mCommandPools.back().ref();
 }
 
-VkObjectRef<ISemaphore> Context::createSemaphore() {
+Vulkan::VkObjectRef<Vulkan::ISemaphore> Context::createSemaphore() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<ISemaphore> semaphore = makeVkObject<Semaphore>(mDevice.ref());
+  Vulkan::VkObject<Vulkan::ISemaphore> semaphore =
+      makeVkObject<Vulkan::Semaphore>(mDevice.ref());
   mSemaphores.emplace_back(std::move(semaphore));
   return mSemaphores.back().ref();
 }
 
-VkObjectRef<IFence> Context::createFence() {
+Vulkan::VkObjectRef<Vulkan::IFence> Context::createFence() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<IFence> fence = makeVkObject<Fence>(mDevice.ref());
+  Vulkan::VkObject<Vulkan::IFence> fence =
+      makeVkObject<Vulkan::Fence>(mDevice.ref());
   mFences.emplace_back(std::move(fence));
   return mFences.back().ref();
 }
@@ -348,7 +347,8 @@ void Context::dispose() {
   }
 
   if (mDebugMessenger != VK_NULL_HANDLE) {
-    trDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
+    Vulkan::trDestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger,
+                                            nullptr);
     mDebugMessenger = VK_NULL_HANDLE;
   }
 

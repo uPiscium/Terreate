@@ -8,6 +8,7 @@ message(STATUS "C++ standard : " ${CMAKE_CXX_STANDARD})
 
 add_subdirectory(core)
 add_subdirectory(util)
+add_subdirectory(vulkan)
 
 add_library(
   ${PROJECT_NAME} STATIC
@@ -19,6 +20,7 @@ target_link_libraries(
   PRIVATE
   TRcore
   TRutil
+  TRvulkan
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ../../deps)
 target_include_directories(${PROJECT_NAME} PUBLIC ../../include)

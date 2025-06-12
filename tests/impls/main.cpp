@@ -1,8 +1,5 @@
 #include <core/context.hpp>
 #include <core/debugger.hpp>
-#include <core/window.hpp>
-
-#include "../include/_main.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -58,7 +55,7 @@ int test1() {
   ctx.attachDebugger(debugger);
 
   auto window = ctx.createWindow("Terreate", {800, 600},
-                                 Core::WindowSettings{.resizable = false});
+                                 Vulkan::WindowSettings{.resizable = false});
   auto surface = ctx.createSurface(window);
   auto swapchain = ctx.createSwapchain(window, surface);
   auto graphicQueue = ctx.createGraphicQueue();
@@ -108,27 +105,6 @@ int test1() {
   delete debugger;
 
   return 0;
-}
-
-void test2() {
-#ifdef TERREATE_DEBUG_BUILD
-  std::cout << "Running in debug mode." << std::endl;
-#else
-  std::cout << "Running in release mode." << std::endl;
-#endif
-
-  VulkanTriangle app;
-
-  try {
-    app.run();
-  } catch (const std::runtime_error &e) {
-    std::cerr << "Error: " << e.what() << std::endl;
-  } catch (...) {
-    std::cerr << "Unknown error occurred." << std::endl;
-  }
-
-  std::cout << "Vulkan Triangle application finished successfully."
-            << std::endl;
 }
 
 int main() { test1(); }

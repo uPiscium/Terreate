@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 include(FetchContent)
-project(TRcore LANGUAGES CXX)
+project(TRvulkan LANGUAGES CXX)
 
 if(TERREATE_DEBUG_BUILD)
   message(STATUS "Building with debug flags")
@@ -21,8 +21,17 @@ message(STATUS "Component: " ${PROJECT_NAME})
 
 add_library(
   ${PROJECT_NAME} STATIC
-  context.cpp
-  debugger.cpp
+  command.cpp
+  device.cpp
+  framebuffer.cpp
+  pipeline.cpp
+  queue.cpp
+  renderpass.cpp
+  surface.cpp
+  swapchain.cpp
+  sync.cpp
+  window.cpp
+  winevent.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)

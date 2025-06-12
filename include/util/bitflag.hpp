@@ -1,7 +1,7 @@
 #pragma once
 #include "../common/type.hpp"
 
-namespace Terreate::Core {
+namespace Terreate::Util {
 template <typename T>
 concept enum_type = std::is_enum_v<T>;
 
@@ -101,4 +101,4 @@ template <enum_type T> inline bool operator!=(Bitflag<T> lhs, Bitflag<T> rhs) {
   return !(lhs == rhs);
 }
 
-} // namespace Terreate::Core
+} // namespace Terreate::Util

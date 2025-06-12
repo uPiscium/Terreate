@@ -47,5 +47,4 @@ debugCallbackWrapper(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
   }
   return static_cast<VkBool32>(result);
 }
-
 } // namespace Terreate::Core
