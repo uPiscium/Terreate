@@ -4,7 +4,7 @@
 
 namespace Terreate::Core {
 QueueFamilyIndices Device::findQueue(VkPhysicalDevice device,
-                                     VkSurfaceKHR surface) const {
+                                     VkObjectRef<ISurface> surface) const {
   QueueFamilyIndices queueFamily;
 
   Type::u32 queueFamilyCount = 0;
@@ -21,7 +21,7 @@ QueueFamilyIndices Device::findQueue(VkPhysicalDevice device,
     }
 
     VkBool32 presentSupport = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, *surface, &presentSupport);
     if (presentSupport) {
       queueFamily.presentFamily = i;
     }
@@ -41,7 +41,8 @@ QueueFamilyIndices Device::findQueue(VkPhysicalDevice device,
   return queueFamily;
 }
 
-int Device::rateDevice(VkPhysicalDevice device, VkSurfaceKHR surface) const {
+int Device::rateDevice(VkPhysicalDevice device,
+                       VkObjectRef<ISurface> surface) const {
   VkPhysicalDeviceProperties deviceProperties;
   vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
@@ -74,32 +75,33 @@ bool Device::checkExtSupport(VkPhysicalDevice device) {
   return requiredExtensions.empty();
 }
 
-SwapchainSupportDetails Device::getSwapchainSupport(VkPhysicalDevice device,
-                                                    VkSurfaceKHR surface) {
+SwapchainSupportDetails
+Device::getSwapchainSupport(VkPhysicalDevice device,
+                            VkObjectRef<ISurface> surface) {
   SwapchainSupportDetails details;
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface,
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, *surface,
                                             &details.capabilities);
   Type::u32 formatCount;
-  vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+  vkGetPhysicalDeviceSurfaceFormatsKHR(device, *surface, &formatCount, nullptr);
   if (formatCount != 0) {
     details.formats.resize(formatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount,
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, *surface, &formatCount,
                                          details.formats.data());
   }
 
   Type::u32 presentModeCount;
-  vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount,
+  vkGetPhysicalDeviceSurfacePresentModesKHR(device, *surface, &presentModeCount,
                                             nullptr);
   if (presentModeCount != 0) {
     details.presentModes.resize(presentModeCount);
     vkGetPhysicalDeviceSurfacePresentModesKHR(
-        device, surface, &presentModeCount, details.presentModes.data());
+        device, *surface, &presentModeCount, details.presentModes.data());
   }
 
   return details;
 }
 
-void Device::pickPhysicalDevice(VkSurfaceKHR surface) {
+void Device::pickPhysicalDevice(VkObjectRef<ISurface> surface) {
   Type::map<Type::i32, VkPhysicalDevice> deviceMap;
   Type::u32 deviceCount = 0;
   vkEnumeratePhysicalDevices(mInstance, &deviceCount, nullptr);
@@ -139,7 +141,7 @@ void Device::pickPhysicalDevice(VkSurfaceKHR surface) {
   mQueueFamily = this->findQueue(mPhysicalDevice, surface);
 }
 
-void Device::createLogicalDevice(VkSurfaceKHR surface) {
+void Device::createLogicalDevice(VkObjectRef<ISurface> surface) {
   Type::vec<VkDeviceQueueCreateInfo> queueCreateInfos;
   float queuePriority = 1.0f;
 
@@ -177,7 +179,7 @@ void Device::createLogicalDevice(VkSurfaceKHR surface) {
   }
 }
 
-Device::Device(VkInstance instance, VkSurfaceKHR surface)
+Device::Device(VkInstance instance, VkObjectRef<ISurface> surface)
     : mInstance(instance) {
   this->pickPhysicalDevice(surface);
   this->createLogicalDevice(surface);

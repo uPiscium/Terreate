@@ -5,7 +5,13 @@
 #include "../common/type.hpp"
 
 namespace Terreate::Core {
-class Surface {
+class ISurface {
+public:
+  virtual ~ISurface() = default;
+  virtual operator VkSurfaceKHR() const = 0;
+};
+
+class Surface : public ISurface {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Surface);
 
@@ -15,10 +21,8 @@ private:
 
 public:
   Surface(VkInstance instance, VkObjectRef<Window> window);
-  ~Surface() { this->dispose(); }
+  ~Surface() override;
 
-  void dispose();
-
-  operator VkSurfaceKHR() const { return mSurface; }
+  operator VkSurfaceKHR() const override { return mSurface; }
 };
 } // namespace Terreate::Core

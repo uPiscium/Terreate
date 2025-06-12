@@ -1,7 +1,4 @@
 #pragma once
-#include "device.hpp"
-#include "swapchain.hpp"
-#include "vkobj.hpp"
 #include "winevent.hpp"
 
 #include "../common/enum.hpp"

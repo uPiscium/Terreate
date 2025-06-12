@@ -23,7 +23,7 @@ private:
   VkExtent2D pickExtent(Type::pair<Type::i32> framebufferSize,
                         VkSurfaceCapabilitiesKHR const &capabilities);
   void createSwapchain(Type::pair<Type::i32> framebufferSize,
-                       VkSurfaceKHR surface);
+                       VkObjectRef<ISurface> surface);
   void createImageViews();
 
 private:
@@ -36,7 +36,7 @@ private:
 
 public:
   Swapchain(VkObjectRef<Device> device, Type::pair<Type::i32> framebufferSize,
-            VkSurfaceKHR surface);
+            VkObjectRef<ISurface> surface);
   ~Swapchain() { this->destroy(); }
 
   VkObjectRef<Device> getDevice() const { return mDevice; }

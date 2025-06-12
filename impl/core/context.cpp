@@ -6,6 +6,7 @@
 #include "core/framebuffer.hpp"
 #include "core/pipeline.hpp"
 #include "core/renderpass.hpp"
+#include "core/surface.hpp"
 #include "core/sync.hpp"
 
 namespace Terreate::Core {
@@ -160,31 +161,31 @@ VkObjectRef<Window> Context::createWindow(Type::str const &title,
   return mWindows.back().ref();
 }
 
-VkObjectRef<Surface> Context::createSurface(VkObjectRef<Window> window) {
+VkObjectRef<ISurface> Context::createSurface(VkObjectRef<Window> window) {
   if (!mInstance) {
     throw Exception::NullReferenceException(
         "Instance is not initialized. Please create a window first.");
   }
 
-  auto surface = makeVkObject<Surface>(mInstance, window);
+  VkObject<ISurface> surface = makeVkObject<Surface>(mInstance, window);
   mSurfaces.emplace_back(std::move(surface));
 
   if (!mDevice) {
-    mDevice = makeVkObject<Device>(mInstance, *mSurfaces.back().ref());
+    mDevice = makeVkObject<Device>(mInstance, mSurfaces.back().ref());
   }
 
   return mSurfaces.back().ref();
 }
 
 VkObjectRef<Swapchain> Context::createSwapchain(VkObjectRef<Window> window,
-                                                VkObjectRef<Surface> surface) {
+                                                VkObjectRef<ISurface> surface) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
   auto swapchain = makeVkObject<Swapchain>(
-      mDevice.get(), window->properties.framebufferSize, *surface);
+      mDevice.get(), window->properties.framebufferSize, surface);
   mSwapchains.emplace_back(std::move(swapchain));
   return mSwapchains.back().ref();
 }

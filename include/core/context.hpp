@@ -24,7 +24,7 @@ private:
   VkObject<Device> mDevice = nullptr;
 
   Type::vec<VkObject<Window>> mWindows;
-  Type::vec<VkObject<Surface>> mSurfaces;
+  Type::vec<VkObject<ISurface>> mSurfaces;
   Type::vec<VkObject<Swapchain>> mSwapchains;
   Type::vec<VkObject<IGraphicQueue>> mGraphicQueues;
   Type::vec<VkObject<IPresentQueue>> mPresentQueues;
@@ -57,9 +57,9 @@ public:
   VkObjectRef<Window>
   createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
                WindowSettings const &settings = WindowSettings());
-  VkObjectRef<Surface> createSurface(VkObjectRef<Window> window);
+  VkObjectRef<ISurface> createSurface(VkObjectRef<Window> window);
   VkObjectRef<Swapchain> createSwapchain(VkObjectRef<Window> window,
-                                         VkObjectRef<Surface> surface);
+                                         VkObjectRef<ISurface> surface);
   VkObjectRef<IGraphicQueue> createGraphicQueue();
   VkObjectRef<IPresentQueue> createPresentQueue();
   VkObjectRef<IRenderPass> createRenderPass(VkObjectRef<Swapchain> swapchain);

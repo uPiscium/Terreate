@@ -11,7 +11,7 @@ Surface::Surface(VkInstance instance, VkObjectRef<Window> window)
   }
 }
 
-void Surface::dispose() {
+Surface::~Surface() {
   if (mSurface != VK_NULL_HANDLE) {
     vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
     mSurface = VK_NULL_HANDLE;

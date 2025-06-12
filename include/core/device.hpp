@@ -1,4 +1,6 @@
 #pragma once
+#include "surface.hpp"
+
 #include "../common/type.hpp"
 
 namespace Terreate::Core {
@@ -33,20 +35,20 @@ private:
 
 private:
   QueueFamilyIndices findQueue(VkPhysicalDevice device,
-                               VkSurfaceKHR surface) const;
-  int rateDevice(VkPhysicalDevice device, VkSurfaceKHR surface) const;
+                               VkObjectRef<ISurface> surface) const;
+  int rateDevice(VkPhysicalDevice device, VkObjectRef<ISurface> surface) const;
   bool checkExtSupport(VkPhysicalDevice device);
   SwapchainSupportDetails getSwapchainSupport(VkPhysicalDevice device,
-                                              VkSurfaceKHR surface);
-  void pickPhysicalDevice(VkSurfaceKHR surface);
-  void createLogicalDevice(VkSurfaceKHR surface);
+                                              VkObjectRef<ISurface> surface);
+  void pickPhysicalDevice(VkObjectRef<ISurface> surface);
+  void createLogicalDevice(VkObjectRef<ISurface> surface);
 
 public:
-  Device(VkInstance instance, VkSurfaceKHR surface);
+  Device(VkInstance instance, VkObjectRef<ISurface> surface);
   ~Device() { this->dispose(); }
 
   QueueFamilyIndices getQueue() const { return mQueueFamily; }
-  SwapchainSupportDetails getSwapchainSupport(VkSurfaceKHR surface) {
+  SwapchainSupportDetails getSwapchainSupport(VkObjectRef<ISurface> surface) {
     return this->getSwapchainSupport(mPhysicalDevice, surface);
   }
 
