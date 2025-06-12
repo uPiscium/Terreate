@@ -2,7 +2,7 @@
 #include "../../include/core/command.hpp"
 
 namespace Terreate::Core {
-CommandPool::CommandPool(VkObjectRef<Device> device) : mDevice(device) {
+CommandPool::CommandPool(VkObjectRef<IDevice> device) : mDevice(device) {
   VkCommandPoolCreateInfo poolInfo{};
   poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
   poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -32,7 +32,7 @@ CommandPool::createCommandBuffer(Type::CommandBufferLevel const &level) {
   return mCommandBuffers.back().ref();
 }
 
-CommandBuffer::CommandBuffer(VkObjectRef<Device> device, VkCommandPool pool,
+CommandBuffer::CommandBuffer(VkObjectRef<IDevice> device, VkCommandPool pool,
                              Type::CommandBufferLevel const &level)
     : mDevice(device), mCommandPool(pool) {
   VkCommandBufferAllocateInfo allocInfo{};

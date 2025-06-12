@@ -24,7 +24,7 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(Pipeline);
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkObjectRef<IRenderPass> mRenderPass;
 
   Type::vec<Type::byte> mVertShaderCode;
@@ -39,7 +39,7 @@ private:
   void compileShader(Type::str const &vert, Type::str const &frag);
 
 public:
-  Pipeline(VkObjectRef<Device> device, VkObjectRef<IRenderPass> renderPass)
+  Pipeline(VkObjectRef<IDevice> device, VkObjectRef<IRenderPass> renderPass)
       : mDevice(device), mRenderPass(renderPass) {}
   ~Pipeline();
 

@@ -14,8 +14,6 @@ class ICommandBuffer {
 public:
   virtual ~ICommandBuffer() = default;
 
-  virtual VkObjectRef<Device> getDevice() const = 0;
-
   virtual void setRenderPass(VkObjectRef<IRenderPass> renderPass,
                              VkObjectRef<ISwapchain> swapchain,
                              VkObjectRef<IPipeline> pipeline,
@@ -54,13 +52,13 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(CommandPool);
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
 
   VkCommandPool mCommandPool = VK_NULL_HANDLE;
   Type::vec<VkObject<ICommandBuffer>> mCommandBuffers;
 
 public:
-  CommandPool(VkObjectRef<Device> device);
+  CommandPool(VkObjectRef<IDevice> device);
   ~CommandPool() override;
 
   VkObjectRef<ICommandBuffer>
@@ -83,7 +81,7 @@ private:
   };
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkCommandPool mCommandPool;
 
   bool mIsRecording = false;
@@ -97,12 +95,10 @@ private:
 
 private:
 public:
-  CommandBuffer(VkObjectRef<Device> device, VkCommandPool pool,
+  CommandBuffer(VkObjectRef<IDevice> device, VkCommandPool pool,
                 Type::CommandBufferLevel const &level =
                     Type::CommandBufferLevel::PRIMARY);
   ~CommandBuffer() override;
-
-  VkObjectRef<Device> getDevice() const override { return mDevice; }
 
   void setRenderPass(VkObjectRef<IRenderPass> renderPass,
                      VkObjectRef<ISwapchain> swapchain,

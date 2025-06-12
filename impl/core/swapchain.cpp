@@ -132,7 +132,7 @@ void Swapchain::createImageViews() {
   }
 }
 
-Swapchain::Swapchain(VkObjectRef<Device> device,
+Swapchain::Swapchain(VkObjectRef<IDevice> device,
                      Type::pair<Type::i32> framebufferSize,
                      VkObjectRef<ISurface> surface)
     : mDevice(device) {

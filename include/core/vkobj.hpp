@@ -121,9 +121,7 @@ public:
     return *this;
   }
   template <typename U> VkObject &operator=(VkObject<U> &&other) noexcept {
-    if (this != &other) {
-      mVulkanObject = std::move(other.mVulkanObject);
-    }
+    mVulkanObject = std::move(other.mVulkanObject);
     return *this;
   }
 

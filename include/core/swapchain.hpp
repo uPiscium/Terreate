@@ -39,7 +39,7 @@ private:
   void createImageViews();
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
 
   VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
   Type::vec<VkImage> mSwapchainImages;
@@ -47,7 +47,7 @@ private:
   SwapchainProperty mSwapchainProperty;
 
 public:
-  Swapchain(VkObjectRef<Device> device, Type::pair<Type::i32> framebufferSize,
+  Swapchain(VkObjectRef<IDevice> device, Type::pair<Type::i32> framebufferSize,
             VkObjectRef<ISurface> surface);
   ~Swapchain() override;
 

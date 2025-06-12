@@ -43,7 +43,7 @@ private:
   };
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkQueue mQueue = VK_NULL_HANDLE;
   Type::vec<SubmitInfo> mSubmitInfos;
 
@@ -51,7 +51,7 @@ private:
   Type::vec<VkSubmitInfo> createSubmitInfos();
 
 public:
-  GraphicQueue(VkObjectRef<Device> device);
+  GraphicQueue(VkObjectRef<IDevice> device);
   ~GraphicQueue() override;
 
   void queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
@@ -68,11 +68,11 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(PresentQueue);
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkQueue mQueue = VK_NULL_HANDLE;
 
 public:
-  PresentQueue(VkObjectRef<Device> device);
+  PresentQueue(VkObjectRef<IDevice> device);
   ~PresentQueue() override;
 
   void present(VkObjectRef<ISwapchain> swapchain,

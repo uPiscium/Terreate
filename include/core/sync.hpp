@@ -22,22 +22,22 @@ public:
 
 class Semaphore : public ISemaphore {
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkSemaphore mSemaphore = VK_NULL_HANDLE;
 
 public:
-  Semaphore(VkObjectRef<Device> device);
+  Semaphore(VkObjectRef<IDevice> device);
   ~Semaphore() override;
   operator VkSemaphore() const override { return mSemaphore; }
 };
 
 class Fence : public IFence {
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkFence mFence = VK_NULL_HANDLE;
 
 public:
-  Fence(VkObjectRef<Device> device);
+  Fence(VkObjectRef<IDevice> device);
   ~Fence() override;
 
   bool isSignaled() const override {

@@ -22,7 +22,19 @@ struct SwapchainSupportDetails {
   Type::vec<VkPresentModeKHR> presentModes;
 };
 
-class Device {
+class IDevice {
+public:
+  virtual ~IDevice() = default;
+
+  virtual QueueFamilyIndices getQueue() const = 0;
+  virtual SwapchainSupportDetails
+  getSwapchainSupport(VkObjectRef<ISurface> surface) = 0;
+
+  virtual operator VkDevice() const = 0;
+  virtual operator VkPhysicalDevice() const = 0;
+};
+
+class Device : public IDevice {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Device);
 
@@ -45,16 +57,15 @@ private:
 
 public:
   Device(VkInstance instance, VkObjectRef<ISurface> surface);
-  ~Device() { this->dispose(); }
+  ~Device() override;
 
-  QueueFamilyIndices getQueue() const { return mQueueFamily; }
-  SwapchainSupportDetails getSwapchainSupport(VkObjectRef<ISurface> surface) {
+  QueueFamilyIndices getQueue() const override { return mQueueFamily; }
+  SwapchainSupportDetails
+  getSwapchainSupport(VkObjectRef<ISurface> surface) override {
     return this->getSwapchainSupport(mPhysicalDevice, surface);
   }
 
-  void dispose();
-
-  operator VkDevice() const { return mDevice; }
-  operator VkPhysicalDevice() const { return mPhysicalDevice; }
+  operator VkDevice() const override { return mDevice; }
+  operator VkPhysicalDevice() const override { return mPhysicalDevice; }
 };
 } // namespace Terreate::Core

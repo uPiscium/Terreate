@@ -21,7 +21,7 @@ private:
 private:
   VkInstance mInstance = VK_NULL_HANDLE;
   VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
-  VkObject<Device> mDevice = nullptr;
+  VkObject<IDevice> mDevice = nullptr;
 
   Type::vec<VkObject<IWindow>> mWindows;
   Type::vec<VkObject<ISurface>> mSurfaces;
@@ -50,7 +50,7 @@ public:
   ~Context() { this->dispose(); }
 
   VkInstance getInstance() { return mInstance; }
-  VkObjectRef<Device> getDevice() const { return mDevice.ref(); }
+  VkObjectRef<IDevice> getDevice() const { return mDevice.ref(); }
 
   void attachDebugger(IDebugger *debugger);
 

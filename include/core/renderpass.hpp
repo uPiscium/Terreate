@@ -15,7 +15,7 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(RenderPass);
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   VkObjectRef<ISwapchain> mSwapchain;
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
 
@@ -23,7 +23,7 @@ private:
   void createRenderPass();
 
 public:
-  RenderPass(VkObjectRef<Device> device, VkObjectRef<ISwapchain> swapchain)
+  RenderPass(VkObjectRef<IDevice> device, VkObjectRef<ISwapchain> swapchain)
       : mDevice(device), mSwapchain(swapchain) {
     this->createRenderPass();
   }

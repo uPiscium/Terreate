@@ -2,7 +2,7 @@
 #include "../../include/core/framebuffer.hpp"
 
 namespace Terreate::Core {
-Framebuffer::Framebuffer(VkObjectRef<Device> device,
+Framebuffer::Framebuffer(VkObjectRef<IDevice> device,
                          VkObjectRef<IRenderPass> renderPass,
                          VkObjectRef<ISwapchain> swapchain)
     : mDevice(device) {

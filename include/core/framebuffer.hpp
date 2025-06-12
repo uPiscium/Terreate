@@ -19,11 +19,11 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(Framebuffer);
 
 private:
-  VkObjectRef<Device> mDevice;
+  VkObjectRef<IDevice> mDevice;
   Type::vec<VkFramebuffer> mFramebuffers;
 
 public:
-  Framebuffer(VkObjectRef<Device> device, VkObjectRef<IRenderPass> renderPass,
+  Framebuffer(VkObjectRef<IDevice> device, VkObjectRef<IRenderPass> renderPass,
               VkObjectRef<ISwapchain> swapchain);
   ~Framebuffer() override;
 

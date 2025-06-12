@@ -26,7 +26,7 @@ Type::vec<VkSubmitInfo> GraphicQueue::createSubmitInfos() {
   return submitInfos;
 }
 
-GraphicQueue::GraphicQueue(VkObjectRef<Device> device) : mDevice(device) {
+GraphicQueue::GraphicQueue(VkObjectRef<IDevice> device) : mDevice(device) {
   if (!mDevice) {
     throw Exception::NullReferenceException("Device is null.");
   }
@@ -112,7 +112,7 @@ void GraphicQueue::submit(VkObjectRef<IFence> fence) {
   mSubmitInfos.clear();
 }
 
-PresentQueue::PresentQueue(VkObjectRef<Device> device) : mDevice(device) {
+PresentQueue::PresentQueue(VkObjectRef<IDevice> device) : mDevice(device) {
   if (!mDevice) {
     throw Exception::NullReferenceException("Device is null.");
   }

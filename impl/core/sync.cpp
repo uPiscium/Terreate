@@ -2,7 +2,7 @@
 #include "../../include/core/sync.hpp"
 
 namespace Terreate::Core {
-Semaphore::Semaphore(VkObjectRef<Device> device) : mDevice(device) {
+Semaphore::Semaphore(VkObjectRef<IDevice> device) : mDevice(device) {
   VkSemaphoreCreateInfo createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -19,7 +19,7 @@ Semaphore::~Semaphore() {
   }
 }
 
-Fence::Fence(VkObjectRef<Device> device) : mDevice(device) {
+Fence::Fence(VkObjectRef<IDevice> device) : mDevice(device) {
   VkFenceCreateInfo createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
   createInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;

@@ -185,7 +185,7 @@ Device::Device(VkInstance instance, VkObjectRef<ISurface> surface)
   this->createLogicalDevice(surface);
 }
 
-void Device::dispose() {
+Device::~Device() {
   if (mDevice != VK_NULL_HANDLE) {
     vkDestroyDevice(mDevice, nullptr);
     mDevice = VK_NULL_HANDLE;
