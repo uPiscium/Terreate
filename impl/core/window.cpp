@@ -91,6 +91,13 @@ StandardCursor::operator GLFWcursor *() const { return mCursor; }
 
 StandardCursor::operator bool() const { return mCursor != nullptr; }
 
+void Window::destroy() {
+  if (mWindow != nullptr) {
+    glfwDestroyWindow(mWindow);
+    mWindow = nullptr;
+  }
+}
+
 Window::Window(VkInstance instance, Type::str const &title,
                Type::pair<Type::i32> const &size,
                WindowSettings const &settings)
@@ -125,13 +132,37 @@ Window::Window(VkInstance instance, Type::str const &title,
   glfwSetCharCallback(mWindow, Wrapper::charCallbackWrapper);
   glfwSetDropCallback(mWindow, Wrapper::dropCallbackWrapper);
 
-  this->properties.setup(mWindow);
+  mProperties.setup(mWindow);
 }
 
-void Window::destroy() {
+void Window::setIcon(Icon const &icon) {
+  if (icon) {
+    glfwSetWindowIcon(mWindow, icon.getImageCount(), icon);
+  } else {
+    glfwSetWindowIcon(mWindow, 0, nullptr);
+  }
+}
+
+void Window::setCursor(Cursor const &cursor) {
+  if (cursor) {
+    glfwSetCursor(mWindow, cursor);
+  } else {
+    glfwSetCursor(mWindow, nullptr);
+  }
+}
+
+void Window::setCursor(StandardCursor const &cursor) {
+  if (cursor) {
+    glfwSetCursor(mWindow, cursor);
+  } else {
+    glfwSetCursor(mWindow, nullptr);
+  }
+}
+
+void Window::close() {
   if (mWindow != nullptr) {
-    glfwDestroyWindow(mWindow);
-    mWindow = nullptr;
+    glfwSetWindowShouldClose(mWindow, GLFW_TRUE);
+    this->destroy();
   }
 }
 } // namespace Terreate::Core

@@ -8,6 +8,7 @@
 #include "core/renderpass.hpp"
 #include "core/surface.hpp"
 #include "core/sync.hpp"
+#include "core/window.hpp"
 
 namespace Terreate::Core {
 void Context::loadEXTfunctions() {
@@ -153,15 +154,16 @@ void Context::attachDebugger(IDebugger *debugger) {
 #endif
 }
 
-VkObjectRef<Window> Context::createWindow(Type::str const &title,
-                                          Type::pair<Type::i32> const &size,
-                                          WindowSettings const &settings) {
-  auto window = makeVkObject<Window>(mInstance, title, size, settings);
+VkObjectRef<IWindow> Context::createWindow(Type::str const &title,
+                                           Type::pair<Type::i32> const &size,
+                                           WindowSettings const &settings) {
+  VkObject<IWindow> window =
+      makeVkObject<Window>(mInstance, title, size, settings);
   mWindows.emplace_back(std::move(window));
   return mWindows.back().ref();
 }
 
-VkObjectRef<ISurface> Context::createSurface(VkObjectRef<Window> window) {
+VkObjectRef<ISurface> Context::createSurface(VkObjectRef<IWindow> window) {
   if (!mInstance) {
     throw Exception::NullReferenceException(
         "Instance is not initialized. Please create a window first.");
@@ -178,7 +180,7 @@ VkObjectRef<ISurface> Context::createSurface(VkObjectRef<Window> window) {
 }
 
 VkObjectRef<ISwapchain>
-Context::createSwapchain(VkObjectRef<Window> window,
+Context::createSwapchain(VkObjectRef<IWindow> window,
                          VkObjectRef<ISurface> surface) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
@@ -186,7 +188,7 @@ Context::createSwapchain(VkObjectRef<Window> window,
   }
 
   VkObject<ISwapchain> swapchain = makeVkObject<Swapchain>(
-      mDevice.ref(), window->properties.framebufferSize, surface);
+      mDevice.ref(), window->getProperties().framebufferSize, surface);
   mSwapchains.emplace_back(std::move(swapchain));
   return mSwapchains.back().ref();
 }

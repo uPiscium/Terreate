@@ -20,7 +20,7 @@ private:
   VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 
 public:
-  Surface(VkInstance instance, VkObjectRef<Window> window);
+  Surface(VkInstance instance, VkObjectRef<IWindow> window);
   ~Surface() override;
 
   operator VkSurfaceKHR() const override { return mSurface; }

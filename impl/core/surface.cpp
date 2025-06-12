@@ -1,7 +1,7 @@
 #include "../../include/core/surface.hpp"
 
 namespace Terreate::Core {
-Surface::Surface(VkInstance instance, VkObjectRef<Window> window)
+Surface::Surface(VkInstance instance, VkObjectRef<IWindow> window)
     : mInstance(instance) {
   if (glfwCreateWindowSurface(instance, *window, nullptr, &mSurface) !=
       VK_SUCCESS) {

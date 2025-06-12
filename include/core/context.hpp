@@ -23,7 +23,7 @@ private:
   VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
   VkObject<Device> mDevice = nullptr;
 
-  Type::vec<VkObject<Window>> mWindows;
+  Type::vec<VkObject<IWindow>> mWindows;
   Type::vec<VkObject<ISurface>> mSurfaces;
   Type::vec<VkObject<ISwapchain>> mSwapchains;
   Type::vec<VkObject<IGraphicQueue>> mGraphicQueues;
@@ -54,11 +54,11 @@ public:
 
   void attachDebugger(IDebugger *debugger);
 
-  VkObjectRef<Window>
+  VkObjectRef<IWindow>
   createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
                WindowSettings const &settings = WindowSettings());
-  VkObjectRef<ISurface> createSurface(VkObjectRef<Window> window);
-  VkObjectRef<ISwapchain> createSwapchain(VkObjectRef<Window> window,
+  VkObjectRef<ISurface> createSurface(VkObjectRef<IWindow> window);
+  VkObjectRef<ISwapchain> createSwapchain(VkObjectRef<IWindow> window,
                                           VkObjectRef<ISurface> surface);
   VkObjectRef<IGraphicQueue> createGraphicQueue();
   VkObjectRef<IPresentQueue> createPresentQueue();
