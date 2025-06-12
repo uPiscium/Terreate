@@ -5,6 +5,8 @@
 #include "framebuffer.hpp"
 #include "pipeline.hpp"
 #include "queue.hpp"
+#include "renderpass.hpp"
+#include "surface.hpp"
 #include "sync.hpp"
 #include "vkobj.hpp"
 #include "window.hpp"
@@ -19,16 +21,19 @@ private:
 private:
   VkInstance mInstance = VK_NULL_HANDLE;
   VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
-  VkObject<Device> mDevice = nullptr;
+  VkObject<IDevice> mDevice = nullptr;
 
-  Type::vec<VkObject<Window>> mWindows;
-  Type::vec<VkObject<GraphicQueue>> mGraphicQueues;
-  Type::vec<VkObject<PresentQueue>> mPresentQueues;
-  Type::vec<VkObject<Pipeline>> mPipelines;
-  Type::vec<VkObject<Framebuffer>> mFramebuffers;
-  Type::vec<VkObject<CommandPool>> mCommandPools;
-  Type::vec<VkObject<Semaphore>> mSemaphores;
-  Type::vec<VkObject<Fence>> mFences;
+  Type::vec<VkObject<IWindow>> mWindows;
+  Type::vec<VkObject<ISurface>> mSurfaces;
+  Type::vec<VkObject<ISwapchain>> mSwapchains;
+  Type::vec<VkObject<IGraphicQueue>> mGraphicQueues;
+  Type::vec<VkObject<IPresentQueue>> mPresentQueues;
+  Type::vec<VkObject<IRenderPass>> mRenderPasses;
+  Type::vec<VkObject<IPipeline>> mPipelines;
+  Type::vec<VkObject<IFramebuffer>> mFramebuffers;
+  Type::vec<VkObject<ICommandPool>> mCommandPools;
+  Type::vec<VkObject<ISemaphore>> mSemaphores;
+  Type::vec<VkObject<IFence>> mFences;
 
 private:
   void loadEXTfunctions();
@@ -45,20 +50,26 @@ public:
   ~Context() { this->dispose(); }
 
   VkInstance getInstance() { return mInstance; }
-  VkObjectRef<Device> getDevice() const { return mDevice.ref(); }
+  VkObjectRef<IDevice> getDevice() const { return mDevice.ref(); }
 
   void attachDebugger(IDebugger *debugger);
 
-  VkObjectRef<Window>
+  VkObjectRef<IWindow>
   createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
                WindowSettings const &settings = WindowSettings());
-  VkObjectRef<GraphicQueue> createGraphicQueue();
-  VkObjectRef<PresentQueue> createPresentQueue();
-  VkObjectRef<Pipeline> createPipeline(VkObjectRef<Window> window);
-  VkObjectRef<Framebuffer> createFramebuffer(VkObjectRef<Pipeline> pipeline);
-  VkObjectRef<CommandPool> createCommandPool(VkObjectRef<Pipeline> pipeline);
-  VkObjectRef<Semaphore> createSemaphore();
-  VkObjectRef<Fence> createFence();
+  VkObjectRef<ISurface> createSurface(VkObjectRef<IWindow> window);
+  VkObjectRef<ISwapchain> createSwapchain(VkObjectRef<IWindow> window,
+                                          VkObjectRef<ISurface> surface);
+  VkObjectRef<IGraphicQueue> createGraphicQueue();
+  VkObjectRef<IPresentQueue> createPresentQueue();
+  VkObjectRef<IRenderPass> createRenderPass(VkObjectRef<ISwapchain> swapchain);
+  VkObjectRef<IPipeline> createPipeline(VkObjectRef<IRenderPass> renderPass);
+  VkObjectRef<IFramebuffer>
+  createFramebuffer(VkObjectRef<IRenderPass> renderPass,
+                    VkObjectRef<ISwapchain> swapchain);
+  VkObjectRef<ICommandPool> createCommandPool();
+  VkObjectRef<ISemaphore> createSemaphore();
+  VkObjectRef<IFence> createFence();
 
   void dispose();
 

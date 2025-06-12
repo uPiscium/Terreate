@@ -3,6 +3,8 @@
 #include <core/window.hpp>
 
 #include "../include/_main.hpp"
+
+#include <fstream>
 #include <iostream>
 
 using namespace Terreate;
@@ -34,7 +36,6 @@ public:
   }
 };
 
-#include <fstream>
 Type::vec<Type::byte> readFile(std::string const &filename) {
   std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
@@ -58,11 +59,14 @@ int test1() {
 
   auto window = ctx.createWindow("Terreate", {800, 600},
                                  Core::WindowSettings{.resizable = false});
+  auto surface = ctx.createSurface(window);
+  auto swapchain = ctx.createSwapchain(window, surface);
   auto graphicQueue = ctx.createGraphicQueue();
   auto presentQueue = ctx.createPresentQueue();
-  auto pipeline = ctx.createPipeline(window);
-  auto framebuffer = ctx.createFramebuffer(pipeline);
-  auto commandPool = ctx.createCommandPool(pipeline);
+  auto renderPass = ctx.createRenderPass(swapchain);
+  auto pipeline = ctx.createPipeline(renderPass);
+  auto framebuffer = ctx.createFramebuffer(renderPass, swapchain);
+  auto commandPool = ctx.createCommandPool();
   auto commandBuffer = commandPool->createCommandBuffer();
   auto semaphoreImageAvailable = ctx.createSemaphore();
   auto semaphoreRenderFinished = ctx.createSemaphore();
@@ -78,13 +82,15 @@ int test1() {
 
     fenceInFlight->wait();
     fenceInFlight->reset();
-    Type::u32 imageIndex = pipeline->getNextImageIndex(semaphoreImageAvailable);
+    Type::u32 imageIndex =
+        swapchain->getNextImageIndex(semaphoreImageAvailable);
 
     commandBuffer->reset();
     commandBuffer->begin();
-    commandBuffer->setRenderPass((*framebuffer)[imageIndex], {0, 0, 0, 1},
+    commandBuffer->setRenderPass(renderPass, swapchain, pipeline,
+                                 (*framebuffer)[imageIndex], {0, 0, 0, 1},
                                  Type::SubpassContent::INLINE);
-    auto framebufferSize = pipeline->getSwapchain()->getProperty().extent;
+    auto framebufferSize = swapchain->getProperty().extent;
     commandBuffer->setViewport(0, 0, framebufferSize.width,
                                framebufferSize.height, 0.0f, 1.0f);
     commandBuffer->setScissor(0, 0, framebufferSize.width,
@@ -96,8 +102,7 @@ int test1() {
                         {Type::PipelineStage::COLOR_ATTACHMENT_OUTPUT_BIT},
                         {semaphoreImageAvailable}, {semaphoreRenderFinished});
     graphicQueue->submit(fenceInFlight);
-    presentQueue->present(pipeline->getSwapchain(), {imageIndex},
-                          semaphoreRenderFinished);
+    presentQueue->present(swapchain, {imageIndex}, semaphoreRenderFinished);
   }
 
   delete debugger;

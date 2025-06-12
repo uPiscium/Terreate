@@ -26,7 +26,7 @@ Type::vec<VkSubmitInfo> GraphicQueue::createSubmitInfos() {
   return submitInfos;
 }
 
-GraphicQueue::GraphicQueue(VkObjectRef<Device> device) : mDevice(device) {
+GraphicQueue::GraphicQueue(VkObjectRef<IDevice> device) : mDevice(device) {
   if (!mDevice) {
     throw Exception::NullReferenceException("Device is null.");
   }
@@ -42,10 +42,18 @@ GraphicQueue::GraphicQueue(VkObjectRef<Device> device) : mDevice(device) {
   }
 }
 
-void GraphicQueue::queue(Type::vec<VkObjectRef<CommandBuffer>> commandBuffers,
+GraphicQueue::~GraphicQueue() {
+  if (mQueue != VK_NULL_HANDLE) {
+    vkQueueWaitIdle(mQueue);
+    mSubmitInfos.clear();
+    mQueue = VK_NULL_HANDLE;
+  }
+}
+
+void GraphicQueue::queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
                          Type::vec<Type::PipelineStage> waitStages,
-                         Type::vec<VkObjectRef<Semaphore>> waitSemaphores,
-                         Type::vec<VkObjectRef<Semaphore>> signalSemaphores) {
+                         Type::vec<VkObjectRef<ISemaphore>> waitSemaphores,
+                         Type::vec<VkObjectRef<ISemaphore>> signalSemaphores) {
   if (commandBuffers.size() < 1) {
     throw Exception::InvalidArgument("Command buffer is null.");
   }
@@ -83,7 +91,7 @@ void GraphicQueue::queue(Type::vec<VkObjectRef<CommandBuffer>> commandBuffers,
   mSubmitInfos.push_back(submitInfo);
 }
 
-void GraphicQueue::submit(VkObjectRef<Fence> fence) {
+void GraphicQueue::submit(VkObjectRef<IFence> fence) {
   if (mSubmitInfos.empty()) {
     throw Exception::InvalidArgument("No submit info to submit.");
   }
@@ -104,15 +112,7 @@ void GraphicQueue::submit(VkObjectRef<Fence> fence) {
   mSubmitInfos.clear();
 }
 
-void GraphicQueue::dispose() {
-  if (mQueue != VK_NULL_HANDLE) {
-    vkQueueWaitIdle(mQueue);
-    mSubmitInfos.clear();
-    mQueue = VK_NULL_HANDLE;
-  }
-}
-
-PresentQueue::PresentQueue(VkObjectRef<Device> device) : mDevice(device) {
+PresentQueue::PresentQueue(VkObjectRef<IDevice> device) : mDevice(device) {
   if (!mDevice) {
     throw Exception::NullReferenceException("Device is null.");
   }
@@ -128,9 +128,16 @@ PresentQueue::PresentQueue(VkObjectRef<Device> device) : mDevice(device) {
   }
 }
 
-void PresentQueue::present(VkObjectRef<Swapchain> swapchain,
+PresentQueue::~PresentQueue() {
+  if (mQueue != VK_NULL_HANDLE) {
+    vkQueueWaitIdle(mQueue);
+    mQueue = VK_NULL_HANDLE;
+  }
+}
+
+void PresentQueue::present(VkObjectRef<ISwapchain> swapchain,
                            Type::vec<Type::u32> imageIndices,
-                           VkObjectRef<Semaphore> waitSemaphore) {
+                           VkObjectRef<ISemaphore> waitSemaphore) {
   if (!swapchain) {
     throw Exception::InvalidArgument("Swapchain is null.");
   }
@@ -157,12 +164,5 @@ void PresentQueue::present(VkObjectRef<Swapchain> swapchain,
   presentInfo.pResults = nullptr; // Optional, can be null if not needed
 
   VkResult result = vkQueuePresentKHR(mQueue, &presentInfo);
-}
-
-void PresentQueue::dispose() {
-  if (mQueue != VK_NULL_HANDLE) {
-    vkQueueWaitIdle(mQueue);
-    mQueue = VK_NULL_HANDLE;
-  }
 }
 } // namespace Terreate::Core

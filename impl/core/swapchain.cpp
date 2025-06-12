@@ -45,7 +45,7 @@ VkExtent2D Swapchain::pickExtent(Type::pair<Type::i32> framebufferSize,
 }
 
 void Swapchain::createSwapchain(Type::pair<Type::i32> framebufferSize,
-                                VkSurfaceKHR surface) {
+                                VkObjectRef<ISurface> surface) {
   SwapchainSupportDetails details = mDevice->getSwapchainSupport(surface);
   VkSurfaceFormatKHR surfaceFormat = this->pickSurfaceFormat(details.formats);
   VkPresentModeKHR presentMode = this->pickPresentMode(details.presentModes);
@@ -59,7 +59,7 @@ void Swapchain::createSwapchain(Type::pair<Type::i32> framebufferSize,
 
   VkSwapchainCreateInfoKHR createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-  createInfo.surface = surface;
+  createInfo.surface = *surface;
   createInfo.minImageCount = imgCount;
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -132,15 +132,24 @@ void Swapchain::createImageViews() {
   }
 }
 
-Swapchain::Swapchain(VkObjectRef<Device> device,
+Swapchain::Swapchain(VkObjectRef<IDevice> device,
                      Type::pair<Type::i32> framebufferSize,
-                     VkSurfaceKHR surface)
+                     VkObjectRef<ISurface> surface)
     : mDevice(device) {
   this->createSwapchain(framebufferSize, surface);
   this->createImageViews();
 }
 
-Type::u32 Swapchain::getNextImageIndex(VkObjectRef<Semaphore> semaphore) const {
+Swapchain::~Swapchain() {
+  for (auto imageView : mSwapchainImageViews) {
+    vkDestroyImageView(*mDevice, imageView, nullptr);
+  }
+  vkDestroySwapchainKHR(*mDevice, mSwapchain, nullptr);
+  mSwapchain = VK_NULL_HANDLE;
+}
+
+Type::u32
+Swapchain::getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const {
   VkSemaphore semaphoreHandle = VK_NULL_HANDLE;
   if (semaphore) {
     semaphoreHandle = *semaphore;
@@ -151,13 +160,5 @@ Type::u32 Swapchain::getNextImageIndex(VkObjectRef<Semaphore> semaphore) const {
       vkAcquireNextImageKHR(*mDevice, mSwapchain, UINT64_MAX, semaphoreHandle,
                             VK_NULL_HANDLE, &imageIndex);
   return imageIndex;
-}
-
-void Swapchain::destroy() {
-  for (auto imageView : mSwapchainImageViews) {
-    vkDestroyImageView(*mDevice, imageView, nullptr);
-  }
-  vkDestroySwapchainKHR(*mDevice, mSwapchain, nullptr);
-  mSwapchain = VK_NULL_HANDLE;
 }
 } // namespace Terreate::Core

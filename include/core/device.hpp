@@ -1,4 +1,6 @@
 #pragma once
+#include "surface.hpp"
+
 #include "../common/type.hpp"
 
 namespace Terreate::Core {
@@ -20,7 +22,19 @@ struct SwapchainSupportDetails {
   Type::vec<VkPresentModeKHR> presentModes;
 };
 
-class Device {
+class IDevice {
+public:
+  virtual ~IDevice() = default;
+
+  virtual QueueFamilyIndices getQueue() const = 0;
+  virtual SwapchainSupportDetails
+  getSwapchainSupport(VkObjectRef<ISurface> surface) = 0;
+
+  virtual operator VkDevice() const = 0;
+  virtual operator VkPhysicalDevice() const = 0;
+};
+
+class Device : public IDevice {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Device);
 
@@ -33,26 +47,25 @@ private:
 
 private:
   QueueFamilyIndices findQueue(VkPhysicalDevice device,
-                               VkSurfaceKHR surface) const;
-  int rateDevice(VkPhysicalDevice device, VkSurfaceKHR surface) const;
+                               VkObjectRef<ISurface> surface) const;
+  int rateDevice(VkPhysicalDevice device, VkObjectRef<ISurface> surface) const;
   bool checkExtSupport(VkPhysicalDevice device);
   SwapchainSupportDetails getSwapchainSupport(VkPhysicalDevice device,
-                                              VkSurfaceKHR surface);
-  void pickPhysicalDevice(VkSurfaceKHR surface);
-  void createLogicalDevice(VkSurfaceKHR surface);
+                                              VkObjectRef<ISurface> surface);
+  void pickPhysicalDevice(VkObjectRef<ISurface> surface);
+  void createLogicalDevice(VkObjectRef<ISurface> surface);
 
 public:
-  Device(VkInstance instance, VkSurfaceKHR surface);
-  ~Device() { this->dispose(); }
+  Device(VkInstance instance, VkObjectRef<ISurface> surface);
+  ~Device() override;
 
-  QueueFamilyIndices getQueue() const { return mQueueFamily; }
-  SwapchainSupportDetails getSwapchainSupport(VkSurfaceKHR surface) {
+  QueueFamilyIndices getQueue() const override { return mQueueFamily; }
+  SwapchainSupportDetails
+  getSwapchainSupport(VkObjectRef<ISurface> surface) override {
     return this->getSwapchainSupport(mPhysicalDevice, surface);
   }
 
-  void dispose();
-
-  operator VkDevice() const { return mDevice; }
-  operator VkPhysicalDevice() const { return mPhysicalDevice; }
+  operator VkDevice() const override { return mDevice; }
+  operator VkPhysicalDevice() const override { return mPhysicalDevice; }
 };
 } // namespace Terreate::Core
