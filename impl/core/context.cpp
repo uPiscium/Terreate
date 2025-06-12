@@ -147,24 +147,22 @@ void Context::attachDebugger(Core::IDebugger *debugger) {
 #endif
 }
 
-Vulkan::VkObjectRef<Vulkan::IWindow>
+Vulkan::VkObjectRef<Vulkan::Window>
 Context::createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
                       Vulkan::WindowSettings const &settings) {
-  Vulkan::VkObject<Vulkan::IWindow> window =
-      makeVkObject<Vulkan::Window>(mInstance, title, size, settings);
+  auto window = makeVkObject<Vulkan::Window>(mInstance, title, size, settings);
   mWindows.emplace_back(std::move(window));
   return mWindows.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::ISurface>
-Context::createSurface(Vulkan::VkObjectRef<Vulkan::IWindow> window) {
+Vulkan::VkObjectRef<Vulkan::Surface>
+Context::createSurface(Vulkan::VkObjectRef<Vulkan::Window> window) {
   if (!mInstance) {
     throw Exception::NullReferenceException(
         "Instance is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::ISurface> surface =
-      makeVkObject<Vulkan::Surface>(mInstance, window);
+  auto surface = makeVkObject<Vulkan::Surface>(mInstance, window);
   mSurfaces.emplace_back(std::move(surface));
 
   if (!mDevice) {
@@ -174,112 +172,104 @@ Context::createSurface(Vulkan::VkObjectRef<Vulkan::IWindow> window) {
   return mSurfaces.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::ISwapchain>
-Context::createSwapchain(Vulkan::VkObjectRef<Vulkan::IWindow> window,
-                         Vulkan::VkObjectRef<Vulkan::ISurface> surface) {
+Vulkan::VkObjectRef<Vulkan::Swapchain>
+Context::createSwapchain(Vulkan::VkObjectRef<Vulkan::Window> window,
+                         Vulkan::VkObjectRef<Vulkan::Surface> surface) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::ISwapchain> swapchain =
-      makeVkObject<Vulkan::Swapchain>(
-          mDevice.ref(), window->getProperties().framebufferSize, surface);
+  auto swapchain = makeVkObject<Vulkan::Swapchain>(
+      mDevice.ref(), window->properties.framebufferSize, surface);
   mSwapchains.emplace_back(std::move(swapchain));
   return mSwapchains.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::IGraphicQueue> Context::createGraphicQueue() {
+Vulkan::VkObjectRef<Vulkan::GraphicQueue> Context::createGraphicQueue() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::IGraphicQueue> graphicQueue =
-      makeVkObject<Vulkan::GraphicQueue>(mDevice.ref());
+  auto graphicQueue = makeVkObject<Vulkan::GraphicQueue>(mDevice.ref());
   mGraphicQueues.emplace_back(std::move(graphicQueue));
   return mGraphicQueues.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::IPresentQueue> Context::createPresentQueue() {
+Vulkan::VkObjectRef<Vulkan::PresentQueue> Context::createPresentQueue() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::IPresentQueue> presentQueue =
-      makeVkObject<Vulkan::PresentQueue>(mDevice.ref());
+  auto presentQueue = makeVkObject<Vulkan::PresentQueue>(mDevice.ref());
   mPresentQueues.emplace_back(std::move(presentQueue));
   return mPresentQueues.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::IRenderPass>
-Context::createRenderPass(Vulkan::VkObjectRef<Vulkan::ISwapchain> swapchain) {
+Vulkan::VkObjectRef<Vulkan::RenderPass>
+Context::createRenderPass(Vulkan::VkObjectRef<Vulkan::Swapchain> swapchain) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::IRenderPass> renderPass =
-      makeVkObject<Vulkan::RenderPass>(mDevice.ref(), swapchain);
+  auto renderPass = makeVkObject<Vulkan::RenderPass>(mDevice.ref(), swapchain);
   mRenderPasses.emplace_back(std::move(renderPass));
   return mRenderPasses.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::IPipeline>
-Context::createPipeline(Vulkan::VkObjectRef<Vulkan::IRenderPass> renderPass) {
+Vulkan::VkObjectRef<Vulkan::Pipeline>
+Context::createPipeline(Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::IPipeline> pipeline =
-      makeVkObject<Vulkan::Pipeline>(mDevice.ref(), renderPass);
+  auto pipeline = makeVkObject<Vulkan::Pipeline>(mDevice.ref(), renderPass);
   mPipelines.emplace_back(std::move(pipeline));
   return mPipelines.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::IFramebuffer>
-Context::createFramebuffer(Vulkan::VkObjectRef<Vulkan::IRenderPass> renderPass,
-                           Vulkan::VkObjectRef<Vulkan::ISwapchain> swapchain) {
-  Vulkan::VkObject<Vulkan::IFramebuffer> framebuffer =
+Vulkan::VkObjectRef<Vulkan::Framebuffer>
+Context::createFramebuffer(Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass,
+                           Vulkan::VkObjectRef<Vulkan::Swapchain> swapchain) {
+  auto framebuffer =
       makeVkObject<Vulkan::Framebuffer>(mDevice.ref(), renderPass, swapchain);
   mFramebuffers.emplace_back(std::move(framebuffer));
   return mFramebuffers.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::ICommandPool> Context::createCommandPool() {
+Vulkan::VkObjectRef<Vulkan::CommandPool> Context::createCommandPool() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::ICommandPool> commandPool =
-      makeVkObject<Vulkan::CommandPool>(mDevice.ref());
+  auto commandPool = makeVkObject<Vulkan::CommandPool>(mDevice.ref());
   mCommandPools.emplace_back(std::move(commandPool));
   return mCommandPools.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::ISemaphore> Context::createSemaphore() {
+Vulkan::VkObjectRef<Vulkan::Semaphore> Context::createSemaphore() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::ISemaphore> semaphore =
-      makeVkObject<Vulkan::Semaphore>(mDevice.ref());
+  auto semaphore = makeVkObject<Vulkan::Semaphore>(mDevice.ref());
   mSemaphores.emplace_back(std::move(semaphore));
   return mSemaphores.back().ref();
 }
 
-Vulkan::VkObjectRef<Vulkan::IFence> Context::createFence() {
+Vulkan::VkObjectRef<Vulkan::Fence> Context::createFence() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  Vulkan::VkObject<Vulkan::IFence> fence =
-      makeVkObject<Vulkan::Fence>(mDevice.ref());
+  auto fence = makeVkObject<Vulkan::Fence>(mDevice.ref());
   mFences.emplace_back(std::move(fence));
   return mFences.back().ref();
 }

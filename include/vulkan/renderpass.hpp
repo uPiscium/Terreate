@@ -4,31 +4,25 @@
 #include "vkobj.hpp"
 
 namespace Terreate::Vulkan {
-class IRenderPass {
-public:
-  virtual ~IRenderPass() = default;
-  virtual operator VkRenderPass() const = 0;
-};
-
-class RenderPass : public IRenderPass {
+class RenderPass {
 private:
   PROHIBIT_COPY_AND_ASSIGN(RenderPass);
 
 private:
-  VkObjectRef<IDevice> mDevice;
-  VkObjectRef<ISwapchain> mSwapchain;
+  VkObjectRef<Device> mDevice;
+  VkObjectRef<Swapchain> mSwapchain;
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
 
 private:
   void createRenderPass();
 
 public:
-  RenderPass(VkObjectRef<IDevice> device, VkObjectRef<ISwapchain> swapchain)
+  RenderPass(VkObjectRef<Device> device, VkObjectRef<Swapchain> swapchain)
       : mDevice(device), mSwapchain(swapchain) {
     this->createRenderPass();
   }
-  ~RenderPass() override;
+  ~RenderPass();
 
-  operator VkRenderPass() const override { return mRenderPass; }
+  operator VkRenderPass() const { return mRenderPass; }
 };
 } // namespace Terreate::Vulkan

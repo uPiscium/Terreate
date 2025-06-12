@@ -1,31 +1,18 @@
 #pragma once
 #include "device.hpp"
 #include "renderpass.hpp"
-#include "swapchain.hpp"
 #include "vkobj.hpp"
 
 #include "../common/type.hpp"
 
 namespace Terreate::Vulkan {
-class IPipeline {
-public:
-  virtual ~IPipeline() = default;
-  virtual VkPipelineLayout getLayout() const = 0;
-  virtual void
-  attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
-                              Type::vec<Type::byte> const &frag) = 0;
-  virtual void attachShaderSources(Type::str const &vert,
-                                   Type::str const &frag) = 0;
-  virtual operator VkPipeline() const = 0;
-};
-
-class Pipeline : public IPipeline {
+class Pipeline {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Pipeline);
 
 private:
-  VkObjectRef<IDevice> mDevice;
-  VkObjectRef<IRenderPass> mRenderPass;
+  VkObjectRef<Device> mDevice;
+  VkObjectRef<RenderPass> mRenderPass;
 
   Type::vec<Type::byte> mVertShaderCode;
   Type::vec<Type::byte> mFragShaderCode;
@@ -39,19 +26,18 @@ private:
   void compileShader(Type::str const &vert, Type::str const &frag);
 
 public:
-  Pipeline(VkObjectRef<IDevice> device, VkObjectRef<IRenderPass> renderPass)
+  Pipeline(VkObjectRef<Device> device, VkObjectRef<RenderPass> renderPass)
       : mDevice(device), mRenderPass(renderPass) {}
   ~Pipeline();
 
-  VkPipelineLayout getLayout() const override { return mPipelineLayout; }
+  VkPipelineLayout getLayout() const { return mPipelineLayout; }
 
   void attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
-                                   Type::vec<Type::byte> const &frag) override;
-  void attachShaderSources(Type::str const &vert,
-                           Type::str const &frag) override {
+                                   Type::vec<Type::byte> const &frag);
+  void attachShaderSources(Type::str const &vert, Type::str const &frag) {
     this->compileShader(vert, frag);
   }
 
-  operator VkPipeline() const override { return mGraphicsPipeline; }
+  operator VkPipeline() const { return mGraphicsPipeline; }
 };
 } // namespace Terreate::Vulkan

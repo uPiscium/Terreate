@@ -48,7 +48,7 @@ Type::vec<Type::byte> readFile(std::string const &filename) {
   return buffer;
 }
 
-int test1() {
+int main() {
   Core::Context ctx("Terreate", Type::Version(0, 1, 0));
 
   auto *debugger = new MyDebugger();
@@ -106,5 +106,3 @@ int test1() {
 
   return 0;
 }
-
-int main() { test1(); }

@@ -5,51 +5,36 @@
 #include "../common/type.hpp"
 
 namespace Terreate::Vulkan {
-class ISemaphore {
-public:
-  virtual ~ISemaphore() = default;
-  virtual operator VkSemaphore() const = 0;
-};
-
-class IFence {
-public:
-  virtual ~IFence() = default;
-  virtual bool isSignaled() const = 0;
-  virtual void reset() = 0;
-  virtual bool wait(uint64_t timeout = UINT64_MAX) = 0;
-  virtual operator VkFence() const = 0;
-};
-
-class Semaphore : public ISemaphore {
+class Semaphore {
 private:
-  VkObjectRef<IDevice> mDevice;
+  VkObjectRef<Device> mDevice;
   VkSemaphore mSemaphore = VK_NULL_HANDLE;
 
 public:
-  Semaphore(VkObjectRef<IDevice> device);
-  ~Semaphore() override;
-  operator VkSemaphore() const override { return mSemaphore; }
+  Semaphore(VkObjectRef<Device> device);
+  ~Semaphore();
+  operator VkSemaphore() const { return mSemaphore; }
 };
 
-class Fence : public IFence {
+class Fence {
 private:
-  VkObjectRef<IDevice> mDevice;
+  VkObjectRef<Device> mDevice;
   VkFence mFence = VK_NULL_HANDLE;
 
 public:
-  Fence(VkObjectRef<IDevice> device);
-  ~Fence() override;
+  Fence(VkObjectRef<Device> device);
+  ~Fence();
 
-  bool isSignaled() const override {
+  bool isSignaled() const {
     return vkGetFenceStatus(*mDevice, mFence) == VK_SUCCESS;
   }
 
-  void reset() override;
-  bool wait(uint64_t timeout = UINT64_MAX) override {
+  void reset();
+  bool wait(uint64_t timeout = UINT64_MAX) {
     return vkWaitForFences(*mDevice, 1, &mFence, VK_TRUE, timeout) ==
            VK_SUCCESS;
   }
 
-  operator VkFence() const override { return mFence; }
+  operator VkFence() const { return mFence; }
 };
 } // namespace Terreate::Vulkan

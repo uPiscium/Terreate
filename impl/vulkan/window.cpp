@@ -132,7 +132,7 @@ Window::Window(VkInstance instance, Type::str const &title,
   glfwSetCharCallback(mWindow, Wrapper::charCallbackWrapper);
   glfwSetDropCallback(mWindow, Wrapper::dropCallbackWrapper);
 
-  mProperties.setup(mWindow);
+  this->properties.setup(mWindow);
 }
 
 void Window::setIcon(Icon const &icon) {

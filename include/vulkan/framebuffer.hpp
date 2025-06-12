@@ -7,31 +7,24 @@
 #include "../common/type.hpp"
 
 namespace Terreate::Vulkan {
-class IFramebuffer {
-public:
-  virtual ~IFramebuffer() = default;
-  virtual Type::vec<VkFramebuffer> const &getFramebuffers() const = 0;
-  virtual VkFramebuffer operator[](Type::u64 const &index) const = 0;
-};
-
-class Framebuffer : public IFramebuffer {
+class Framebuffer {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Framebuffer);
 
 private:
-  VkObjectRef<IDevice> mDevice;
+  VkObjectRef<Device> mDevice;
   Type::vec<VkFramebuffer> mFramebuffers;
 
 public:
-  Framebuffer(VkObjectRef<IDevice> device, VkObjectRef<IRenderPass> renderPass,
-              VkObjectRef<ISwapchain> swapchain);
-  ~Framebuffer() override;
+  Framebuffer(VkObjectRef<Device> device, VkObjectRef<RenderPass> renderPass,
+              VkObjectRef<Swapchain> swapchain);
+  ~Framebuffer();
 
-  Type::vec<VkFramebuffer> const &getFramebuffers() const override {
+  Type::vec<VkFramebuffer> const &getFramebuffers() const {
     return mFramebuffers;
   }
 
-  VkFramebuffer operator[](Type::u64 const &index) const override {
+  VkFramebuffer operator[](Type::u64 const &index) const {
     return mFramebuffers[index];
   }
 };

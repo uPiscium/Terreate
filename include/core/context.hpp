@@ -22,19 +22,19 @@ private:
 private:
   VkInstance mInstance = VK_NULL_HANDLE;
   VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
-  Vulkan::VkObject<Vulkan::IDevice> mDevice = nullptr;
+  Vulkan::VkObject<Vulkan::Device> mDevice = nullptr;
 
-  Type::vec<Vulkan::VkObject<Vulkan::IWindow>> mWindows;
-  Type::vec<Vulkan::VkObject<Vulkan::ISurface>> mSurfaces;
-  Type::vec<Vulkan::VkObject<Vulkan::ISwapchain>> mSwapchains;
-  Type::vec<Vulkan::VkObject<Vulkan::IGraphicQueue>> mGraphicQueues;
-  Type::vec<Vulkan::VkObject<Vulkan::IPresentQueue>> mPresentQueues;
-  Type::vec<Vulkan::VkObject<Vulkan::IRenderPass>> mRenderPasses;
-  Type::vec<Vulkan::VkObject<Vulkan::IPipeline>> mPipelines;
-  Type::vec<Vulkan::VkObject<Vulkan::IFramebuffer>> mFramebuffers;
-  Type::vec<Vulkan::VkObject<Vulkan::ICommandPool>> mCommandPools;
-  Type::vec<Vulkan::VkObject<Vulkan::ISemaphore>> mSemaphores;
-  Type::vec<Vulkan::VkObject<Vulkan::IFence>> mFences;
+  Type::vec<Vulkan::VkObject<Vulkan::Window>> mWindows;
+  Type::vec<Vulkan::VkObject<Vulkan::Surface>> mSurfaces;
+  Type::vec<Vulkan::VkObject<Vulkan::Swapchain>> mSwapchains;
+  Type::vec<Vulkan::VkObject<Vulkan::GraphicQueue>> mGraphicQueues;
+  Type::vec<Vulkan::VkObject<Vulkan::PresentQueue>> mPresentQueues;
+  Type::vec<Vulkan::VkObject<Vulkan::RenderPass>> mRenderPasses;
+  Type::vec<Vulkan::VkObject<Vulkan::Pipeline>> mPipelines;
+  Type::vec<Vulkan::VkObject<Vulkan::Framebuffer>> mFramebuffers;
+  Type::vec<Vulkan::VkObject<Vulkan::CommandPool>> mCommandPools;
+  Type::vec<Vulkan::VkObject<Vulkan::Semaphore>> mSemaphores;
+  Type::vec<Vulkan::VkObject<Vulkan::Fence>> mFences;
 
 private:
   void loadEXTfunctions();
@@ -51,32 +51,32 @@ public:
   ~Context() { this->dispose(); }
 
   VkInstance getInstance() { return mInstance; }
-  Vulkan::VkObjectRef<Vulkan::IDevice> getDevice() const {
+  Vulkan::VkObjectRef<Vulkan::Device> getDevice() const {
     return mDevice.ref();
   }
 
   void attachDebugger(IDebugger *debugger);
 
-  Vulkan::VkObjectRef<Vulkan::IWindow> createWindow(
+  Vulkan::VkObjectRef<Vulkan::Window> createWindow(
       Type::str const &title, Type::pair<Type::i32> const &size,
       Vulkan::WindowSettings const &settings = Vulkan::WindowSettings());
-  Vulkan::VkObjectRef<Vulkan::ISurface>
-  createSurface(Vulkan::VkObjectRef<Vulkan::IWindow> window);
-  Vulkan::VkObjectRef<Vulkan::ISwapchain>
-  createSwapchain(Vulkan::VkObjectRef<Vulkan::IWindow> window,
-                  Vulkan::VkObjectRef<Vulkan::ISurface> surface);
-  Vulkan::VkObjectRef<Vulkan::IGraphicQueue> createGraphicQueue();
-  Vulkan::VkObjectRef<Vulkan::IPresentQueue> createPresentQueue();
-  Vulkan::VkObjectRef<Vulkan::IRenderPass>
-  createRenderPass(Vulkan::VkObjectRef<Vulkan::ISwapchain> swapchain);
-  Vulkan::VkObjectRef<Vulkan::IPipeline>
-  createPipeline(Vulkan::VkObjectRef<Vulkan::IRenderPass> renderPass);
-  Vulkan::VkObjectRef<Vulkan::IFramebuffer>
-  createFramebuffer(Vulkan::VkObjectRef<Vulkan::IRenderPass> renderPass,
-                    Vulkan::VkObjectRef<Vulkan::ISwapchain> swapchain);
-  Vulkan::VkObjectRef<Vulkan::ICommandPool> createCommandPool();
-  Vulkan::VkObjectRef<Vulkan::ISemaphore> createSemaphore();
-  Vulkan::VkObjectRef<Vulkan::IFence> createFence();
+  Vulkan::VkObjectRef<Vulkan::Surface>
+  createSurface(Vulkan::VkObjectRef<Vulkan::Window> window);
+  Vulkan::VkObjectRef<Vulkan::Swapchain>
+  createSwapchain(Vulkan::VkObjectRef<Vulkan::Window> window,
+                  Vulkan::VkObjectRef<Vulkan::Surface> surface);
+  Vulkan::VkObjectRef<Vulkan::GraphicQueue> createGraphicQueue();
+  Vulkan::VkObjectRef<Vulkan::PresentQueue> createPresentQueue();
+  Vulkan::VkObjectRef<Vulkan::RenderPass>
+  createRenderPass(Vulkan::VkObjectRef<Vulkan::Swapchain> swapchain);
+  Vulkan::VkObjectRef<Vulkan::Pipeline>
+  createPipeline(Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass);
+  Vulkan::VkObjectRef<Vulkan::Framebuffer>
+  createFramebuffer(Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass,
+                    Vulkan::VkObjectRef<Vulkan::Swapchain> swapchain);
+  Vulkan::VkObjectRef<Vulkan::CommandPool> createCommandPool();
+  Vulkan::VkObjectRef<Vulkan::Semaphore> createSemaphore();
+  Vulkan::VkObjectRef<Vulkan::Fence> createFence();
 
   void dispose();
 

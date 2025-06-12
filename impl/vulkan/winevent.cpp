@@ -4,99 +4,98 @@
 namespace Terreate::Vulkan {
 namespace Wrapper {
 void windowPositionCallbackWrapper(GLFWwindow *window, int xpos, int ypos) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getProperties().position = Type::pair<Type::i32>(xpos, ypos);
-  ptr->getEvents().onPositionChange.publish(ptr, xpos, ypos);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->properties.position = Type::pair<Type::i32>(xpos, ypos);
+  ptr->events.onPositionChange.publish(ptr, xpos, ypos);
 }
 
 void windowSizeCallbackWrapper(GLFWwindow *window, int width, int height) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getProperties().size = Type::pair<Type::u32>(width, height);
-  ptr->getEvents().onSizeChange.publish(ptr, width, height);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->properties.size = Type::pair<Type::u32>(width, height);
+  ptr->events.onSizeChange.publish(ptr, width, height);
 }
 
 void windowCloseCallbackWrapper(GLFWwindow *window) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getEvents().onClose.publish(ptr);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->events.onClose.publish(ptr);
 }
 
 void windowRefreshCallbackWrapper(GLFWwindow *window) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getEvents().onRefresh.publish(ptr);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->events.onRefresh.publish(ptr);
 }
 
 void windowFocusCallbackWrapper(GLFWwindow *window, int focused) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getEvents().onFocus.publish(ptr, (bool)focused);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->events.onFocus.publish(ptr, (bool)focused);
 }
 
 void windowIconifyCallbackWrapper(GLFWwindow *window, int iconified) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getEvents().onIconify.publish(ptr, (bool)iconified);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->events.onIconify.publish(ptr, (bool)iconified);
 }
 
 void windowMaximizeCallbackWrapper(GLFWwindow *window, int maximized) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getEvents().onMaximize.publish(ptr, (bool)maximized);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->events.onMaximize.publish(ptr, (bool)maximized);
 }
 
 void windowFramebufferSizeCallbackWrapper(GLFWwindow *window, int width,
                                           int height) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getProperties().framebufferSize = Type::pair<Type::i32>(width, height);
-  ptr->getEvents().onFramebufferSizeChange.publish(ptr, width, height);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->properties.framebufferSize = Type::pair<Type::i32>(width, height);
+  ptr->events.onFramebufferSizeChange.publish(ptr, width, height);
 }
 
 void windowContentScaleCallbackWrapper(GLFWwindow *window, float xscale,
                                        float yscale) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getEvents().onContentScaleChange.publish(ptr, xscale, yscale);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->events.onContentScaleChange.publish(ptr, xscale, yscale);
 }
 
 void mousebuttonCallbackWrapper(GLFWwindow *window, int button, int action,
                                 int mods) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getEvents().onMousebuttonInput.publish(ptr, button, action,
-                                              Modifier(mods));
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->events.onMousebuttonInput.publish(ptr, button, action, Modifier(mods));
 }
 
 void cursorPositionCallbackWrapper(GLFWwindow *window, double xpos,
                                    double ypos) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getProperties().cursorPosition = Type::pair<double>(xpos, ypos);
-  ptr->getEvents().onCursorPositionChange.publish(ptr, xpos, ypos);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->properties.cursorPosition = Type::pair<double>(xpos, ypos);
+  ptr->events.onCursorPositionChange.publish(ptr, xpos, ypos);
 }
 
 void cursorEnterCallbackWrapper(GLFWwindow *window, int entered) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getEvents().onCursorEnter.publish(ptr, (bool)entered);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->events.onCursorEnter.publish(ptr, (bool)entered);
 }
 
 void scrollCallbackWrapper(GLFWwindow *window, double xoffset, double yoffset) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getProperties().scrollOffset = Type::pair<double>(xoffset, yoffset);
-  ptr->getEvents().onScroll.publish(ptr, xoffset, yoffset);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->properties.scrollOffset = Type::pair<double>(xoffset, yoffset);
+  ptr->events.onScroll.publish(ptr, xoffset, yoffset);
 }
 
 void keyCallbackWrapper(GLFWwindow *window, int key, int scancode, int action,
                         int mods) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
   Key wrappedKey = Key(key, scancode, action, mods);
-  ptr->getProperties().keys.get().push_back(wrappedKey);
-  ptr->getEvents().onKeyInput.publish(ptr, wrappedKey);
+  ptr->properties.keys.get().push_back(wrappedKey);
+  ptr->events.onKeyInput.publish(ptr, wrappedKey);
 }
 
 void charCallbackWrapper(GLFWwindow *window, Type::u32 codepoint) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
-  ptr->getProperties().codePoints.get().push_back(codepoint);
-  ptr->getEvents().onCharInput.publish(ptr, codepoint);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
+  ptr->properties.codePoints.get().push_back(codepoint);
+  ptr->events.onCharInput.publish(ptr, codepoint);
 }
 
 void dropCallbackWrapper(GLFWwindow *window, int count, const char **paths) {
-  IWindow *ptr = (IWindow *)glfwGetWindowUserPointer(window);
+  Window *ptr = (Window *)glfwGetWindowUserPointer(window);
   Type::vec<Type::str> droppedFiles(paths, paths + count);
-  ptr->getProperties().droppedFiles = droppedFiles;
-  ptr->getEvents().onFileDrop.publish(ptr, droppedFiles);
+  ptr->properties.droppedFiles = droppedFiles;
+  ptr->events.onFileDrop.publish(ptr, droppedFiles);
 }
 } // namespace Wrapper
 

@@ -1,7 +1,7 @@
 #include "../../include/vulkan/surface.hpp"
 
 namespace Terreate::Vulkan {
-Surface::Surface(VkInstance instance, VkObjectRef<IWindow> window)
+Surface::Surface(VkInstance instance, VkObjectRef<Window> window)
     : mInstance(instance) {
   if (glfwCreateWindowSurface(instance, *window, nullptr, &mSurface) !=
       VK_SUCCESS) {

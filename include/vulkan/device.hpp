@@ -22,19 +22,7 @@ struct SwapchainSupportDetails {
   Type::vec<VkPresentModeKHR> presentModes;
 };
 
-class IDevice {
-public:
-  virtual ~IDevice() = default;
-
-  virtual QueueFamilyIndices getQueue() const = 0;
-  virtual SwapchainSupportDetails
-  getSwapchainSupport(VkObjectRef<ISurface> surface) = 0;
-
-  virtual operator VkDevice() const = 0;
-  virtual operator VkPhysicalDevice() const = 0;
-};
-
-class Device : public IDevice {
+class Device {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Device);
 
@@ -47,25 +35,24 @@ private:
 
 private:
   QueueFamilyIndices findQueue(VkPhysicalDevice device,
-                               VkObjectRef<ISurface> surface) const;
-  int rateDevice(VkPhysicalDevice device, VkObjectRef<ISurface> surface) const;
+                               VkObjectRef<Surface> surface) const;
+  int rateDevice(VkPhysicalDevice device, VkObjectRef<Surface> surface) const;
   bool checkExtSupport(VkPhysicalDevice device);
   SwapchainSupportDetails getSwapchainSupport(VkPhysicalDevice device,
-                                              VkObjectRef<ISurface> surface);
-  void pickPhysicalDevice(VkObjectRef<ISurface> surface);
-  void createLogicalDevice(VkObjectRef<ISurface> surface);
+                                              VkObjectRef<Surface> surface);
+  void pickPhysicalDevice(VkObjectRef<Surface> surface);
+  void createLogicalDevice(VkObjectRef<Surface> surface);
 
 public:
-  Device(VkInstance instance, VkObjectRef<ISurface> surface);
-  ~Device() override;
+  Device(VkInstance instance, VkObjectRef<Surface> surface);
+  ~Device();
 
-  QueueFamilyIndices getQueue() const override { return mQueueFamily; }
-  SwapchainSupportDetails
-  getSwapchainSupport(VkObjectRef<ISurface> surface) override {
+  QueueFamilyIndices getQueue() const { return mQueueFamily; }
+  SwapchainSupportDetails getSwapchainSupport(VkObjectRef<Surface> surface) {
     return this->getSwapchainSupport(mPhysicalDevice, surface);
   }
 
-  operator VkDevice() const override { return mDevice; }
-  operator VkPhysicalDevice() const override { return mPhysicalDevice; }
+  operator VkDevice() const { return mDevice; }
+  operator VkPhysicalDevice() const { return mPhysicalDevice; }
 };
 } // namespace Terreate::Vulkan

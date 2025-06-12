@@ -45,7 +45,7 @@ VkExtent2D Swapchain::pickExtent(Type::pair<Type::i32> framebufferSize,
 }
 
 void Swapchain::createSwapchain(Type::pair<Type::i32> framebufferSize,
-                                VkObjectRef<ISurface> surface) {
+                                VkObjectRef<Surface> surface) {
   SwapchainSupportDetails details = mDevice->getSwapchainSupport(surface);
   VkSurfaceFormatKHR surfaceFormat = this->pickSurfaceFormat(details.formats);
   VkPresentModeKHR presentMode = this->pickPresentMode(details.presentModes);
@@ -132,9 +132,9 @@ void Swapchain::createImageViews() {
   }
 }
 
-Swapchain::Swapchain(VkObjectRef<IDevice> device,
+Swapchain::Swapchain(VkObjectRef<Device> device,
                      Type::pair<Type::i32> framebufferSize,
-                     VkObjectRef<ISurface> surface)
+                     VkObjectRef<Surface> surface)
     : mDevice(device) {
   this->createSwapchain(framebufferSize, surface);
   this->createImageViews();
@@ -148,8 +148,7 @@ Swapchain::~Swapchain() {
   mSwapchain = VK_NULL_HANDLE;
 }
 
-Type::u32
-Swapchain::getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const {
+Type::u32 Swapchain::getNextImageIndex(VkObjectRef<Semaphore> semaphore) const {
   VkSemaphore semaphoreHandle = VK_NULL_HANDLE;
   if (semaphore) {
     semaphoreHandle = *semaphore;

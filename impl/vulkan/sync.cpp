@@ -2,7 +2,7 @@
 #include "../../include/vulkan/sync.hpp"
 
 namespace Terreate::Vulkan {
-Semaphore::Semaphore(VkObjectRef<IDevice> device) : mDevice(device) {
+Semaphore::Semaphore(VkObjectRef<Device> device) : mDevice(device) {
   VkSemaphoreCreateInfo createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -19,7 +19,7 @@ Semaphore::~Semaphore() {
   }
 }
 
-Fence::Fence(VkObjectRef<IDevice> device) : mDevice(device) {
+Fence::Fence(VkObjectRef<Device> device) : mDevice(device) {
   VkFenceCreateInfo createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
   createInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
@@ -29,16 +29,16 @@ Fence::Fence(VkObjectRef<IDevice> device) : mDevice(device) {
   }
 }
 
-void Fence::reset() {
-  if (vkResetFences(*mDevice, 1, &mFence) != VK_SUCCESS) {
-    throw Exception::SyncObjectResetFailure("failed to reset fence!");
-  }
-}
-
 Fence::~Fence() {
   if (mFence != VK_NULL_HANDLE) {
     vkDestroyFence(*mDevice, mFence, nullptr);
     mFence = VK_NULL_HANDLE;
+  }
+}
+
+void Fence::reset() {
+  if (vkResetFences(*mDevice, 1, &mFence) != VK_SUCCESS) {
+    throw Exception::SyncObjectResetFailure("failed to reset fence!");
   }
 }
 } // namespace Terreate::Vulkan

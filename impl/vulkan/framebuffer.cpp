@@ -2,9 +2,9 @@
 #include "../../include/vulkan/framebuffer.hpp"
 
 namespace Terreate::Vulkan {
-Framebuffer::Framebuffer(VkObjectRef<IDevice> device,
-                         VkObjectRef<IRenderPass> renderPass,
-                         VkObjectRef<ISwapchain> swapchain)
+Framebuffer::Framebuffer(VkObjectRef<Device> device,
+                         VkObjectRef<RenderPass> renderPass,
+                         VkObjectRef<Swapchain> swapchain)
     : mDevice(device) {
   auto const &extent = swapchain->getProperty().extent;
   auto const &imageViews = swapchain->getImageViews();

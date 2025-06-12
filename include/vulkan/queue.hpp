@@ -7,30 +7,7 @@
 #include "../common/type.hpp"
 
 namespace Terreate::Vulkan {
-class IQueue {
-public:
-  virtual ~IQueue() = default;
-  virtual operator VkQueue() const = 0;
-};
-
-class IGraphicQueue : public IQueue {
-public:
-  virtual void
-  queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
-        Type::vec<Type::PipelineStage> waitStages = {},
-        Type::vec<VkObjectRef<ISemaphore>> waitSemaphores = {},
-        Type::vec<VkObjectRef<ISemaphore>> signalSemaphores = {}) = 0;
-  virtual void submit(VkObjectRef<IFence> fence = nullptr) = 0;
-};
-
-class IPresentQueue : public IQueue {
-public:
-  virtual void present(VkObjectRef<ISwapchain> swapchain,
-                       Type::vec<Type::u32> imageIndices,
-                       VkObjectRef<ISemaphore> waitSemaphore = nullptr) = 0;
-};
-
-class GraphicQueue : public IGraphicQueue {
+class GraphicQueue {
 private:
   PROHIBIT_COPY_AND_ASSIGN(GraphicQueue);
 
@@ -43,7 +20,7 @@ private:
   };
 
 private:
-  VkObjectRef<IDevice> mDevice;
+  VkObjectRef<Device> mDevice;
   VkQueue mQueue = VK_NULL_HANDLE;
   Type::vec<SubmitInfo> mSubmitInfos;
 
@@ -51,34 +28,34 @@ private:
   Type::vec<VkSubmitInfo> createSubmitInfos();
 
 public:
-  GraphicQueue(VkObjectRef<IDevice> device);
-  ~GraphicQueue() override;
+  GraphicQueue(VkObjectRef<Device> device);
+  ~GraphicQueue();
 
-  void queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
+  void queue(Type::vec<VkObjectRef<CommandBuffer>> commandBuffers,
              Type::vec<Type::PipelineStage> waitStages = {},
-             Type::vec<VkObjectRef<ISemaphore>> waitSemaphores = {},
-             Type::vec<VkObjectRef<ISemaphore>> signalSemaphores = {}) override;
-  void submit(VkObjectRef<IFence> fence = nullptr) override;
+             Type::vec<VkObjectRef<Semaphore>> waitSemaphores = {},
+             Type::vec<VkObjectRef<Semaphore>> signalSemaphores = {});
+  void submit(VkObjectRef<Fence> fence = nullptr);
 
-  operator VkQueue() const override { return mQueue; }
+  operator VkQueue() const { return mQueue; }
 };
 
-class PresentQueue : public IPresentQueue {
+class PresentQueue {
 private:
   PROHIBIT_COPY_AND_ASSIGN(PresentQueue);
 
 private:
-  VkObjectRef<IDevice> mDevice;
+  VkObjectRef<Device> mDevice;
   VkQueue mQueue = VK_NULL_HANDLE;
 
 public:
-  PresentQueue(VkObjectRef<IDevice> device);
-  ~PresentQueue() override;
+  PresentQueue(VkObjectRef<Device> device);
+  ~PresentQueue();
 
-  void present(VkObjectRef<ISwapchain> swapchain,
+  void present(VkObjectRef<Swapchain> swapchain,
                Type::vec<Type::u32> imageIndices,
-               VkObjectRef<ISemaphore> waitSemaphore = nullptr) override;
+               VkObjectRef<Semaphore> waitSemaphore = nullptr);
 
-  operator VkQueue() const override { return mQueue; }
+  operator VkQueue() const { return mQueue; }
 };
 } // namespace Terreate::Vulkan

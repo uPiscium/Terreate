@@ -11,19 +11,7 @@ struct SwapchainProperty {
   VkExtent2D extent;
 };
 
-class ISwapchain {
-public:
-  virtual ~ISwapchain() = default;
-
-  virtual SwapchainProperty const &getProperty() const = 0;
-  virtual Type::vec<VkImageView> const &getImageViews() const = 0;
-  virtual Type::u32
-  getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const = 0;
-
-  virtual operator VkSwapchainKHR() const = 0;
-};
-
-class Swapchain : public ISwapchain {
+class Swapchain {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Swapchain);
 
@@ -35,11 +23,11 @@ private:
   VkExtent2D pickExtent(Type::pair<Type::i32> framebufferSize,
                         VkSurfaceCapabilitiesKHR const &capabilities);
   void createSwapchain(Type::pair<Type::i32> framebufferSize,
-                       VkObjectRef<ISurface> surface);
+                       VkObjectRef<Surface> surface);
   void createImageViews();
 
 private:
-  VkObjectRef<IDevice> mDevice;
+  VkObjectRef<Device> mDevice;
 
   VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
   Type::vec<VkImage> mSwapchainImages;
@@ -47,18 +35,16 @@ private:
   SwapchainProperty mSwapchainProperty;
 
 public:
-  Swapchain(VkObjectRef<IDevice> device, Type::pair<Type::i32> framebufferSize,
-            VkObjectRef<ISurface> surface);
-  ~Swapchain() override;
+  Swapchain(VkObjectRef<Device> device, Type::pair<Type::i32> framebufferSize,
+            VkObjectRef<Surface> surface);
+  ~Swapchain();
 
-  SwapchainProperty const &getProperty() const override {
-    return mSwapchainProperty;
-  }
-  Type::vec<VkImageView> const &getImageViews() const override {
+  SwapchainProperty const &getProperty() const { return mSwapchainProperty; }
+  Type::vec<VkImageView> const &getImageViews() const {
     return mSwapchainImageViews;
   }
-  Type::u32 getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const override;
+  Type::u32 getNextImageIndex(VkObjectRef<Semaphore> semaphore) const;
 
-  operator VkSwapchainKHR() const override { return mSwapchain; }
+  operator VkSwapchainKHR() const { return mSwapchain; }
 };
 } // namespace Terreate::Vulkan

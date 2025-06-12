@@ -5,13 +5,7 @@
 #include "../common/type.hpp"
 
 namespace Terreate::Vulkan {
-class ISurface {
-public:
-  virtual ~ISurface() = default;
-  virtual operator VkSurfaceKHR() const = 0;
-};
-
-class Surface : public ISurface {
+class Surface {
 private:
   PROHIBIT_COPY_AND_ASSIGN(Surface);
 
@@ -20,9 +14,9 @@ private:
   VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 
 public:
-  Surface(VkInstance instance, VkObjectRef<IWindow> window);
-  ~Surface() override;
+  Surface(VkInstance instance, VkObjectRef<Window> window);
+  ~Surface();
 
-  operator VkSurfaceKHR() const override { return mSurface; }
+  operator VkSurfaceKHR() const { return mSurface; }
 };
 } // namespace Terreate::Vulkan

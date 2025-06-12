@@ -2,7 +2,7 @@
 #include "../../include/vulkan/command.hpp"
 
 namespace Terreate::Vulkan {
-CommandPool::CommandPool(VkObjectRef<IDevice> device) : mDevice(device) {
+CommandPool::CommandPool(VkObjectRef<Device> device) : mDevice(device) {
   VkCommandPoolCreateInfo poolInfo{};
   poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
   poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -24,15 +24,15 @@ CommandPool::~CommandPool() {
   }
 }
 
-VkObjectRef<ICommandBuffer>
+VkObjectRef<CommandBuffer>
 CommandPool::createCommandBuffer(Type::CommandBufferLevel const &level) {
-  VkObject<ICommandBuffer> commandBuffer =
+  auto commandBuffer =
       makeVkObject<CommandBuffer>(mDevice, mCommandPool, level);
   mCommandBuffers.push_back(std::move(commandBuffer));
   return mCommandBuffers.back().ref();
 }
 
-CommandBuffer::CommandBuffer(VkObjectRef<IDevice> device, VkCommandPool pool,
+CommandBuffer::CommandBuffer(VkObjectRef<Device> device, VkCommandPool pool,
                              Type::CommandBufferLevel const &level)
     : mDevice(device), mCommandPool(pool) {
   VkCommandBufferAllocateInfo allocInfo{};
@@ -54,9 +54,9 @@ CommandBuffer::~CommandBuffer() {
   }
 }
 
-void CommandBuffer::setRenderPass(VkObjectRef<IRenderPass> renderPass,
-                                  VkObjectRef<ISwapchain> swapchain,
-                                  VkObjectRef<IPipeline> pipeline,
+void CommandBuffer::setRenderPass(VkObjectRef<RenderPass> renderPass,
+                                  VkObjectRef<Swapchain> swapchain,
+                                  VkObjectRef<Pipeline> pipeline,
                                   VkFramebuffer framebuffer,
                                   Type::vec<float> const &clearColor,
                                   Type::SubpassContent content) {

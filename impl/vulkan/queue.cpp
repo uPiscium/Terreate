@@ -26,7 +26,7 @@ Type::vec<VkSubmitInfo> GraphicQueue::createSubmitInfos() {
   return submitInfos;
 }
 
-GraphicQueue::GraphicQueue(VkObjectRef<IDevice> device) : mDevice(device) {
+GraphicQueue::GraphicQueue(VkObjectRef<Device> device) : mDevice(device) {
   if (!mDevice) {
     throw Exception::NullReferenceException("Device is null.");
   }
@@ -50,10 +50,10 @@ GraphicQueue::~GraphicQueue() {
   }
 }
 
-void GraphicQueue::queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
+void GraphicQueue::queue(Type::vec<VkObjectRef<CommandBuffer>> commandBuffers,
                          Type::vec<Type::PipelineStage> waitStages,
-                         Type::vec<VkObjectRef<ISemaphore>> waitSemaphores,
-                         Type::vec<VkObjectRef<ISemaphore>> signalSemaphores) {
+                         Type::vec<VkObjectRef<Semaphore>> waitSemaphores,
+                         Type::vec<VkObjectRef<Semaphore>> signalSemaphores) {
   if (commandBuffers.size() < 1) {
     throw Exception::InvalidArgument("Command buffer is null.");
   }
@@ -91,7 +91,7 @@ void GraphicQueue::queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
   mSubmitInfos.push_back(submitInfo);
 }
 
-void GraphicQueue::submit(VkObjectRef<IFence> fence) {
+void GraphicQueue::submit(VkObjectRef<Fence> fence) {
   if (mSubmitInfos.empty()) {
     throw Exception::InvalidArgument("No submit info to submit.");
   }
@@ -112,7 +112,7 @@ void GraphicQueue::submit(VkObjectRef<IFence> fence) {
   mSubmitInfos.clear();
 }
 
-PresentQueue::PresentQueue(VkObjectRef<IDevice> device) : mDevice(device) {
+PresentQueue::PresentQueue(VkObjectRef<Device> device) : mDevice(device) {
   if (!mDevice) {
     throw Exception::NullReferenceException("Device is null.");
   }
@@ -135,9 +135,9 @@ PresentQueue::~PresentQueue() {
   }
 }
 
-void PresentQueue::present(VkObjectRef<ISwapchain> swapchain,
+void PresentQueue::present(VkObjectRef<Swapchain> swapchain,
                            Type::vec<Type::u32> imageIndices,
-                           VkObjectRef<ISemaphore> waitSemaphore) {
+                           VkObjectRef<Semaphore> waitSemaphore) {
   if (!swapchain) {
     throw Exception::InvalidArgument("Swapchain is null.");
   }

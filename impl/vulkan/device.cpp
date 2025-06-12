@@ -4,7 +4,7 @@
 
 namespace Terreate::Vulkan {
 QueueFamilyIndices Device::findQueue(VkPhysicalDevice device,
-                                     VkObjectRef<ISurface> surface) const {
+                                     VkObjectRef<Surface> surface) const {
   QueueFamilyIndices queueFamily;
 
   Type::u32 queueFamilyCount = 0;
@@ -42,7 +42,7 @@ QueueFamilyIndices Device::findQueue(VkPhysicalDevice device,
 }
 
 int Device::rateDevice(VkPhysicalDevice device,
-                       VkObjectRef<ISurface> surface) const {
+                       VkObjectRef<Surface> surface) const {
   VkPhysicalDeviceProperties deviceProperties;
   vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
@@ -77,7 +77,7 @@ bool Device::checkExtSupport(VkPhysicalDevice device) {
 
 SwapchainSupportDetails
 Device::getSwapchainSupport(VkPhysicalDevice device,
-                            VkObjectRef<ISurface> surface) {
+                            VkObjectRef<Surface> surface) {
   SwapchainSupportDetails details;
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, *surface,
                                             &details.capabilities);
@@ -101,7 +101,7 @@ Device::getSwapchainSupport(VkPhysicalDevice device,
   return details;
 }
 
-void Device::pickPhysicalDevice(VkObjectRef<ISurface> surface) {
+void Device::pickPhysicalDevice(VkObjectRef<Surface> surface) {
   Type::map<Type::i32, VkPhysicalDevice> deviceMap;
   Type::u32 deviceCount = 0;
   vkEnumeratePhysicalDevices(mInstance, &deviceCount, nullptr);
@@ -141,7 +141,7 @@ void Device::pickPhysicalDevice(VkObjectRef<ISurface> surface) {
   mQueueFamily = this->findQueue(mPhysicalDevice, surface);
 }
 
-void Device::createLogicalDevice(VkObjectRef<ISurface> surface) {
+void Device::createLogicalDevice(VkObjectRef<Surface> surface) {
   Type::vec<VkDeviceQueueCreateInfo> queueCreateInfos;
   float queuePriority = 1.0f;
 
@@ -166,7 +166,7 @@ void Device::createLogicalDevice(VkObjectRef<ISurface> surface) {
 
 #ifdef TERREATE_DEBUG_BUILD
   createInfo.enabledLayerCount =
-      static_cast<uint32_t>(VALIDATION_LAYERS.size());
+      static_cast<Type::u32>(VALIDATION_LAYERS.size());
   createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
 #else
   createInfo.enabledLayerCount = 0;
@@ -179,7 +179,7 @@ void Device::createLogicalDevice(VkObjectRef<ISurface> surface) {
   }
 }
 
-Device::Device(VkInstance instance, VkObjectRef<ISurface> surface)
+Device::Device(VkInstance instance, VkObjectRef<Surface> surface)
     : mInstance(instance) {
   this->pickPhysicalDevice(surface);
   this->createLogicalDevice(surface);

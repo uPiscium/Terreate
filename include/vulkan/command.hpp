@@ -10,65 +10,30 @@
 #include "../util/bitflag.hpp"
 
 namespace Terreate::Vulkan {
-class ICommandBuffer {
-public:
-  virtual ~ICommandBuffer() = default;
+class CommandBuffer;
 
-  virtual void setRenderPass(VkObjectRef<IRenderPass> renderPass,
-                             VkObjectRef<ISwapchain> swapchain,
-                             VkObjectRef<IPipeline> pipeline,
-                             VkFramebuffer framebuffer,
-                             Type::vec<float> const &clearColor,
-                             Type::SubpassContent content) = 0;
-  virtual void setViewport(float x0, float y0, float width, float height,
-                           float minDepth, float maxDepth) = 0;
-  virtual void setScissor(Type::i32 offsetX, Type::i32 offsetY, Type::u32 width,
-                          Type::u32 height) = 0;
-
-  virtual void begin(Util::Bitflag<Type::CommandBufferUsage> flags = 0,
-                     VkCommandBufferInheritanceInfo *inherit = nullptr) = 0;
-  virtual void end() = 0;
-  virtual void drawBuffer(Type::u64 verexCount, Type::u64 instanceCount,
-                          Type::u64 firstVertex = 0,
-                          Type::u64 firstInstance = 0) = 0;
-  virtual void reset() = 0;
-
-  virtual operator VkCommandBuffer() const = 0;
-};
-
-class ICommandPool {
-public:
-  virtual ~ICommandPool() = default;
-
-  virtual VkObjectRef<ICommandBuffer>
-  createCommandBuffer(Type::CommandBufferLevel const &level =
-                          Type::CommandBufferLevel::PRIMARY) = 0;
-
-  virtual operator VkCommandPool() const = 0;
-};
-
-class CommandPool : public ICommandPool {
+class CommandPool {
 private:
   PROHIBIT_COPY_AND_ASSIGN(CommandPool);
 
 private:
-  VkObjectRef<IDevice> mDevice;
+  VkObjectRef<Device> mDevice;
 
   VkCommandPool mCommandPool = VK_NULL_HANDLE;
-  Type::vec<VkObject<ICommandBuffer>> mCommandBuffers;
+  Type::vec<VkObject<CommandBuffer>> mCommandBuffers;
 
 public:
-  CommandPool(VkObjectRef<IDevice> device);
-  ~CommandPool() override;
+  CommandPool(VkObjectRef<Device> device);
+  ~CommandPool();
 
-  VkObjectRef<ICommandBuffer>
+  VkObjectRef<CommandBuffer>
   createCommandBuffer(Type::CommandBufferLevel const &level =
-                          Type::CommandBufferLevel::PRIMARY) override;
+                          Type::CommandBufferLevel::PRIMARY);
 
-  operator VkCommandPool() const override { return mCommandPool; }
+  operator VkCommandPool() const { return mCommandPool; }
 };
 
-class CommandBuffer : public ICommandBuffer {
+class CommandBuffer {
 private:
   PROHIBIT_COPY_AND_ASSIGN(CommandBuffer);
 
@@ -81,7 +46,7 @@ private:
   };
 
 private:
-  VkObjectRef<IDevice> mDevice;
+  VkObjectRef<Device> mDevice;
   VkCommandPool mCommandPool;
 
   bool mIsRecording = false;
@@ -95,29 +60,27 @@ private:
 
 private:
 public:
-  CommandBuffer(VkObjectRef<IDevice> device, VkCommandPool pool,
+  CommandBuffer(VkObjectRef<Device> device, VkCommandPool pool,
                 Type::CommandBufferLevel const &level =
                     Type::CommandBufferLevel::PRIMARY);
-  ~CommandBuffer() override;
+  ~CommandBuffer();
 
-  void setRenderPass(VkObjectRef<IRenderPass> renderPass,
-                     VkObjectRef<ISwapchain> swapchain,
-                     VkObjectRef<IPipeline> pipeline, VkFramebuffer framebuffer,
+  void setRenderPass(VkObjectRef<RenderPass> renderPass,
+                     VkObjectRef<Swapchain> swapchain,
+                     VkObjectRef<Pipeline> pipeline, VkFramebuffer framebuffer,
                      Type::vec<float> const &clearColor,
-                     Type::SubpassContent content) override;
+                     Type::SubpassContent content);
   void setViewport(float x0, float y0, float width, float height,
-                   float minDepth, float maxDepth) override;
+                   float minDepth, float maxDepth);
   void setScissor(Type::i32 offsetX, Type::i32 offsetY, Type::u32 width,
-                  Type::u32 height) override;
+                  Type::u32 height);
   void begin(Util::Bitflag<Type::CommandBufferUsage> flags = 0,
-             VkCommandBufferInheritanceInfo *inherit = nullptr) override;
-  void end() override;
+             VkCommandBufferInheritanceInfo *inherit = nullptr);
+  void end();
   void drawBuffer(Type::u64 verexCount, Type::u64 instanceCount,
-                  Type::u64 firstVertex = 0,
-                  Type::u64 firstInstance = 0) override;
-  void reset() override;
+                  Type::u64 firstVertex = 0, Type::u64 firstInstance = 0);
+  void reset();
 
-  operator VkCommandBuffer() const override { return mCommandBuffer; }
-  // operator VkCommandBufferInheritanceInfo() const { return ; }
+  operator VkCommandBuffer() const { return mCommandBuffer; }
 };
 } // namespace Terreate::Vulkan
