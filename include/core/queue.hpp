@@ -18,16 +18,16 @@ public:
   virtual void
   queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
         Type::vec<Type::PipelineStage> waitStages = {},
-        Type::vec<VkObjectRef<Semaphore>> waitSemaphores = {},
-        Type::vec<VkObjectRef<Semaphore>> signalSemaphores = {}) = 0;
-  virtual void submit(VkObjectRef<Fence> fence = nullptr) = 0;
+        Type::vec<VkObjectRef<ISemaphore>> waitSemaphores = {},
+        Type::vec<VkObjectRef<ISemaphore>> signalSemaphores = {}) = 0;
+  virtual void submit(VkObjectRef<IFence> fence = nullptr) = 0;
 };
 
 class IPresentQueue : public IQueue {
 public:
   virtual void present(VkObjectRef<Swapchain> swapchain,
                        Type::vec<Type::u32> imageIndices,
-                       VkObjectRef<Semaphore> waitSemaphore = nullptr) = 0;
+                       VkObjectRef<ISemaphore> waitSemaphore = nullptr) = 0;
 };
 
 class GraphicQueue : public IGraphicQueue {
@@ -56,9 +56,9 @@ public:
 
   void queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
              Type::vec<Type::PipelineStage> waitStages = {},
-             Type::vec<VkObjectRef<Semaphore>> waitSemaphores = {},
-             Type::vec<VkObjectRef<Semaphore>> signalSemaphores = {}) override;
-  void submit(VkObjectRef<Fence> fence = nullptr) override;
+             Type::vec<VkObjectRef<ISemaphore>> waitSemaphores = {},
+             Type::vec<VkObjectRef<ISemaphore>> signalSemaphores = {}) override;
+  void submit(VkObjectRef<IFence> fence = nullptr) override;
 
   operator VkQueue() const override { return mQueue; }
 };
@@ -77,7 +77,7 @@ public:
 
   void present(VkObjectRef<Swapchain> swapchain,
                Type::vec<Type::u32> imageIndices,
-               VkObjectRef<Semaphore> waitSemaphore = nullptr) override;
+               VkObjectRef<ISemaphore> waitSemaphore = nullptr) override;
 
   operator VkQueue() const override { return mQueue; }
 };

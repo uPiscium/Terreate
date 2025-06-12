@@ -52,8 +52,8 @@ GraphicQueue::~GraphicQueue() {
 
 void GraphicQueue::queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
                          Type::vec<Type::PipelineStage> waitStages,
-                         Type::vec<VkObjectRef<Semaphore>> waitSemaphores,
-                         Type::vec<VkObjectRef<Semaphore>> signalSemaphores) {
+                         Type::vec<VkObjectRef<ISemaphore>> waitSemaphores,
+                         Type::vec<VkObjectRef<ISemaphore>> signalSemaphores) {
   if (commandBuffers.size() < 1) {
     throw Exception::InvalidArgument("Command buffer is null.");
   }
@@ -91,7 +91,7 @@ void GraphicQueue::queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
   mSubmitInfos.push_back(submitInfo);
 }
 
-void GraphicQueue::submit(VkObjectRef<Fence> fence) {
+void GraphicQueue::submit(VkObjectRef<IFence> fence) {
   if (mSubmitInfos.empty()) {
     throw Exception::InvalidArgument("No submit info to submit.");
   }
@@ -137,7 +137,7 @@ PresentQueue::~PresentQueue() {
 
 void PresentQueue::present(VkObjectRef<Swapchain> swapchain,
                            Type::vec<Type::u32> imageIndices,
-                           VkObjectRef<Semaphore> waitSemaphore) {
+                           VkObjectRef<ISemaphore> waitSemaphore) {
   if (!swapchain) {
     throw Exception::InvalidArgument("Swapchain is null.");
   }

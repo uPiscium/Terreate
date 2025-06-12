@@ -82,7 +82,8 @@ int test1() {
 
     fenceInFlight->wait();
     fenceInFlight->reset();
-    Type::u32 imageIndex = pipeline->getNextImageIndex(semaphoreImageAvailable);
+    Type::u32 imageIndex =
+        swapchain->getNextImageIndex(semaphoreImageAvailable);
 
     commandBuffer->reset();
     commandBuffer->begin();

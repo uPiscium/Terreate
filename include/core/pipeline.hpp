@@ -2,7 +2,6 @@
 #include "device.hpp"
 #include "renderpass.hpp"
 #include "swapchain.hpp"
-#include "sync.hpp"
 #include "vkobj.hpp"
 
 #include "../common/type.hpp"
@@ -11,17 +10,12 @@ namespace Terreate::Core {
 class IPipeline {
 public:
   virtual ~IPipeline() = default;
-
   virtual VkPipelineLayout getLayout() const = 0;
-  virtual Type::u32
-  getNextImageIndex(VkObjectRef<Semaphore> semaphore) const = 0;
-
   virtual void
   attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
                               Type::vec<Type::byte> const &frag) = 0;
   virtual void attachShaderSources(Type::str const &vert,
                                    Type::str const &frag) = 0;
-
   virtual operator VkPipeline() const = 0;
 };
 
@@ -52,9 +46,6 @@ public:
   ~Pipeline();
 
   VkPipelineLayout getLayout() const override { return mPipelineLayout; }
-  Type::u32 getNextImageIndex(VkObjectRef<Semaphore> semaphore) const override {
-    return mSwapchain->getNextImageIndex(semaphore);
-  }
 
   void attachCompiledShaderSources(Type::vec<Type::byte> const &vert,
                                    Type::vec<Type::byte> const &frag) override;

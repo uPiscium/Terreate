@@ -6,6 +6,7 @@
 #include "core/framebuffer.hpp"
 #include "core/pipeline.hpp"
 #include "core/renderpass.hpp"
+#include "core/sync.hpp"
 
 namespace Terreate::Core {
 void Context::loadEXTfunctions() {
@@ -258,24 +259,24 @@ VkObjectRef<ICommandPool> Context::createCommandPool() {
   return mCommandPools.back().ref();
 }
 
-VkObjectRef<Semaphore> Context::createSemaphore() {
+VkObjectRef<ISemaphore> Context::createSemaphore() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto semaphore = makeVkObject<Semaphore>(mDevice.get());
+  VkObject<ISemaphore> semaphore = makeVkObject<Semaphore>(mDevice.get());
   mSemaphores.emplace_back(std::move(semaphore));
   return mSemaphores.back().ref();
 }
 
-VkObjectRef<Fence> Context::createFence() {
+VkObjectRef<IFence> Context::createFence() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto fence = makeVkObject<Fence>(mDevice.get());
+  VkObject<IFence> fence = makeVkObject<Fence>(mDevice.get());
   mFences.emplace_back(std::move(fence));
   return mFences.back().ref();
 }

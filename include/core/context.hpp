@@ -32,8 +32,8 @@ private:
   Type::vec<VkObject<IPipeline>> mPipelines;
   Type::vec<VkObject<IFramebuffer>> mFramebuffers;
   Type::vec<VkObject<ICommandPool>> mCommandPools;
-  Type::vec<VkObject<Semaphore>> mSemaphores;
-  Type::vec<VkObject<Fence>> mFences;
+  Type::vec<VkObject<ISemaphore>> mSemaphores;
+  Type::vec<VkObject<IFence>> mFences;
 
 private:
   void loadEXTfunctions();
@@ -69,8 +69,8 @@ public:
   createFramebuffer(VkObjectRef<IRenderPass> renderPass,
                     VkObjectRef<Swapchain> swapchain);
   VkObjectRef<ICommandPool> createCommandPool();
-  VkObjectRef<Semaphore> createSemaphore();
-  VkObjectRef<Fence> createFence();
+  VkObjectRef<ISemaphore> createSemaphore();
+  VkObjectRef<IFence> createFence();
 
   void dispose();
 

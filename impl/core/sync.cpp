@@ -12,7 +12,7 @@ Semaphore::Semaphore(VkObjectRef<Device> device) : mDevice(device) {
   }
 }
 
-void Semaphore::dispose() {
+Semaphore::~Semaphore() {
   if (mSemaphore != VK_NULL_HANDLE) {
     vkDestroySemaphore(*mDevice, mSemaphore, nullptr);
     mSemaphore = VK_NULL_HANDLE;
@@ -35,7 +35,7 @@ void Fence::reset() {
   }
 }
 
-void Fence::dispose() {
+Fence::~Fence() {
   if (mFence != VK_NULL_HANDLE) {
     vkDestroyFence(*mDevice, mFence, nullptr);
     mFence = VK_NULL_HANDLE;

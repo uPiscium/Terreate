@@ -140,7 +140,8 @@ Swapchain::Swapchain(VkObjectRef<Device> device,
   this->createImageViews();
 }
 
-Type::u32 Swapchain::getNextImageIndex(VkObjectRef<Semaphore> semaphore) const {
+Type::u32
+Swapchain::getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const {
   VkSemaphore semaphoreHandle = VK_NULL_HANDLE;
   if (semaphore) {
     semaphoreHandle = *semaphore;

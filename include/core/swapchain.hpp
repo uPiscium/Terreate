@@ -44,7 +44,7 @@ public:
   Type::vec<VkImageView> const &getImageViews() const {
     return mSwapchainImageViews;
   }
-  Type::u32 getNextImageIndex(VkObjectRef<Semaphore> semaphore) const;
+  Type::u32 getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const;
 
   void destroy();
 
