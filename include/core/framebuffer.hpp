@@ -24,7 +24,7 @@ private:
 
 public:
   Framebuffer(VkObjectRef<Device> device, VkObjectRef<IRenderPass> renderPass,
-              VkObjectRef<Swapchain> swapchain);
+              VkObjectRef<ISwapchain> swapchain);
   ~Framebuffer() override;
 
   Type::vec<VkFramebuffer> const &getFramebuffers() const override {

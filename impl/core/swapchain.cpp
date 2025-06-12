@@ -140,6 +140,14 @@ Swapchain::Swapchain(VkObjectRef<Device> device,
   this->createImageViews();
 }
 
+Swapchain::~Swapchain() {
+  for (auto imageView : mSwapchainImageViews) {
+    vkDestroyImageView(*mDevice, imageView, nullptr);
+  }
+  vkDestroySwapchainKHR(*mDevice, mSwapchain, nullptr);
+  mSwapchain = VK_NULL_HANDLE;
+}
+
 Type::u32
 Swapchain::getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const {
   VkSemaphore semaphoreHandle = VK_NULL_HANDLE;
@@ -152,13 +160,5 @@ Swapchain::getNextImageIndex(VkObjectRef<ISemaphore> semaphore) const {
       vkAcquireNextImageKHR(*mDevice, mSwapchain, UINT64_MAX, semaphoreHandle,
                             VK_NULL_HANDLE, &imageIndex);
   return imageIndex;
-}
-
-void Swapchain::destroy() {
-  for (auto imageView : mSwapchainImageViews) {
-    vkDestroyImageView(*mDevice, imageView, nullptr);
-  }
-  vkDestroySwapchainKHR(*mDevice, mSwapchain, nullptr);
-  mSwapchain = VK_NULL_HANDLE;
 }
 } // namespace Terreate::Core

@@ -135,7 +135,7 @@ PresentQueue::~PresentQueue() {
   }
 }
 
-void PresentQueue::present(VkObjectRef<Swapchain> swapchain,
+void PresentQueue::present(VkObjectRef<ISwapchain> swapchain,
                            Type::vec<Type::u32> imageIndices,
                            VkObjectRef<ISemaphore> waitSemaphore) {
   if (!swapchain) {

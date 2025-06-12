@@ -25,7 +25,7 @@ public:
 
 class IPresentQueue : public IQueue {
 public:
-  virtual void present(VkObjectRef<Swapchain> swapchain,
+  virtual void present(VkObjectRef<ISwapchain> swapchain,
                        Type::vec<Type::u32> imageIndices,
                        VkObjectRef<ISemaphore> waitSemaphore = nullptr) = 0;
 };
@@ -75,7 +75,7 @@ public:
   PresentQueue(VkObjectRef<Device> device);
   ~PresentQueue() override;
 
-  void present(VkObjectRef<Swapchain> swapchain,
+  void present(VkObjectRef<ISwapchain> swapchain,
                Type::vec<Type::u32> imageIndices,
                VkObjectRef<ISemaphore> waitSemaphore = nullptr) override;
 

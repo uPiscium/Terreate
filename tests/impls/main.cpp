@@ -64,7 +64,7 @@ int test1() {
   auto graphicQueue = ctx.createGraphicQueue();
   auto presentQueue = ctx.createPresentQueue();
   auto renderPass = ctx.createRenderPass(swapchain);
-  auto pipeline = ctx.createPipeline(swapchain, renderPass);
+  auto pipeline = ctx.createPipeline(renderPass);
   auto framebuffer = ctx.createFramebuffer(renderPass, swapchain);
   auto commandPool = ctx.createCommandPool();
   auto commandBuffer = commandPool->createCommandBuffer();

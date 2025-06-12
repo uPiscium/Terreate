@@ -17,7 +17,7 @@ public:
   virtual VkObjectRef<Device> getDevice() const = 0;
 
   virtual void setRenderPass(VkObjectRef<IRenderPass> renderPass,
-                             VkObjectRef<Swapchain> swapchain,
+                             VkObjectRef<ISwapchain> swapchain,
                              VkObjectRef<IPipeline> pipeline,
                              VkFramebuffer framebuffer,
                              Type::vec<float> const &clearColor,
@@ -105,7 +105,7 @@ public:
   VkObjectRef<Device> getDevice() const override { return mDevice; }
 
   void setRenderPass(VkObjectRef<IRenderPass> renderPass,
-                     VkObjectRef<Swapchain> swapchain,
+                     VkObjectRef<ISwapchain> swapchain,
                      VkObjectRef<IPipeline> pipeline, VkFramebuffer framebuffer,
                      Type::vec<float> const &clearColor,
                      Type::SubpassContent content) override;

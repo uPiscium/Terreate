@@ -16,15 +16,15 @@ private:
 
 private:
   VkObjectRef<Device> mDevice;
-  VkObjectRef<Swapchain> mSwapchain;
+  VkObjectRef<ISwapchain> mSwapchain;
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
 
 private:
   void createRenderPass();
 
 public:
-  RenderPass(VkObjectRef<Swapchain> swapchain)
-      : mDevice(swapchain->getDevice()), mSwapchain(swapchain) {
+  RenderPass(VkObjectRef<Device> device, VkObjectRef<ISwapchain> swapchain)
+      : mDevice(device), mSwapchain(swapchain) {
     this->createRenderPass();
   }
   ~RenderPass() override;

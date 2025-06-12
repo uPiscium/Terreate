@@ -25,7 +25,7 @@ private:
 
   Type::vec<VkObject<Window>> mWindows;
   Type::vec<VkObject<ISurface>> mSurfaces;
-  Type::vec<VkObject<Swapchain>> mSwapchains;
+  Type::vec<VkObject<ISwapchain>> mSwapchains;
   Type::vec<VkObject<IGraphicQueue>> mGraphicQueues;
   Type::vec<VkObject<IPresentQueue>> mPresentQueues;
   Type::vec<VkObject<IRenderPass>> mRenderPasses;
@@ -58,16 +58,15 @@ public:
   createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
                WindowSettings const &settings = WindowSettings());
   VkObjectRef<ISurface> createSurface(VkObjectRef<Window> window);
-  VkObjectRef<Swapchain> createSwapchain(VkObjectRef<Window> window,
-                                         VkObjectRef<ISurface> surface);
+  VkObjectRef<ISwapchain> createSwapchain(VkObjectRef<Window> window,
+                                          VkObjectRef<ISurface> surface);
   VkObjectRef<IGraphicQueue> createGraphicQueue();
   VkObjectRef<IPresentQueue> createPresentQueue();
-  VkObjectRef<IRenderPass> createRenderPass(VkObjectRef<Swapchain> swapchain);
-  VkObjectRef<IPipeline> createPipeline(VkObjectRef<Swapchain> swapchain,
-                                        VkObjectRef<IRenderPass> renderPass);
+  VkObjectRef<IRenderPass> createRenderPass(VkObjectRef<ISwapchain> swapchain);
+  VkObjectRef<IPipeline> createPipeline(VkObjectRef<IRenderPass> renderPass);
   VkObjectRef<IFramebuffer>
   createFramebuffer(VkObjectRef<IRenderPass> renderPass,
-                    VkObjectRef<Swapchain> swapchain);
+                    VkObjectRef<ISwapchain> swapchain);
   VkObjectRef<ICommandPool> createCommandPool();
   VkObjectRef<ISemaphore> createSemaphore();
   VkObjectRef<IFence> createFence();

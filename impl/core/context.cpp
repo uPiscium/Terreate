@@ -177,15 +177,16 @@ VkObjectRef<ISurface> Context::createSurface(VkObjectRef<Window> window) {
   return mSurfaces.back().ref();
 }
 
-VkObjectRef<Swapchain> Context::createSwapchain(VkObjectRef<Window> window,
-                                                VkObjectRef<ISurface> surface) {
+VkObjectRef<ISwapchain>
+Context::createSwapchain(VkObjectRef<Window> window,
+                         VkObjectRef<ISurface> surface) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto swapchain = makeVkObject<Swapchain>(
-      mDevice.get(), window->properties.framebufferSize, surface);
+  VkObject<ISwapchain> swapchain = makeVkObject<Swapchain>(
+      mDevice.ref(), window->properties.framebufferSize, surface);
   mSwapchains.emplace_back(std::move(swapchain));
   return mSwapchains.back().ref();
 }
@@ -197,7 +198,7 @@ VkObjectRef<IGraphicQueue> Context::createGraphicQueue() {
   }
 
   VkObject<IGraphicQueue> graphicQueue =
-      makeVkObject<GraphicQueue>(mDevice.get());
+      makeVkObject<GraphicQueue>(mDevice.ref());
   mGraphicQueues.emplace_back(std::move(graphicQueue));
   return mGraphicQueues.back().ref();
 }
@@ -209,42 +210,42 @@ VkObjectRef<IPresentQueue> Context::createPresentQueue() {
   }
 
   VkObject<IPresentQueue> presentQueue =
-      makeVkObject<PresentQueue>(mDevice.get());
+      makeVkObject<PresentQueue>(mDevice.ref());
   mPresentQueues.emplace_back(std::move(presentQueue));
   return mPresentQueues.back().ref();
 }
 
 VkObjectRef<IRenderPass>
-Context::createRenderPass(VkObjectRef<Swapchain> swapchain) {
+Context::createRenderPass(VkObjectRef<ISwapchain> swapchain) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<IRenderPass> renderPass = makeVkObject<RenderPass>(swapchain);
+  VkObject<IRenderPass> renderPass =
+      makeVkObject<RenderPass>(mDevice.ref(), swapchain);
   mRenderPasses.emplace_back(std::move(renderPass));
   return mRenderPasses.back().ref();
 }
 
 VkObjectRef<IPipeline>
-Context::createPipeline(VkObjectRef<Swapchain> swapchain,
-                        VkObjectRef<IRenderPass> renderPass) {
+Context::createPipeline(VkObjectRef<IRenderPass> renderPass) {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
   VkObject<IPipeline> pipeline =
-      makeVkObject<Pipeline>(mDevice.get(), swapchain, renderPass);
+      makeVkObject<Pipeline>(mDevice.ref(), renderPass);
   mPipelines.emplace_back(std::move(pipeline));
   return mPipelines.back().ref();
 }
 
 VkObjectRef<IFramebuffer>
 Context::createFramebuffer(VkObjectRef<IRenderPass> renderPass,
-                           VkObjectRef<Swapchain> swapchain) {
+                           VkObjectRef<ISwapchain> swapchain) {
   VkObject<IFramebuffer> framebuffer =
-      makeVkObject<Framebuffer>(mDevice.get(), renderPass, swapchain);
+      makeVkObject<Framebuffer>(mDevice.ref(), renderPass, swapchain);
   mFramebuffers.emplace_back(std::move(framebuffer));
   return mFramebuffers.back().ref();
 }
@@ -255,7 +256,7 @@ VkObjectRef<ICommandPool> Context::createCommandPool() {
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<ICommandPool> commandPool = makeVkObject<CommandPool>(mDevice.get());
+  VkObject<ICommandPool> commandPool = makeVkObject<CommandPool>(mDevice.ref());
   mCommandPools.emplace_back(std::move(commandPool));
   return mCommandPools.back().ref();
 }
@@ -266,7 +267,7 @@ VkObjectRef<ISemaphore> Context::createSemaphore() {
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<ISemaphore> semaphore = makeVkObject<Semaphore>(mDevice.get());
+  VkObject<ISemaphore> semaphore = makeVkObject<Semaphore>(mDevice.ref());
   mSemaphores.emplace_back(std::move(semaphore));
   return mSemaphores.back().ref();
 }
@@ -277,7 +278,7 @@ VkObjectRef<IFence> Context::createFence() {
         "Device is not initialized. Please create a window first.");
   }
 
-  VkObject<IFence> fence = makeVkObject<Fence>(mDevice.get());
+  VkObject<IFence> fence = makeVkObject<Fence>(mDevice.ref());
   mFences.emplace_back(std::move(fence));
   return mFences.back().ref();
 }

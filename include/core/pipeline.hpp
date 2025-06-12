@@ -25,7 +25,6 @@ private:
 
 private:
   VkObjectRef<Device> mDevice;
-  VkObjectRef<Swapchain> mSwapchain;
   VkObjectRef<IRenderPass> mRenderPass;
 
   Type::vec<Type::byte> mVertShaderCode;
@@ -40,9 +39,8 @@ private:
   void compileShader(Type::str const &vert, Type::str const &frag);
 
 public:
-  Pipeline(VkObjectRef<Device> device, VkObjectRef<Swapchain> swapchain,
-           VkObjectRef<IRenderPass> renderPass)
-      : mDevice(device), mSwapchain(swapchain), mRenderPass(renderPass) {}
+  Pipeline(VkObjectRef<Device> device, VkObjectRef<IRenderPass> renderPass)
+      : mDevice(device), mRenderPass(renderPass) {}
   ~Pipeline();
 
   VkPipelineLayout getLayout() const override { return mPipelineLayout; }
