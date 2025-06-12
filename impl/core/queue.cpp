@@ -42,6 +42,14 @@ GraphicQueue::GraphicQueue(VkObjectRef<Device> device) : mDevice(device) {
   }
 }
 
+GraphicQueue::~GraphicQueue() {
+  if (mQueue != VK_NULL_HANDLE) {
+    vkQueueWaitIdle(mQueue);
+    mSubmitInfos.clear();
+    mQueue = VK_NULL_HANDLE;
+  }
+}
+
 void GraphicQueue::queue(Type::vec<VkObjectRef<ICommandBuffer>> commandBuffers,
                          Type::vec<Type::PipelineStage> waitStages,
                          Type::vec<VkObjectRef<Semaphore>> waitSemaphores,
@@ -104,14 +112,6 @@ void GraphicQueue::submit(VkObjectRef<Fence> fence) {
   mSubmitInfos.clear();
 }
 
-void GraphicQueue::dispose() {
-  if (mQueue != VK_NULL_HANDLE) {
-    vkQueueWaitIdle(mQueue);
-    mSubmitInfos.clear();
-    mQueue = VK_NULL_HANDLE;
-  }
-}
-
 PresentQueue::PresentQueue(VkObjectRef<Device> device) : mDevice(device) {
   if (!mDevice) {
     throw Exception::NullReferenceException("Device is null.");
@@ -125,6 +125,13 @@ PresentQueue::PresentQueue(VkObjectRef<Device> device) : mDevice(device) {
   if (mQueue == VK_NULL_HANDLE) {
     throw Exception::QueueRetrievalFailure(
         "Failed to retrieve present queue from the device.");
+  }
+}
+
+PresentQueue::~PresentQueue() {
+  if (mQueue != VK_NULL_HANDLE) {
+    vkQueueWaitIdle(mQueue);
+    mQueue = VK_NULL_HANDLE;
   }
 }
 
@@ -157,12 +164,5 @@ void PresentQueue::present(VkObjectRef<Swapchain> swapchain,
   presentInfo.pResults = nullptr; // Optional, can be null if not needed
 
   VkResult result = vkQueuePresentKHR(mQueue, &presentInfo);
-}
-
-void PresentQueue::dispose() {
-  if (mQueue != VK_NULL_HANDLE) {
-    vkQueueWaitIdle(mQueue);
-    mQueue = VK_NULL_HANDLE;
-  }
 }
 } // namespace Terreate::Core

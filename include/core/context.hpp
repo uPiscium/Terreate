@@ -26,8 +26,8 @@ private:
   Type::vec<VkObject<Window>> mWindows;
   Type::vec<VkObject<Surface>> mSurfaces;
   Type::vec<VkObject<Swapchain>> mSwapchains;
-  Type::vec<VkObject<GraphicQueue>> mGraphicQueues;
-  Type::vec<VkObject<PresentQueue>> mPresentQueues;
+  Type::vec<VkObject<IGraphicQueue>> mGraphicQueues;
+  Type::vec<VkObject<IPresentQueue>> mPresentQueues;
   Type::vec<VkObject<IRenderPass>> mRenderPasses;
   Type::vec<VkObject<IPipeline>> mPipelines;
   Type::vec<VkObject<IFramebuffer>> mFramebuffers;
@@ -60,8 +60,8 @@ public:
   VkObjectRef<Surface> createSurface(VkObjectRef<Window> window);
   VkObjectRef<Swapchain> createSwapchain(VkObjectRef<Window> window,
                                          VkObjectRef<Surface> surface);
-  VkObjectRef<GraphicQueue> createGraphicQueue();
-  VkObjectRef<PresentQueue> createPresentQueue();
+  VkObjectRef<IGraphicQueue> createGraphicQueue();
+  VkObjectRef<IPresentQueue> createPresentQueue();
   VkObjectRef<IRenderPass> createRenderPass(VkObjectRef<Swapchain> swapchain);
   VkObjectRef<IPipeline> createPipeline(VkObjectRef<Swapchain> swapchain,
                                         VkObjectRef<IRenderPass> renderPass);

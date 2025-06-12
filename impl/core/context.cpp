@@ -188,24 +188,26 @@ VkObjectRef<Swapchain> Context::createSwapchain(VkObjectRef<Window> window,
   return mSwapchains.back().ref();
 }
 
-VkObjectRef<GraphicQueue> Context::createGraphicQueue() {
+VkObjectRef<IGraphicQueue> Context::createGraphicQueue() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto graphicQueue = makeVkObject<GraphicQueue>(mDevice.get());
+  VkObject<IGraphicQueue> graphicQueue =
+      makeVkObject<GraphicQueue>(mDevice.get());
   mGraphicQueues.emplace_back(std::move(graphicQueue));
   return mGraphicQueues.back().ref();
 }
 
-VkObjectRef<PresentQueue> Context::createPresentQueue() {
+VkObjectRef<IPresentQueue> Context::createPresentQueue() {
   if (!mDevice) {
     throw Exception::NullReferenceException(
         "Device is not initialized. Please create a window first.");
   }
 
-  auto presentQueue = makeVkObject<PresentQueue>(mDevice.get());
+  VkObject<IPresentQueue> presentQueue =
+      makeVkObject<PresentQueue>(mDevice.get());
   mPresentQueues.emplace_back(std::move(presentQueue));
   return mPresentQueues.back().ref();
 }
