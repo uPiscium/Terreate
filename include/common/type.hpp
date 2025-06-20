@@ -32,10 +32,13 @@ typedef std::uint16_t u16;
 typedef std::uint32_t u32;
 typedef std::uint64_t u64;
 
-typedef i8 byte;
-typedef u8 ubyte;
 typedef std::string str;
 typedef std::stringstream Stream;
+
+typedef VkFormat ImageFormat;
+
+typedef i8 byte;
+typedef u8 ubyte;
 
 template <typename T> using optional = std::optional<T>;
 template <typename T> using vec = std::vector<T>;

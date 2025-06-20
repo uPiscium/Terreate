@@ -147,6 +147,16 @@ void Context::attachDebugger(Core::IDebugger *debugger) {
 #endif
 }
 
+Vulkan::VkObjectRef<IDisplay>
+Context::createDisplay(Type::str const &title,
+                       Type::pair<Type::i32> const &size,
+                       Vulkan::WindowSettings const &settings) {
+  Vulkan::VkObject<IDisplay> display =
+      Vulkan::makeVkObject<Display>(mInstance, &mDevice, title, size, settings);
+  mDisplays.emplace_back(std::move(display));
+  return mDisplays.back().ref();
+}
+
 Vulkan::VkObjectRef<Vulkan::Window>
 Context::createWindow(Type::str const &title, Type::pair<Type::i32> const &size,
                       Vulkan::WindowSettings const &settings) {
@@ -220,6 +230,18 @@ Context::createRenderPass(Vulkan::VkObjectRef<Vulkan::Swapchain> swapchain) {
   return mRenderPasses.back().ref();
 }
 
+Vulkan::VkObjectRef<Vulkan::RenderPass>
+Context::createRenderPass(Type::ImageFormat const &format) {
+  if (!mDevice) {
+    throw Exception::NullReferenceException(
+        "Device is not initialized. Please create a window first.");
+  }
+
+  auto renderPass = makeVkObject<Vulkan::RenderPass>(mDevice.ref(), format);
+  mRenderPasses.emplace_back(std::move(renderPass));
+  return mRenderPasses.back().ref();
+}
+
 Vulkan::VkObjectRef<Vulkan::Pipeline>
 Context::createPipeline(Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass) {
   if (!mDevice) {
@@ -237,6 +259,19 @@ Context::createFramebuffer(Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass,
                            Vulkan::VkObjectRef<Vulkan::Swapchain> swapchain) {
   auto framebuffer =
       makeVkObject<Vulkan::Framebuffer>(mDevice.ref(), renderPass, swapchain);
+  mFramebuffers.emplace_back(std::move(framebuffer));
+  return mFramebuffers.back().ref();
+}
+
+Vulkan::VkObjectRef<Vulkan::Framebuffer>
+Context::createFramebuffer(Type::vec<VkImageView> const &imageViews,
+                           Type::pair<Type::i32> const &extent,
+                           Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass) {
+  VkExtent2D vkExtent;
+  vkExtent.width = extent.first;
+  vkExtent.height = extent.second;
+  auto framebuffer = makeVkObject<Vulkan::Framebuffer>(
+      mDevice.ref(), imageViews, vkExtent, renderPass);
   mFramebuffers.emplace_back(std::move(framebuffer));
   return mFramebuffers.back().ref();
 }

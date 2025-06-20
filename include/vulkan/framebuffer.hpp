@@ -18,6 +18,9 @@ private:
 public:
   Framebuffer(VkObjectRef<Device> device, VkObjectRef<RenderPass> renderPass,
               VkObjectRef<Swapchain> swapchain);
+  Framebuffer(VkObjectRef<Device> device,
+              Type::vec<VkImageView> const &imageViews,
+              VkExtent2D const &extent, VkObjectRef<RenderPass> renderPass);
   ~Framebuffer();
 
   Type::vec<VkFramebuffer> const &getFramebuffers() const {

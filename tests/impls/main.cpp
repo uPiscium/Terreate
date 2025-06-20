@@ -54,6 +54,9 @@ int main() {
   auto *debugger = new MyDebugger();
   ctx.attachDebugger(debugger);
 
+  // auto display = ctx.createDisplay("Terreate Display", {800, 600},
+  //                                  Vulkan::WindowSettings{.resizable =
+  //                                  false});
   auto window = ctx.createWindow("Terreate", {800, 600},
                                  Vulkan::WindowSettings{.resizable = false});
   auto surface = ctx.createSurface(window);
@@ -61,8 +64,12 @@ int main() {
   auto graphicQueue = ctx.createGraphicQueue();
   auto presentQueue = ctx.createPresentQueue();
   auto renderPass = ctx.createRenderPass(swapchain);
+  // auto renderPass = ctx.createRenderPass(display->getImageFormat());
   auto pipeline = ctx.createPipeline(renderPass);
   auto framebuffer = ctx.createFramebuffer(renderPass, swapchain);
+  // auto framebuffer = ctx.createFramebuffer(
+  //     display->getImageViews(), display->getProperties().framebufferSize,
+  //     renderPass);
   auto commandPool = ctx.createCommandPool();
   auto commandBuffer = commandPool->createCommandBuffer();
   auto semaphoreImageAvailable = ctx.createSemaphore();
@@ -73,6 +80,8 @@ int main() {
   auto fragShaderCode = readFile("tests/resources/shader/frag.spv");
 
   pipeline->attachCompiledShaderSources(vertShaderCode, fragShaderCode);
+
+  ;
 
   while (!window->isClosed()) {
     glfwPollEvents();

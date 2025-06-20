@@ -1,5 +1,6 @@
 #pragma once
 #include "debugger.hpp"
+#include "display.hpp"
 
 #include "../vulkan/command.hpp"
 #include "../vulkan/device.hpp"
@@ -24,6 +25,7 @@ private:
   VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
   Vulkan::VkObject<Vulkan::Device> mDevice = nullptr;
 
+  Type::vec<Vulkan::VkObject<IDisplay>> mDisplays;
   Type::vec<Vulkan::VkObject<Vulkan::Window>> mWindows;
   Type::vec<Vulkan::VkObject<Vulkan::Surface>> mSurfaces;
   Type::vec<Vulkan::VkObject<Vulkan::Swapchain>> mSwapchains;
@@ -57,6 +59,10 @@ public:
 
   void attachDebugger(IDebugger *debugger);
 
+  Vulkan::VkObjectRef<IDisplay> createDisplay(
+      Type::str const &title, Type::pair<Type::i32> const &size,
+      Vulkan::WindowSettings const &settings = Vulkan::WindowSettings());
+
   Vulkan::VkObjectRef<Vulkan::Window> createWindow(
       Type::str const &title, Type::pair<Type::i32> const &size,
       Vulkan::WindowSettings const &settings = Vulkan::WindowSettings());
@@ -69,11 +75,17 @@ public:
   Vulkan::VkObjectRef<Vulkan::PresentQueue> createPresentQueue();
   Vulkan::VkObjectRef<Vulkan::RenderPass>
   createRenderPass(Vulkan::VkObjectRef<Vulkan::Swapchain> swapchain);
+  Vulkan::VkObjectRef<Vulkan::RenderPass>
+  createRenderPass(Type::ImageFormat const &format);
   Vulkan::VkObjectRef<Vulkan::Pipeline>
   createPipeline(Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass);
   Vulkan::VkObjectRef<Vulkan::Framebuffer>
   createFramebuffer(Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass,
                     Vulkan::VkObjectRef<Vulkan::Swapchain> swapchain);
+  Vulkan::VkObjectRef<Vulkan::Framebuffer>
+  createFramebuffer(Type::vec<VkImageView> const &imageViews,
+                    Type::pair<Type::i32> const &extent,
+                    Vulkan::VkObjectRef<Vulkan::RenderPass> renderPass);
   Vulkan::VkObjectRef<Vulkan::CommandPool> createCommandPool();
   Vulkan::VkObjectRef<Vulkan::Semaphore> createSemaphore();
   Vulkan::VkObjectRef<Vulkan::Fence> createFence();

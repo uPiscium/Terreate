@@ -152,7 +152,7 @@ public:
   bool isAutoIconified() const {
     return bool(glfwGetWindowAttrib(mWindow, GLFW_AUTO_ICONIFY));
   }
-  bool isFocusOnShowed() const {
+  bool isFocusOnShown() const {
     return bool(glfwGetWindowAttrib(mWindow, GLFW_FOCUS_ON_SHOW));
   }
   bool isPressing(Type::Keyboard const &key) const {
