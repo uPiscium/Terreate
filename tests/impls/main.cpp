@@ -1,108 +1,78 @@
-#include <core/context.hpp>
-#include <core/debugger.hpp>
+#include "../include/main.hpp"
 
-#include <fstream>
-#include <iostream>
-
-using namespace Terreate;
-
-class MyDebugger : public Core::IDebugger {
-public:
-  virtual bool verbose(Type::str const &message, Type::MessageType const type,
-                       Type::vec<Core::DebugObject> const &object) override {
-    // std::cout << "Verbose: " << message << std::endl;
-    return false;
+namespace Terreate::TestImpl {
+GLFWwindow *VulkanTriangle::initWindow(int width, int height,
+                                       Type::str const &title) {
+  if (!glfwInit()) {
+    throw std::runtime_error("Failed to initialize GLFW");
   }
 
-  virtual bool info(Type::str const &message, Type::MessageType const type,
-                    Type::vec<Core::DebugObject> const &object) override {
-    // std::cout << "Info: " << message << std::endl;
-    return false;
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  GLFWwindow *window =
+      glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+  if (!window) {
+    glfwTerminate();
+    throw std::runtime_error("Failed to create GLFW window");
   }
 
-  virtual bool warning(Type::str const &message, Type::MessageType const type,
-                       Type::vec<Core::DebugObject> const &object) override {
-    std::cout << "Warning: " << message << std::endl;
-    return false;
-  }
-
-  virtual bool error(Type::str const &message, Type::MessageType const type,
-                     Type::vec<Core::DebugObject> const &object) override {
-    std::cout << "Error: " << message << std::endl;
-    return false;
-  }
-};
-
-Type::vec<Type::byte> readFile(std::string const &filename) {
-  std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-  if (!file.is_open()) {
-    throw std::runtime_error("Failed to open file: " + filename);
-  }
-
-  size_t fileSize = (size_t)file.tellg();
-  Type::vec<Type::byte> buffer(fileSize);
-  file.seekg(0);
-  file.read((char *)buffer.data(), fileSize);
-  file.close();
-  return buffer;
+  return window;
 }
 
-int main() {
-  Core::Context ctx("Terreate", Type::Version(0, 1, 0));
+void VulkanTriangle::destroyWindow(GLFWwindow *window) {
+  if (window) {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+  }
+}
 
-  auto *debugger = new MyDebugger();
-  ctx.attachDebugger(debugger);
+void VulkanTriangle::initVulkan() {
+  mWindow = this->initWindow();
+  mInstance = this->createInstance();
 
-  auto window = ctx.createWindow("Terreate", {800, 600},
-                                 Vulkan::WindowSettings{.resizable = false});
-  auto surface = ctx.createSurface(window);
-  auto swapchain = ctx.createSwapchain(window, surface);
-  auto graphicQueue = ctx.createGraphicQueue();
-  auto presentQueue = ctx.createPresentQueue();
-  auto renderPass = ctx.createRenderPass(swapchain);
-  auto pipeline = ctx.createPipeline(renderPass);
-  auto framebuffer = ctx.createFramebuffer(renderPass, swapchain);
-  auto commandPool = ctx.createCommandPool();
-  auto commandBuffer = commandPool->createCommandBuffer();
-  auto semaphoreImageAvailable = ctx.createSemaphore();
-  auto semaphoreRenderFinished = ctx.createSemaphore();
-  auto fenceInFlight = ctx.createFence();
+  if (ENABLE_DEBUG_BUILD) {
+    VkDebugUtilsMessengerCreateInfoEXT createInfo;
+    this->populateDebugMessengerCreateInfo(createInfo);
+    mDebugMessenger = this->createDebugMessenger(mInstance, createInfo);
+  }
+}
 
-  auto vertShaderCode = readFile("tests/resources/shader/vert.spv");
-  auto fragShaderCode = readFile("tests/resources/shader/frag.spv");
-
-  pipeline->attachCompiledShaderSources(vertShaderCode, fragShaderCode);
-
-  while (!window->isClosed()) {
+void VulkanTriangle::mainLoop() {
+  while (!glfwWindowShouldClose(mWindow)) {
     glfwPollEvents();
+  }
+}
 
-    fenceInFlight->wait();
-    fenceInFlight->reset();
-    Type::u32 imageIndex =
-        swapchain->getNextImageIndex(semaphoreImageAvailable);
-
-    commandBuffer->reset();
-    commandBuffer->begin();
-    commandBuffer->setRenderPass(renderPass, swapchain, pipeline,
-                                 (*framebuffer)[imageIndex], {0, 0, 0, 1},
-                                 Type::SubpassContent::INLINE);
-    auto framebufferSize = swapchain->getProperty().extent;
-    commandBuffer->setViewport(0, 0, framebufferSize.width,
-                               framebufferSize.height, 0.0f, 1.0f);
-    commandBuffer->setScissor(0, 0, framebufferSize.width,
-                              framebufferSize.height);
-    commandBuffer->drawBuffer(3, 1, 0, 0); // Draw a triangle
-    commandBuffer->end();
-
-    graphicQueue->queue({commandBuffer},
-                        {Type::PipelineStage::COLOR_ATTACHMENT_OUTPUT_BIT},
-                        {semaphoreImageAvailable}, {semaphoreRenderFinished});
-    graphicQueue->submit(fenceInFlight);
-    presentQueue->present(swapchain, {imageIndex}, semaphoreRenderFinished);
+void VulkanTriangle::cleanup() {
+  if (ENABLE_DEBUG_BUILD) {
+    this->destroyDebugMessenger(mInstance, mDebugMessenger);
   }
 
-  delete debugger;
+  this->destroyInstance(mInstance);
+  this->destroyWindow(mWindow);
+}
 
-  return 0;
+void VulkanTriangle::run() {
+  try {
+    this->initVulkan();
+    this->mainLoop();
+  } catch (const std::runtime_error &e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    this->cleanup();
+    throw; // Re-throw to handle in main
+  }
+
+  this->cleanup();
+}
+} // namespace Terreate::TestImpl
+
+int main() {
+  try {
+    Terreate::TestImpl::VulkanTriangle app;
+    app.run();
+  } catch (const std::runtime_error &e) {
+    std::cerr << "Fatal error: " << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }
