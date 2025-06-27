@@ -25,6 +25,12 @@
 #define UNICODE_FULL_SPACE 32306
 #endif // UNICODE_FULL_SPACE
 
+#ifndef PROHIBIT_COPY_AND_ASSIGN
+#define PROHIBIT_COPY_AND_ASSIGN(TypeName)                                     \
+  TypeName(TypeName const &) = delete;                                         \
+  TypeName &operator=(TypeName const &) = delete;
+#endif // PROHIBIT_COPY_AND_ASSIGN
+
 namespace Terreate {
 typedef std::int8_t i8;
 typedef std::int16_t i16;
@@ -44,6 +50,9 @@ typedef std::wstring wstr;
 typedef std::stringstream stream;
 typedef std::ifstream ifstream;
 typedef std::ofstream ofstream;
+
+// OpenGL types
+typedef u32 GLObject;
 
 template <typename S, typename T> using umap = std::unordered_map<S, T>;
 template <typename S, typename T = S> using pair = std::pair<S, T>;
