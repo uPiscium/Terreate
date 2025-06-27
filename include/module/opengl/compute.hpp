@@ -4,7 +4,6 @@
 #include "../common/math.hpp"
 #include "../common/type.hpp"
 
-#include "object.hpp"
 #include "texture.hpp"
 
 namespace Terreate::OpenGL {
@@ -17,7 +16,7 @@ class ComputeKernel {
 private:
   bool mCompiled = false;
   bool mLinked = false;
-  Object mKernelID = Object();
+  GLObject mKernelID = 0;
   str mKernelSource = "";
 
 public:
