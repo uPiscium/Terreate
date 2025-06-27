@@ -1,7 +1,6 @@
 #include "../../../include/module/opengl/window.hpp"
 
 namespace Terreate::OpenGL {
-
 Window::Window(u32 const &width, u32 const &height, str const &title,
                WindowSettings const &settings, Window *shared) {
   glfwWindowHint(GLFW_RESIZABLE, settings.resizable);
@@ -29,5 +28,13 @@ Window::Window(u32 const &width, u32 const &height, str const &title,
 void Window::destroy() {
   glfwDestroyWindow(mWindow);
   mWindow = nullptr;
+}
+
+void Window::bind() const {
+  if (mWindow) {
+    glfwMakeContextCurrent(mWindow);
+  }
+  pair<u32> size = mProperty.getFramebufferSize();
+  glViewport(0, 0, size.first, size.second);
 }
 } // namespace Terreate::OpenGL

@@ -1,9 +1,10 @@
+#include "../../../include/module/common/exception.hpp"
 #include "../../../include/module/opengl/screen.hpp"
 
 namespace Terreate::OpenGL {
 Screen::Screen(u32 const &width, u32 const &height, u32 const &layers)
     : mWidth(width), mHeight(height), mLayers(layers) {
-  glGenFramebuffers(1, mFrameBuffer);
+  glGenFramebuffers(1, &mFrameBuffer);
   glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer);
   u32 rbo = 0;
   glGenRenderbuffers(1, &rbo);
@@ -12,8 +13,8 @@ Screen::Screen(u32 const &width, u32 const &height, u32 const &layers)
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
                             GL_RENDERBUFFER, rbo);
 
-  Object buffer = Object();
-  glGenTextures(1, buffer);
+  GLObject buffer = 0;
+  glGenTextures(1, &buffer);
   glBindTexture(GL_TEXTURE_2D_ARRAY, buffer);
   glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA32F, mWidth, mHeight, layers);
   glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -25,41 +26,46 @@ Screen::Screen(u32 const &width, u32 const &height, u32 const &layers)
   }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  mTexture = Texture(buffer, mWidth, mHeight, layers);
+  Texture *texture = new Texture(buffer, mWidth, mHeight, layers);
+  mTexture = unique<Texture>(texture);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Screen::~Screen() {
-  if (mFrameBuffer.Count() <= 1) {
-    glDeleteFramebuffers(1, mFrameBuffer);
-    mFrameBuffer.Delete();
+  if (mFrameBuffer != 0) {
+    glDeleteFramebuffers(1, &mFrameBuffer);
+    mFrameBuffer = 0;
   }
 }
 
 void Screen::transcript(Screen const &screen) const {
-  this->readOnlyBind();
-  screen.drawOnlyBind();
+  this->bind(BindMode::READ_ONLY);
+  screen.bind(BindMode::WRITE_ONLY);
   glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, screen.mWidth, screen.mHeight,
                     GL_COLOR_BUFFER_BIT, GL_NEAREST);
   this->unbind();
 }
 
-void Screen::drawOnlyBind() const {
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFrameBuffer);
-  glDrawBuffers(mDrawBuffers.size(), mDrawBuffers.data());
-}
-
-void Screen::bind() {
-  glGetIntegerv(GL_VIEWPORT, mInitialViewPort);
-  glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer);
+void Screen::bind(BindMode mode) const {
+  switch (mode) {
+  case BindMode::READ_ONLY:
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, mFrameBuffer);
+    break;
+  case BindMode::WRITE_ONLY:
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFrameBuffer);
+    break;
+  case BindMode::READ_WRITE:
+    glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer);
+    break;
+  default:
+    throw Exception::ScreenError("Invalid bind mode for Screen.");
+  }
   glViewport(0, 0, mWidth, mHeight);
   glDrawBuffers(mDrawBuffers.size(), mDrawBuffers.data());
 }
 
 void Screen::unbind() const {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glViewport(mInitialViewPort[0], mInitialViewPort[1], mInitialViewPort[2],
-             mInitialViewPort[3]);
   glDrawBuffer(GL_BACK);
 }
 

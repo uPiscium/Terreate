@@ -26,14 +26,13 @@ public:
 
 class Window {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(Window);
+
+private:
   GLFWwindow *mWindow = nullptr;
   WindowProperty mProperty;
   WindowEvent mEvent;
   Mouse mMouse;
-
-private:
-  Window(Window const &) = delete;
-  Window &operator=(Window const &) = delete;
 
 public:
   Window(u32 const &width, u32 const &height, str const &title,
@@ -136,7 +135,8 @@ public:
   void clearStencil() const { glClear(GL_STENCIL_BUFFER_BIT); }
   void swap() const { glfwSwapBuffers(mWindow); }
   void pollEvents() const { glfwPollEvents(); }
-  void bind() const { this->setCurrentContext(); }
+  void bind() const;
+  void unbind() const { glfwMakeContextCurrent(nullptr); }
 
   operator bool() const { return !this->isClosed(); }
 };

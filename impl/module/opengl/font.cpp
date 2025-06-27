@@ -4,7 +4,8 @@
 namespace Terreate::OpenGL {
 void Font::initializeTexture() {
   u32 size = Texture::getMaxTextureSize() / 2;
-  mTexture = Texture(size / 4, size / 4, 16);
+  Texture *texture = new Texture(size / 4, size / 4, 16);
+  mTexture = unique<Texture>(texture);
 }
 
 void Font::loadDummyCharacter() {
@@ -19,16 +20,16 @@ void Font::loadDummyCharacter() {
 }
 
 Font::Font() {
-  mLibrary = shared<FT_Library>(new FT_Library());
-  if (FT_Init_FreeType(mLibrary.get())) {
+  mLibrary = FT_Library();
+  if (FT_Init_FreeType(&mLibrary)) {
     throw Exception::FontError("Failed to initialize FreeType.");
     return;
   }
 }
 
 Font::Font(str const &path, u32 const &size) : mSize(size) {
-  mLibrary = shared<FT_Library>(new FT_Library());
-  if (FT_Init_FreeType(mLibrary.get())) {
+  mLibrary = FT_Library();
+  if (FT_Init_FreeType(&mLibrary)) {
     throw Exception::FontError("Failed to initialize FreeType.");
     return;
   }
@@ -36,15 +37,13 @@ Font::Font(str const &path, u32 const &size) : mSize(size) {
 }
 
 Font::~Font() {
-  if (mFace.use_count() <= 1 && mLibrary.use_count() <= 1) {
-    if (mFace != nullptr) {
-      FT_Done_Face(*mFace);
-    }
-    if (mLibrary != nullptr) {
-      FT_Done_FreeType(*mLibrary);
-    }
-    mCharacters.clear();
+  if (mFace != nullptr) {
+    FT_Done_Face(mFace);
   }
+  if (mLibrary != nullptr) {
+    FT_Done_FreeType(mLibrary);
+  }
+  mCharacters.clear();
 }
 
 CharacterData const &Font::getCharacter(wchar_t const &character) {
@@ -87,14 +86,14 @@ vec<CharacterData> Font::getCharacters(wstr const &text) const {
 }
 
 void Font::loadFont(str const &path, u32 const &size) {
-  mFace = shared<FT_Face>(new FT_Face());
-  if (FT_New_Face(*mLibrary, path.c_str(), 0, mFace.get())) {
+  mFace = FT_Face();
+  if (FT_New_Face(mLibrary, path.c_str(), 0, &mFace)) {
     throw Exception::FontError("Failed to load font.");
     return;
   }
 
   mSize = size;
-  FT_Set_Pixel_Sizes(*mFace, 0, size);
+  FT_Set_Pixel_Sizes(mFace, 0, size);
   this->initializeTexture();
   this->loadDummyCharacter();
 }
@@ -118,17 +117,17 @@ void Font::loadCharacter(wchar_t const &character) {
     return;
   }
 
-  if (FT_Load_Char(*mFace, character, FT_LOAD_RENDER)) {
+  if (FT_Load_Char(mFace, character, FT_LOAD_RENDER)) {
     throw Exception::FontError("Failed to load character.");
     return;
   }
 
-  u32 width = (*mFace)->glyph->bitmap.width;
-  u32 height = (*mFace)->glyph->bitmap.rows;
-  unsigned char *buffer = (*mFace)->glyph->bitmap.buffer;
+  u32 width = mFace->glyph->bitmap.width;
+  u32 height = mFace->glyph->bitmap.rows;
+  unsigned char *buffer = mFace->glyph->bitmap.buffer;
 
-  u32 tw = mTexture.getWidth();
-  u32 th = mTexture.getHeight();
+  u32 tw = mTexture->getWidth();
+  u32 th = mTexture->getHeight();
   if (mXOffset + width >= tw) {
     mXOffset = 0;
     mYOffset += mSize;
@@ -138,8 +137,8 @@ void Font::loadCharacter(wchar_t const &character) {
     ++mZOffset;
   }
 
-  mTexture.loadDataAt(std::to_string((u32)character), mXOffset, mYOffset,
-                      mZOffset, width, height, 1, buffer);
+  mTexture->loadDataAt(std::to_string((u32)character), mXOffset, mYOffset,
+                       mZOffset, width, height, 1, buffer);
   vec<float> uv = {(float)mXOffset / tw, (float)mYOffset / th,
                    (float)(mXOffset + width) / tw,
                    (float)(mYOffset + height) / th, (float)mZOffset};
@@ -148,8 +147,8 @@ void Font::loadCharacter(wchar_t const &character) {
   CharacterData c = CharacterData();
   c.codepoint = (u32)character;
   c.size = {width, height};
-  c.bearing = {(*mFace)->glyph->bitmap_left, (*mFace)->glyph->bitmap_top};
-  c.advance = (*mFace)->glyph->advance.x;
+  c.bearing = {mFace->glyph->bitmap_left, mFace->glyph->bitmap_top};
+  c.advance = mFace->glyph->advance.x;
   c.uv = uv;
 
   mCharacters.insert({character, c});

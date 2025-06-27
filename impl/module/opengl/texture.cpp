@@ -4,7 +4,7 @@
 namespace Terreate::OpenGL {
 Texture::Texture(u32 const &width, u32 const &height, u32 const &layers)
     : mSize({width, height}), mLayers(layers) {
-  glGenTextures(1, mTexture);
+  glGenTextures(1, &mTexture);
 
   this->bind();
   glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA32F, mSize.first, mSize.second,
@@ -16,7 +16,7 @@ Texture::Texture(u32 const &width, u32 const &height, u32 const &layers)
 
 Texture::Texture(TextureSize const &size, u32 const &layers)
     : mSize({(u32)size, (u32)size}), mLayers(layers) {
-  glGenTextures(1, mTexture);
+  glGenTextures(1, &mTexture);
 
   this->bind();
   glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA32F, mSize.first, mSize.second,
@@ -27,9 +27,9 @@ Texture::Texture(TextureSize const &size, u32 const &layers)
 }
 
 Texture::~Texture() {
-  if (mTexture.Count() <= 1) {
-    glDeleteTextures(1, mTexture);
-    mTexture.Delete();
+  if (mTexture != 0) {
+    glDeleteTextures(1, &mTexture);
+    mTexture = 0;
   }
 }
 
@@ -136,9 +136,9 @@ u32 Texture::getMaxLayers() {
 }
 
 CubeTexture::~CubeTexture() {
-  if (mTexture.Count() <= 1) {
-    glDeleteTextures(1, mTexture);
-    mTexture.Delete();
+  if (mTexture != 0) {
+    glDeleteTextures(1, &mTexture);
+    mTexture = 0;
   }
 }
 

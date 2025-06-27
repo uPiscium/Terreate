@@ -130,7 +130,7 @@ void TestApp::sizeCallback(Window *window, int const &width,
   glViewport(0, 0, width, height);
   mWidth = (float)width;
   mHeight = (float)height;
-  mShader.use();
+  mShader.bind();
   mUniform.transform = scale(
       identity<mat4>(), vec3(1.0f / mWidth, 1.0f / mHeight, 1.0f / mDepth));
   mUBO.reloadData(mUniform);
@@ -160,14 +160,14 @@ void TestApp::charCallback(Window *window, u32 const &codepoint) {
 }
 
 TestApp::TestApp() : mScreen(1000, 1000, 4) {
-  mFont = Font("resources/AsebiMin-Light.otf", 128);
-  mInfoFont = Font("resources/AsebiMin-Light.otf", 32);
+  mFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 128);
+  mInfoFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 32);
 
-  mText.loadFont(&mFont);
+  mText.loadFont(mFont.get());
   mText.loadShader("resources/shaders/textVert.glsl",
                    "resources/shaders/textFrag.glsl");
 
-  mInfoText.loadFont(&mInfoFont);
+  mInfoText.loadFont(mInfoFont.get());
   mInfoText.loadShader("resources/shaders/textVert.glsl",
                        "resources/shaders/textFrag.glsl");
 
@@ -252,22 +252,22 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
   // Uncomment if you want to break your brain...
   /* mShader.UseDepth(false); */
 
-  mShader.use();
+  mShader.bind();
   mShader.setUniform("uTexture", 0);
   Shader::activateTexture(TextureTargets::TEX_0);
 
-  mScreenShader.use();
+  mScreenShader.bind();
   mScreenShader.setUniform("uTexture", 0);
   Shader::activateTexture(TextureTargets::TEX_0);
 
-  mTexture2 = Texture(800, 800, 2);
+  mTexture2 = std::make_unique<Texture>(800, 800, 2);
   ImageConverter converter;
   i32 width = 0, height = 0, channels = 0;
   stbi_set_flip_vertically_on_load(true);
   ubyte *pixels =
       stbi_load("resources/testImage2.png", &width, &height, &channels, 4);
   converter.convert("testImage2", 1, width, height, channels, pixels,
-                    mTexture2);
+                    *mTexture2);
   stbi_image_free(pixels);
 }
 
@@ -289,20 +289,20 @@ void TestApp::frame(Window *window) {
   mUBO.reloadData(mUniform);
   mScreenUBO.reloadData(mScreenUniform);
 
-  Texture const &texture = mScreen.getTexture();
+  Texture *texture = mScreen.getTexture();
 
   mScreen.fill({0, 0, 0});
   mScreen.clear();
   mScreen.bind();
-  mScreenShader.use();
+  mScreenShader.bind();
   /* mInfoFont.Use(); */
-  mTexture2.bind();
+  mTexture2->bind();
   mScreenBuffer.draw(DrawMode::TRIANGLES);
-  mTexture2.unbind();
+  mTexture2->unbind();
   /* mInfoFont.Unuse(); */
-  mScreenShader.unuse();
+  mScreenShader.unbind();
   mText.loadText(wstr(L"Cube"));
-  auto size = mFont.getTextSize(wstr(L"Cube"));
+  auto size = mFont->getTextSize(wstr(L"Cube"));
   mText.render(500 - size.first / 2.0, 500 - size.second / 2.0,
                mScreen.getWidth(), mScreen.getHeight());
   mScreen.unbind();
@@ -312,11 +312,11 @@ void TestApp::frame(Window *window) {
   mSSBO.reloadData(mSettings);
 
   window->bind();
-  mShader.use();
-  texture.bind();
+  mShader.bind();
+  texture->bind();
   mBuffer.draw(DrawMode::TRIANGLES);
-  texture.unbind();
-  mShader.unuse();
+  texture->unbind();
+  mShader.unbind();
 
   mText = mTextString;
   mText.render(0, 0, mWidth, mHeight);

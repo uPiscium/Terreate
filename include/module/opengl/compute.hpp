@@ -4,7 +4,6 @@
 #include "../common/math.hpp"
 #include "../common/type.hpp"
 
-#include "object.hpp"
 #include "texture.hpp"
 
 namespace Terreate::OpenGL {
@@ -15,9 +14,12 @@ void checkLinkStatus(u32 const &id);
 
 class ComputeKernel {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(ComputeKernel);
+
+private:
   bool mCompiled = false;
   bool mLinked = false;
-  Object mKernelID = Object();
+  GLObject mKernelID = 0;
   str mKernelSource = "";
 
 public:
