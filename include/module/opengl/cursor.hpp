@@ -6,15 +6,14 @@
 namespace Terreate::OpenGL {
 class Cursor {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(Cursor);
+
+private:
   GLFWcursor *mCursor = nullptr;
   GLFWimage mImage = GLFWimage();
   ubyte *mPixels = nullptr;
   i32 mXHot = 0;
   i32 mYHot = 0;
-
-private:
-  Cursor(Cursor const &) = delete;
-  Cursor &operator=(Cursor const &) = delete;
 
 public:
   Cursor(i32 const &xHot = 0, i32 const &yHot = 0) : mXHot(xHot), mYHot(yHot) {}
@@ -28,11 +27,10 @@ public:
 
 class StandardCursor {
 private:
-  GLFWcursor *mCursor = nullptr;
+  PROHIBIT_COPY_AND_ASSIGN(StandardCursor);
 
 private:
-  StandardCursor(StandardCursor const &) = delete;
-  StandardCursor &operator=(StandardCursor const &) = delete;
+  GLFWcursor *mCursor = nullptr;
 
 public:
   StandardCursor(CursorShape const &shape) {

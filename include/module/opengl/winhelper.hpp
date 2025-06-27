@@ -70,6 +70,9 @@ typedef Event<Window *, vec<str> const &> FileDropEvent;
 
 class WindowProperty {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(WindowProperty);
+
+private:
   GLFWwindow *mWindow = nullptr;
 
   vec<u32> mCodePoints;
@@ -133,6 +136,9 @@ public:
 
 class WindowEvent {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(WindowEvent);
+
+private:
   GLFWwindow *mWindow = nullptr;
 
 private:
@@ -153,5 +159,9 @@ public:
   KeyEvent onKeyInput;
   CharEvent onCharInput;
   FileDropEvent onFileDrop;
+
+public:
+  WindowEvent() = default;
+  ~WindowEvent() = default;
 };
 } // namespace Terreate::OpenGL
