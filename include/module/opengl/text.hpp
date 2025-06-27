@@ -6,6 +6,8 @@
 #include "font.hpp"
 #include "shader.hpp"
 
+// TODO: Move text module to more high level module
+
 namespace Terreate::OpenGL {
 class Text {
 private:
