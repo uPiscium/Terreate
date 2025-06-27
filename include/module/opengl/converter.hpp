@@ -8,6 +8,9 @@
 namespace Terreate::OpenGL {
 class ImageConverter {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(ImageConverter);
+
+private:
   static u32 const sKernelInputSize = 16;
   static str const sKernelSource;
 

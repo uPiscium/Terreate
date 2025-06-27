@@ -14,6 +14,9 @@ void checkLinkStatus(u32 const &id);
 
 class ComputeKernel {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(ComputeKernel);
+
+private:
   bool mCompiled = false;
   bool mLinked = false;
   GLObject mKernelID = 0;
