@@ -130,7 +130,7 @@ void TestApp::sizeCallback(Window *window, int const &width,
   glViewport(0, 0, width, height);
   mWidth = (float)width;
   mHeight = (float)height;
-  mShader.use();
+  mShader.bind();
   mUniform.transform = scale(
       identity<mat4>(), vec3(1.0f / mWidth, 1.0f / mHeight, 1.0f / mDepth));
   mUBO.reloadData(mUniform);
@@ -252,11 +252,11 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
   // Uncomment if you want to break your brain...
   /* mShader.UseDepth(false); */
 
-  mShader.use();
+  mShader.bind();
   mShader.setUniform("uTexture", 0);
   Shader::activateTexture(TextureTargets::TEX_0);
 
-  mScreenShader.use();
+  mScreenShader.bind();
   mScreenShader.setUniform("uTexture", 0);
   Shader::activateTexture(TextureTargets::TEX_0);
 
@@ -289,18 +289,18 @@ void TestApp::frame(Window *window) {
   mUBO.reloadData(mUniform);
   mScreenUBO.reloadData(mScreenUniform);
 
-  Texture const &texture = mScreen.getTexture();
+  Texture *texture = mScreen.getTexture();
 
   mScreen.fill({0, 0, 0});
   mScreen.clear();
   mScreen.bind();
-  mScreenShader.use();
+  mScreenShader.bind();
   /* mInfoFont.Use(); */
   mTexture2->bind();
   mScreenBuffer.draw(DrawMode::TRIANGLES);
   mTexture2->unbind();
   /* mInfoFont.Unuse(); */
-  mScreenShader.unuse();
+  mScreenShader.unbind();
   mText.loadText(wstr(L"Cube"));
   auto size = mFont->getTextSize(wstr(L"Cube"));
   mText.render(500 - size.first / 2.0, 500 - size.second / 2.0,
@@ -312,11 +312,11 @@ void TestApp::frame(Window *window) {
   mSSBO.reloadData(mSettings);
 
   window->bind();
-  mShader.use();
-  texture.bind();
+  mShader.bind();
+  texture->bind();
   mBuffer.draw(DrawMode::TRIANGLES);
-  texture.unbind();
-  mShader.unuse();
+  texture->unbind();
+  mShader.unbind();
 
   mText = mTextString;
   mText.render(0, 0, mWidth, mHeight);
