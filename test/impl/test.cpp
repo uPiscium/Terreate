@@ -86,7 +86,7 @@ void testCompute() {
 
   ComputeKernel kernel;
   kernel.addKernelSource(
-      Shader::loadShaderSource("tests/resources/shaders/compute.glsl"));
+      Shader::loadShaderSource("resources/shaders/compute.glsl"));
   kernel.compile();
   kernel.link();
   std::cout << "kernel compiled" << std::endl;
@@ -101,7 +101,7 @@ void testCompute() {
 
   ComputeKernel kernel2;
   kernel2.addKernelSource(
-      Shader::loadShaderSource("tests/resources/shaders/compute.glsl"));
+      Shader::loadShaderSource("resources/shaders/compute.glsl"));
   kernel2.compile();
   kernel2.link();
   std::cout << "kernel2 compiled" << std::endl;
@@ -160,28 +160,28 @@ void TestApp::charCallback(Window *window, u32 const &codepoint) {
 }
 
 TestApp::TestApp() : mScreen(1000, 1000, 4) {
-  mFont = Font("tests/resources/AsebiMin-Light.otf", 128);
-  mInfoFont = Font("tests/resources/AsebiMin-Light.otf", 32);
+  mFont = Font("resources/AsebiMin-Light.otf", 128);
+  mInfoFont = Font("resources/AsebiMin-Light.otf", 32);
 
   mText.loadFont(&mFont);
-  mText.loadShader("tests/resources/shaders/textVert.glsl",
-                   "tests/resources/shaders/textFrag.glsl");
+  mText.loadShader("resources/shaders/textVert.glsl",
+                   "resources/shaders/textFrag.glsl");
 
   mInfoText.loadFont(&mInfoFont);
-  mInfoText.loadShader("tests/resources/shaders/textVert.glsl",
-                       "tests/resources/shaders/textFrag.glsl");
+  mInfoText.loadShader("resources/shaders/textVert.glsl",
+                       "resources/shaders/textFrag.glsl");
 
   mShader.addVertexShaderSource(
-      Shader::loadShaderSource("tests/resources/shaders/mainVert.glsl"));
+      Shader::loadShaderSource("resources/shaders/mainVert.glsl"));
   mShader.addFragmentShaderSource(
-      Shader::loadShaderSource("tests/resources/shaders/mainFrag.glsl"));
+      Shader::loadShaderSource("resources/shaders/mainFrag.glsl"));
   mShader.compile();
   mShader.link();
 
   mScreenShader.addVertexShaderSource(
-      Shader::loadShaderSource("tests/resources/shaders/screenVert.glsl"));
+      Shader::loadShaderSource("resources/shaders/screenVert.glsl"));
   mScreenShader.addFragmentShaderSource(
-      Shader::loadShaderSource("tests/resources/shaders/screenFrag.glsl"));
+      Shader::loadShaderSource("resources/shaders/screenFrag.glsl"));
   mScreenShader.compile();
   mScreenShader.link();
 
@@ -264,8 +264,8 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
   ImageConverter converter;
   i32 width = 0, height = 0, channels = 0;
   stbi_set_flip_vertically_on_load(true);
-  ubyte *pixels = stbi_load("tests/resources/testImage2.png", &width, &height,
-                            &channels, 4);
+  ubyte *pixels =
+      stbi_load("resources/testImage2.png", &width, &height, &channels, 4);
   converter.convert("testImage2", 1, width, height, channels, pixels,
                     mTexture2);
   stbi_image_free(pixels);
