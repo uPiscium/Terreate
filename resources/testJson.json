@@ -1,0 +1,24 @@
+[
+  {
+    "Auth": null,
+    "Name": "Admin",
+    "Password": "admin"
+  },
+  {
+    "Auth": true,
+    "Name": "User",
+    "Password": "user"
+  },
+  {
+    "Auth": false,
+    "Name": "Guest",
+    "Password": "guest"
+  },
+  {
+    "Users": [
+      "Admin", "User", "Guest"
+    ],
+    "Master": "Admin",
+    "Email": "admin@localhost"
+  }
+]
