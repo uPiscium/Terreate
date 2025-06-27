@@ -1,3 +1,6 @@
+-I./deps/
+-I./include/
+
 -I./includes/Deps/
 -I./includes/
 -I./tests/includes/
