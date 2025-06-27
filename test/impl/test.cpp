@@ -160,14 +160,14 @@ void TestApp::charCallback(Window *window, u32 const &codepoint) {
 }
 
 TestApp::TestApp() : mScreen(1000, 1000, 4) {
-  mFont = Font("resources/AsebiMin-Light.otf", 128);
-  mInfoFont = Font("resources/AsebiMin-Light.otf", 32);
+  mFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 128);
+  mInfoFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 32);
 
-  mText.loadFont(&mFont);
+  mText.loadFont(mFont.get());
   mText.loadShader("resources/shaders/textVert.glsl",
                    "resources/shaders/textFrag.glsl");
 
-  mInfoText.loadFont(&mInfoFont);
+  mInfoText.loadFont(mInfoFont.get());
   mInfoText.loadShader("resources/shaders/textVert.glsl",
                        "resources/shaders/textFrag.glsl");
 
@@ -260,14 +260,14 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
   mScreenShader.setUniform("uTexture", 0);
   Shader::activateTexture(TextureTargets::TEX_0);
 
-  mTexture2 = Texture(800, 800, 2);
+  mTexture2 = std::make_unique<Texture>(800, 800, 2);
   ImageConverter converter;
   i32 width = 0, height = 0, channels = 0;
   stbi_set_flip_vertically_on_load(true);
   ubyte *pixels =
       stbi_load("resources/testImage2.png", &width, &height, &channels, 4);
   converter.convert("testImage2", 1, width, height, channels, pixels,
-                    mTexture2);
+                    *mTexture2);
   stbi_image_free(pixels);
 }
 
@@ -296,13 +296,13 @@ void TestApp::frame(Window *window) {
   mScreen.bind();
   mScreenShader.use();
   /* mInfoFont.Use(); */
-  mTexture2.bind();
+  mTexture2->bind();
   mScreenBuffer.draw(DrawMode::TRIANGLES);
-  mTexture2.unbind();
+  mTexture2->unbind();
   /* mInfoFont.Unuse(); */
   mScreenShader.unuse();
   mText.loadText(wstr(L"Cube"));
-  auto size = mFont.getTextSize(wstr(L"Cube"));
+  auto size = mFont->getTextSize(wstr(L"Cube"));
   mText.render(500 - size.first / 2.0, 500 - size.second / 2.0,
                mScreen.getWidth(), mScreen.getHeight());
   mScreen.unbind();
