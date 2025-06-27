@@ -65,7 +65,6 @@ cmake --build build
 
 ## `nix` installed env
 ```shell
-<<<<<<< HEAD
 nix develop // if you have direnv, use `direnv allow` to automatically enter the environment
 cmake -S . -B build
 cmake --build build
