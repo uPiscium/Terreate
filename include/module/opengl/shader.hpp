@@ -4,8 +4,6 @@
 #include "../common/math.hpp"
 #include "../common/type.hpp"
 
-#include "object.hpp"
-
 namespace Terreate::OpenGL {
 struct ShaderOption {
   bool blending = true;
@@ -28,9 +26,12 @@ struct ShaderOption {
 
 class Shader {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(Shader);
+
+private:
   bool mCompiled = false;
   bool mLinked = false;
-  Object mShaderID = Object();
+  GLObject mShaderID = 0;
   str mVertexShaderSource = "";
   str mFragmentShaderSource = "";
   str mGeometryShaderSource = "";
@@ -130,8 +131,8 @@ public:
   void useStencil(bool const &value) { mOption.stencil = value; }
   void compile();
   void link();
-  void use() const;
-  void unuse() const { glUseProgram(0); }
+  void bind() const;
+  void unbind() const { glUseProgram(0); }
 
   operator bool() const { return mShaderID; }
 

@@ -9,9 +9,9 @@ Shader::Shader() {
 }
 
 Shader::~Shader() {
-  if (mShaderID.Count() <= 1) {
+  if (mShaderID != 0) {
     glDeleteProgram(mShaderID);
-    mShaderID.Delete();
+    mShaderID = 0;
   }
 }
 
@@ -110,7 +110,7 @@ str Shader::loadShaderSource(str const &path) {
   return stream.str();
 }
 
-void Shader::use() const {
+void Shader::bind() const {
   if (!mCompiled) {
     throw Exception::ShaderError("Shader is not compiled");
     return;
