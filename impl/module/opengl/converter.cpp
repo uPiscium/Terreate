@@ -28,7 +28,7 @@ void main() {
 void ImageConverter::createInputTexture() {
   u32 size = Texture::getMaxTextureSize() / 2;
   mKernel.setUniform("textureSize", vec2(size, size));
-  glGenTextures(1, mInputTexture);
+  glGenTextures(1, &mInputTexture);
   glBindTexture(GL_TEXTURE_2D, mInputTexture);
   glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, size, size);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -48,9 +48,9 @@ ImageConverter::ImageConverter() {
 }
 
 ImageConverter::~ImageConverter() {
-  if (mInputTexture.Count() <= 1) {
-    glDeleteTextures(1, mInputTexture);
-    mInputTexture.Delete();
+  if (mInputTexture != 0) {
+    glDeleteTextures(1, &mInputTexture);
+    mInputTexture = 0;
   }
 }
 

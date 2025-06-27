@@ -1,10 +1,9 @@
 #pragma once
 
-#include "../common/enum.hpp"
-
 #include "compute.hpp"
-#include "object.hpp"
 #include "texture.hpp"
+
+// TODO: Move converter module to more high level module
 
 namespace Terreate::OpenGL {
 class ImageConverter {
@@ -13,7 +12,7 @@ private:
   static str const sKernelSource;
 
 private:
-  Object mInputTexture;
+  GLObject mInputTexture;
   ComputeKernel mKernel;
 
 private:
