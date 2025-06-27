@@ -39,7 +39,6 @@ add_library(
   icon.cpp
   joystick.cpp
   mouse.cpp
-  object.cpp
   screen.cpp
   shader.cpp
   text.cpp
