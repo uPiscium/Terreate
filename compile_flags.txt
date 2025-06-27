@@ -1,0 +1,3 @@
+-I./deps/
+-I./include/
+-std=c++20

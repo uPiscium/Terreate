@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.20)
+project(Terreate)
+option(TERREATE_DEBUG_BUILD "Build with debug flags" ON)
+option(TERREATE_BUILD_TEST "Build test" ON)
+
+add_subdirectory(impl)
+if(TERREATE_BUILD_TEST)
+  add_subdirectory(test/impl)
+endif()
+
+if(TERREATE_DEBUG_BUILD)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Wextra")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra")
+endif()
