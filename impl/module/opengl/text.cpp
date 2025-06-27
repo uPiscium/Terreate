@@ -53,11 +53,18 @@ void Text::loadText() {
   mLastText = mText;
 }
 
+Text::~Text() {
+  if (mShaderLoaded) {
+    delete mShader;
+  }
+}
+
 void Text::loadShader(str const &vertexPath, str const &fragmentPath) {
-  mShader.addVertexShaderSource(Shader::loadShaderSource(vertexPath));
-  mShader.addFragmentShaderSource(Shader::loadShaderSource(fragmentPath));
-  mShader.compile();
-  mShader.link();
+  mShader = new Shader();
+  mShader->addVertexShaderSource(Shader::loadShaderSource(vertexPath));
+  mShader->addFragmentShaderSource(Shader::loadShaderSource(fragmentPath));
+  mShader->compile();
+  mShader->link();
   mShaderLoaded = true;
 }
 
@@ -72,20 +79,20 @@ void Text::render(float const &x, float const &y, float const &windowWidth,
     throw Exception::TextError("Shader not loaded");
   }
 
-  mShader.use();
+  mShader->bind();
   Shader::activateTexture(TextureTargets::TEX_0);
-  mShader.setUniform("uTexture", 0);
+  mShader->setUniform("uTexture", 0);
 
-  mShader.setUniform("uModel", translate(identity<mat4>(), vec3(x, y, 0.0f)));
-  mShader.setUniform("uTransform",
-                     ortho(0.0f, windowWidth, 0.0f, windowHeight));
-  mShader.setUniform("uColor", mColor);
+  mShader->setUniform("uModel", translate(identity<mat4>(), vec3(x, y, 0.0f)));
+  mShader->setUniform("uTransform",
+                      ortho(0.0f, windowWidth, 0.0f, windowHeight));
+  mShader->setUniform("uColor", mColor);
 
   mFont->bind();
   mBuffer.draw(DrawMode::TRIANGLES);
   mFont->unbind();
 
-  mShader.unuse();
+  mShader->unbind();
 }
 
 Text &Text::operator=(str const &text) {
