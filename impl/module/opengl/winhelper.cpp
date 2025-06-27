@@ -1,5 +1,6 @@
-#include "../../../include/module/opengl/winhelper.hpp"
+#include "../../../include/module/common/exception.hpp"
 #include "../../../include/module/opengl/window.hpp"
+#include "../../../include/module/opengl/winhelper.hpp"
 
 namespace Terreate::OpenGL {
 namespace Callbacks {
@@ -92,9 +93,69 @@ void WindowProperty::clearAllInputs() {
   mDroppedFiles.clear();
 }
 
+pair<u32> WindowProperty::getFramebufferSize() const {
+  i32 width, height;
+  glfwGetFramebufferSize(mWindow, &width, &height);
+  return pair<u32>{static_cast<u32>(width), static_cast<u32>(height)};
+}
+
+pair<float> WindowProperty::getContentScale() const {
+  float xscale, yscale;
+  glfwGetWindowContentScale(mWindow, &xscale, &yscale);
+  return pair<float>{xscale, yscale};
+}
+
+pair<i32> WindowProperty::getMonitorPosition() const {
+  GLFWmonitor *monitor = glfwGetWindowMonitor(mWindow);
+  if (monitor == nullptr) {
+    return pair<i32>{0, 0};
+  }
+  int xpos, ypos;
+  glfwGetMonitorPos(monitor, &xpos, &ypos);
+  return pair<i32>{xpos, ypos};
+}
+
+pair<u32> WindowProperty::getMonitorSize() const {
+  GLFWmonitor *monitor = glfwGetWindowMonitor(mWindow);
+  if (monitor == nullptr) {
+    return pair<u32>{0, 0};
+  }
+  int width, height;
+  glfwGetMonitorPhysicalSize(monitor, &width, &height);
+  return pair<u32>{static_cast<u32>(width), static_cast<u32>(height)};
+}
+
+pair<u32> WindowProperty::getMonitorPhysicalSize() const {
+  GLFWmonitor *monitor = glfwGetWindowMonitor(mWindow);
+  if (monitor == nullptr) {
+    return pair<u32>{0, 0};
+  }
+  int width, height;
+  glfwGetMonitorPhysicalSize(monitor, &width, &height);
+  return pair<u32>{static_cast<u32>(width), static_cast<u32>(height)};
+}
+
+u32 WindowProperty::getMonitorRefreshRate() const {
+  GLFWmonitor *monitor = glfwGetWindowMonitor(mWindow);
+  if (monitor == nullptr) {
+    return 0;
+  }
+  int refreshRate = glfwGetVideoMode(monitor)->refreshRate;
+  return static_cast<u32>(refreshRate);
+}
+
+str WindowProperty::getMonitorName() const {
+  GLFWmonitor *monitor = glfwGetWindowMonitor(mWindow);
+  if (monitor == nullptr) {
+    return "";
+  }
+  const char *name = glfwGetMonitorName(monitor);
+  return name ? str(name) : "";
+}
+
 void WindowEvent::setWindow(GLFWwindow *window) {
   if (window == nullptr) {
-    throw std::runtime_error("Window pointer cannot be null.");
+    throw Exception::WindowError("Window pointer cannot be null.");
   }
   mWindow = window;
 

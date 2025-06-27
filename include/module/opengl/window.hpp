@@ -136,7 +136,8 @@ public:
   void clearStencil() const { glClear(GL_STENCIL_BUFFER_BIT); }
   void swap() const { glfwSwapBuffers(mWindow); }
   void pollEvents() const { glfwPollEvents(); }
-  void bind() const { this->setCurrentContext(); }
+  void bind() const;
+  void unbind() const { glfwMakeContextCurrent(nullptr); }
 
   operator bool() const { return !this->isClosed(); }
 };

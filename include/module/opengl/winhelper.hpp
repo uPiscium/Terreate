@@ -98,6 +98,13 @@ public:
   str getClipboard() const { return glfwGetClipboardString(mWindow); }
   str getTitle() const { return glfwGetWindowTitle(mWindow); }
   float getOpacity() const { return (float)glfwGetWindowOpacity(mWindow); }
+  pair<u32> getFramebufferSize() const;
+  pair<float> getContentScale() const;
+  pair<i32> getMonitorPosition() const;
+  pair<u32> getMonitorSize() const;
+  pair<u32> getMonitorPhysicalSize() const;
+  u32 getMonitorRefreshRate() const;
+  str getMonitorName() const;
   vec<u32> const &getCodePoints() const { return mCodePoints; }
   vec<Key> const &getKeys() const { return mKeys; }
   vec<str> const &getDroppedFiles() const { return mDroppedFiles; }

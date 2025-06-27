@@ -1,20 +1,19 @@
 #pragma once
 
-#include "../common/enum.hpp"
 #include "../common/type.hpp"
 
-#include "object.hpp"
 #include "texture.hpp"
 
 namespace Terreate::OpenGL {
+enum class BindMode { READ_ONLY, WRITE_ONLY, READ_WRITE };
+
 class Screen {
 private:
-  Object mFrameBuffer = Object();
+  GLObject mFrameBuffer = 0;
   u32 mWidth;
   u32 mHeight;
   u32 mLayers;
-  i32 mInitialViewPort[4];
-  Texture mTexture;
+  unique<Texture> mTexture;
   vec<GLenum> mDrawBuffers;
 
 public:
@@ -23,14 +22,10 @@ public:
 
   u32 getWidth() const { return mWidth; }
   u32 getHeight() const { return mHeight; }
-  Texture const &getTexture() const { return mTexture; }
+  Texture *getTexture() const { return mTexture.get(); }
 
   void transcript(Screen const &screen) const;
-  void readOnlyBind() const {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, mFrameBuffer);
-  }
-  void drawOnlyBind() const;
-  void bind();
+  void bind(BindMode mode = BindMode::READ_WRITE) const;
   void unbind() const;
   void fill(vec<float> const &color);
   void clear();
