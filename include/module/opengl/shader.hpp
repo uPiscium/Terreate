@@ -5,23 +5,63 @@
 #include "../common/type.hpp"
 
 namespace Terreate::OpenGL {
-struct ShaderOption {
-  bool blending = true;
-  bool culling = false;
-  bool depth = true;
-  bool scissor = false;
-  bool stencil = false;
+struct Blending {
+  bool enable = true;
   BlendingFunction src = BlendingFunction::SRC_ALPHA;
   BlendingFunction dst = BlendingFunction::ONE_MINUS_SRC_ALPHA;
-  CullingFace cullFace = CullingFace::BACK;
+
+  void apply() const;
+};
+
+struct Culling {
+  bool enable = false;
+  CullingFace face = CullingFace::BACK;
   CullingMode frontFace = CullingMode::CCW;
-  DepthFunction depthFunc = DepthFunction::LESS;
-  StencilFunction stencilFunc = StencilFunction::ALWAYS;
-  i32 stencilRef = 0;
-  u32 stencilMask = 0xFF;
+
+  void apply() const;
+};
+
+struct Depth {
+  bool enable = true;
+  bool writable = true;
+  float near = 0.0f;
+  float far = 1.0f;
+  float offsetFactor = 0.0f;
+  float offsetUnits = 0.0f;
+  DepthFunction func = DepthFunction::LESS;
+
+  void apply() const;
+};
+
+struct Scissor {
+  bool enable = false;
+  i32 x = 0;
+  i32 y = 0;
+  u32 width = 0;
+  u32 height = 0;
+
+  void apply() const;
+};
+
+struct Stencil {
+  bool enable = false;
+  StencilFunction func = StencilFunction::ALWAYS;
+  i32 ref = 0;
+  u32 mask = 0xFF;
   StencilOperation sFail = StencilOperation::KEEP;
   StencilOperation dpFail = StencilOperation::KEEP;
   StencilOperation dpPass = StencilOperation::KEEP;
+
+  void apply() const;
+};
+
+class ShaderProperty {
+public:
+  Blending blending;
+  Culling culling;
+  Depth depth;
+  Scissor scissor;
+  Stencil stencil;
 };
 
 class Shader {
@@ -34,13 +74,14 @@ private:
   GLObject mShaderID = 0;
   str mVertexShaderSource = "";
   str mFragmentShaderSource = "";
-  str mGeometryShaderSource = "";
-  ShaderOption mOption;
+  ShaderProperty mProperties;
 
 public:
   Shader();
   ~Shader();
 
+  ShaderProperty const &getProperties() const { return mProperties; }
+  ShaderProperty &getProperties() { return mProperties; }
   u32 getAttribute(str const &name) const {
     return glGetAttribLocation(mShaderID, name.c_str());
   }
@@ -98,24 +139,12 @@ public:
   void setUniform(str const &name, mat4 const &value) const {
     glUniformMatrix4fv(this->getLocation(name), 1, GL_FALSE, &value[0][0]);
   }
-  void setBlending(BlendingFunction const &src, BlendingFunction const &dst);
-  void setCullingFace(CullingFace const &face,
-                      CullingMode const &frontFace = CullingMode::CCW);
-  void setDepth(DepthFunction const &func);
-  void setStencilFunction(StencilFunction const &func, i32 const &ref,
-                          u32 const &mask);
-  void setStencilOperation(StencilOperation const &sFail,
-                           StencilOperation const &dpFail,
-                           StencilOperation const &dpPass);
 
   void addVertexShaderSource(str const &source) {
     mVertexShaderSource += source;
   }
   void addFragmentShaderSource(str const &source) {
     mFragmentShaderSource += source;
-  }
-  void addGeometryShaderSource(str const &source) {
-    mGeometryShaderSource += source;
   }
   void bindUniformBlock(str const &name, u32 const &binding) const {
     glUniformBlockBinding(mShaderID, this->getUniformBlockIndex(name), binding);
@@ -124,11 +153,6 @@ public:
     glShaderStorageBlockBinding(mShaderID, this->getStorageBlockIndex(name),
                                 binding);
   }
-  void useBlending(bool const &value) { mOption.blending = value; }
-  void useCulling(bool const &value) { mOption.culling = value; }
-  void useDepth(bool const &value) { mOption.depth = value; }
-  void useScissor(bool const &value) { mOption.scissor = value; }
-  void useStencil(bool const &value) { mOption.stencil = value; }
   void compile();
   void link();
   void bind() const;
