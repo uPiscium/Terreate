@@ -70,6 +70,9 @@ typedef Event<Window *, vec<str> const &> FileDropEvent;
 
 class WindowProperty {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(WindowProperty);
+
+private:
   GLFWwindow *mWindow = nullptr;
 
   vec<u32> mCodePoints;
@@ -98,6 +101,13 @@ public:
   str getClipboard() const { return glfwGetClipboardString(mWindow); }
   str getTitle() const { return glfwGetWindowTitle(mWindow); }
   float getOpacity() const { return (float)glfwGetWindowOpacity(mWindow); }
+  pair<u32> getFramebufferSize() const;
+  pair<float> getContentScale() const;
+  pair<i32> getMonitorPosition() const;
+  pair<u32> getMonitorSize() const;
+  pair<u32> getMonitorPhysicalSize() const;
+  u32 getMonitorRefreshRate() const;
+  str getMonitorName() const;
   vec<u32> const &getCodePoints() const { return mCodePoints; }
   vec<Key> const &getKeys() const { return mKeys; }
   vec<str> const &getDroppedFiles() const { return mDroppedFiles; }
@@ -126,6 +136,9 @@ public:
 
 class WindowEvent {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(WindowEvent);
+
+private:
   GLFWwindow *mWindow = nullptr;
 
 private:
@@ -146,5 +159,9 @@ public:
   KeyEvent onKeyInput;
   CharEvent onCharInput;
   FileDropEvent onFileDrop;
+
+public:
+  WindowEvent() = default;
+  ~WindowEvent() = default;
 };
 } // namespace Terreate::OpenGL

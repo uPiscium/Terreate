@@ -6,6 +6,8 @@
 #include "font.hpp"
 #include "shader.hpp"
 
+// TODO: Move text module to more high level module
+
 namespace Terreate::OpenGL {
 class Text {
 private:
@@ -20,7 +22,7 @@ private:
       {"iUV", {0, 1, 3, 6 * sizeof(float), 3 * sizeof(float)}}};
   umap<str, u32> mLocations = {{"iPosition", 0}, {"iUV", 1}};
   Font *mFont = nullptr;
-  Shader mShader;
+  Shader *mShader;
   vec3 mColor = vec3(1.0f, 1.0f, 1.0f);
 
 private:
@@ -35,7 +37,7 @@ public:
   Text(wstr const &text, Font *font) : mText(text), mFont(font) {
     this->loadText();
   }
-  ~Text() {}
+  ~Text();
 
   void setColor(vec3 const &color) { mColor = color; }
   void setText(wstr const &text) { this->loadText(text); }
@@ -44,7 +46,6 @@ public:
   }
 
   void loadFont(Font *font) { mFont = font; }
-  void loadShader(Shader const &shader) { mShader = shader; }
   void loadShader(str const &vertexPath, str const &fragmentPath);
   void loadText(wstr const &text);
   void loadText(str const &text) {

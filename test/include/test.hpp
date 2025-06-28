@@ -40,14 +40,14 @@ private:
   float mFar = 10000.0f;
   float mDepth = mFar - mNear;
 
-  Font mFont;
+  unique<Font> mFont;
   Text mText;
 
-  Font mInfoFont;
+  unique<Font> mInfoFont;
   Text mInfoText;
 
-  Texture mTexture;
-  Texture mTexture2;
+  unique<Texture> mTexture;
+  unique<Texture> mTexture2;
 
   wstr mTextString = L"日本語テスト";
   // wstr mTextString = L"ABC";

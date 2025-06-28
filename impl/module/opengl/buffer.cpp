@@ -61,20 +61,20 @@ void BufferDataConstructor::Construct() {
 }
 
 Buffer::~Buffer() {
-  if (mVAO.Count() <= 1) {
-    glDeleteVertexArrays(1, mVAO);
-    mVAO.Delete();
+  if (mVAO != 0) {
+    glDeleteVertexArrays(1, &mVAO);
+    mVAO = 0;
   }
-  if (mIBO.Count() <= 1) {
-    glDeleteBuffers(1, mIBO);
-    mIBO.Delete();
+  if (mIBO != 0) {
+    glDeleteBuffers(1, &mIBO);
+    mIBO = 0;
   }
   for (auto &buffer : mBuffers) {
-    if (buffer.Count() <= 1) {
-      glDeleteBuffers(1, buffer);
-      buffer.Delete();
+    if (buffer != 0) {
+      glDeleteBuffers(1, &buffer);
     }
   }
+  mBuffers.clear();
 }
 
 void Buffer::setAttributeDivisor(AttributeData const &attribute,
@@ -90,8 +90,8 @@ void Buffer::loadData(vec<float> const &raw,
                       BufferUsage const &usage) {
   u64 size = raw.size() * sizeof(float);
   this->bind();
-  Object buffer = Object();
-  glGenBuffers(1, buffer);
+  GLObject buffer = 0;
+  glGenBuffers(1, &buffer);
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
   glBufferData(GL_ARRAY_BUFFER, size, raw.data(), (GLenum)usage);
 
@@ -118,8 +118,8 @@ void Buffer::loadData(BufferDataConstructor const &bdc,
   vec<float> data = bdc.GetVertexData();
   u64 size = data.size() * sizeof(float);
   this->bind();
-  Object buffer = Object();
-  glGenBuffers(1, buffer);
+  GLObject buffer = 0;
+  glGenBuffers(1, &buffer);
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
   glBufferData(GL_ARRAY_BUFFER, size, data.data(), (GLenum)usage);
 
@@ -166,7 +166,7 @@ void Buffer::loadIndices(vec<u32> const &indices) {
   mLoadedIndices = true;
   mIndexCount = indices.size();
   this->bind();
-  glGenBuffers(1, mIBO);
+  glGenBuffers(1, &mIBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(u32),
                indices.data(), GL_STATIC_DRAW);
@@ -214,9 +214,9 @@ void Buffer::draw(DrawMode const &mode, u64 const &count) const {
 }
 
 UniformBuffer::~UniformBuffer() {
-  if (mUBO.Count() <= 1) {
-    glDeleteBuffers(1, mUBO);
-    mUBO.Delete();
+  if (mUBO != 0) {
+    glDeleteBuffers(1, &mUBO);
+    mUBO = 0;
   }
 }
 
@@ -232,9 +232,9 @@ void UniformBuffer::bind(Shader const &shader, str const &name) const {
 }
 
 ShaderStorageBuffer::~ShaderStorageBuffer() {
-  if (mSSBO.Count() <= 1) {
-    glDeleteBuffers(1, mSSBO);
-    mSSBO.Delete();
+  if (mSSBO != 0) {
+    glDeleteBuffers(1, &mSSBO);
+    mSSBO = 0;
   }
 }
 

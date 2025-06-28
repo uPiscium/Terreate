@@ -5,7 +5,6 @@
 #include "../common/type.hpp"
 
 #include "compute.hpp"
-#include "object.hpp"
 #include "shader.hpp"
 
 namespace Terreate::OpenGL {
@@ -47,15 +46,18 @@ public:
 
 class Buffer {
 private:
-  Object mVAO = Object();
-  Object mIBO = Object();
+  PROHIBIT_COPY_AND_ASSIGN(Buffer);
+
+private:
+  GLObject mVAO = 0;
+  GLObject mIBO = 0;
   u64 mIndexCount = 0u;
   bool mLoadedIndices = false;
-  vec<Object> mBuffers;
+  vec<GLObject> mBuffers;
   umap<str, AttributeData> mAttributes;
 
 public:
-  Buffer() { glGenVertexArrays(1, mVAO); }
+  Buffer() { glGenVertexArrays(1, &mVAO); }
   ~Buffer();
 
   void setAttributeDivisor(AttributeData const &attribute,
@@ -115,14 +117,17 @@ public:
 
 class UniformBuffer {
 private:
-  Object mUBO = Object();
+  PROHIBIT_COPY_AND_ASSIGN(UniformBuffer);
+
+private:
+  GLObject mUBO = 0;
 
 private:
   void bind() const { glBindBuffer(GL_UNIFORM_BUFFER, mUBO); }
   void unbind() const { glBindBuffer(GL_UNIFORM_BUFFER, 0); }
 
 public:
-  UniformBuffer() { glGenBuffers(1, mUBO); }
+  UniformBuffer() { glGenBuffers(1, &mUBO); }
   ~UniformBuffer();
 
   template <typename T>
@@ -160,7 +165,10 @@ public:
 
 class ShaderStorageBuffer {
 private:
-  Object mSSBO = Object();
+  PROHIBIT_COPY_AND_ASSIGN(ShaderStorageBuffer);
+
+private:
+  GLObject mSSBO = 0;
   u64 mSize = 0u;
 
 private:
@@ -168,7 +176,7 @@ private:
   void unbind() const { glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); }
 
 public:
-  ShaderStorageBuffer() { glGenBuffers(1, mSSBO); }
+  ShaderStorageBuffer() { glGenBuffers(1, &mSSBO); }
   ~ShaderStorageBuffer();
 
   u64 const &getSize() const { return mSize; }

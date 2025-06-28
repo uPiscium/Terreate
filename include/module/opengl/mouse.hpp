@@ -22,6 +22,9 @@ typedef Event<Window *, double const &, double const &> ScrollEvent;
 
 class Mouse {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(Mouse);
+
+private:
   GLFWwindow *mWindow = nullptr;
 
   pair<double> mScrollOffset = {0.0, 0.0};

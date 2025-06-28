@@ -50,9 +50,9 @@ ComputeKernel::ComputeKernel() {
 }
 
 ComputeKernel::~ComputeKernel() {
-  if (mKernelID.Count() <= 1) {
+  if (mKernelID != 0) {
     glDeleteProgram(mKernelID);
-    mKernelID.Delete();
+    mKernelID = 0;
   }
 }
 

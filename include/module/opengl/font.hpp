@@ -18,10 +18,13 @@ struct CharacterData {
 
 class Font {
 private:
-  shared<FT_Library> mLibrary = nullptr;
-  shared<FT_Face> mFace = nullptr;
+  PROHIBIT_COPY_AND_ASSIGN(Font);
+
+private:
+  FT_Library mLibrary = nullptr;
+  FT_Face mFace = nullptr;
   u32 mSize;
-  Texture mTexture;
+  unique<Texture> mTexture;
   u32 mXOffset = 0u;
   u32 mYOffset = 0u;
   u32 mZOffset = 0u;
@@ -46,8 +49,8 @@ public:
   void loadCharacter(wchar_t const &character);
   void loadText(wstr const &text);
 
-  void bind() const { mTexture.bind(); }
-  void unbind() const { mTexture.unbind(); }
+  void bind() const { mTexture->bind(); }
+  void unbind() const { mTexture->unbind(); }
 
   operator bool() const { return mFace != nullptr; }
 };

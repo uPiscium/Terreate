@@ -3,8 +3,6 @@
 #include "../common/enum.hpp"
 #include "../common/type.hpp"
 
-#include "object.hpp"
-
 namespace Terreate::OpenGL {
 class ImageConverter;
 
@@ -28,7 +26,10 @@ enum class TextureSize {
 
 class Texture {
 private:
-  Object mTexture = Object();
+  PROHIBIT_COPY_AND_ASSIGN(Texture);
+
+private:
+  GLObject mTexture = 0;
   pair<u32> mSize = {0u, 0u};
   u32 mLayers = 0u;
   pair<FilterType> mFilter = {FilterType::LINEAR, FilterType::LINEAR};
@@ -39,7 +40,7 @@ private:
   friend class Screen;
   friend class ImageConverter;
 
-  Texture(Object const &texture, u32 const &width, u32 const &height,
+  Texture(GLObject const &texture, u32 const &width, u32 const &height,
           u32 const &layers)
       : mTexture(texture), mSize(width, height), mLayers(layers) {}
 
@@ -51,7 +52,7 @@ private:
   }
 
 public:
-  Texture() { glGenTextures(1, mTexture); }
+  Texture() { glGenTextures(1, &mTexture); }
   Texture(u32 const &width, u32 const &height, u32 const &layers = 1);
   Texture(TextureSize const &size, u32 const &layers = 1);
   ~Texture();
@@ -99,7 +100,7 @@ public:
 
 class CubeTexture {
 private:
-  Object mTexture = Object();
+  GLObject mTexture = 0;
   u32 mWidth = 0u;
   u32 mHeight = 0u;
   u32 mChannels = 0u;
@@ -115,7 +116,7 @@ private:
   }
 
 public:
-  CubeTexture() { glGenTextures(1, mTexture); }
+  CubeTexture() { glGenTextures(1, &mTexture); }
   ~CubeTexture();
 
   void setFilter(FilterType const &filter);
