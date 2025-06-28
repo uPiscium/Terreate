@@ -20,7 +20,7 @@ inline SteadyTimePoint now() { return SteadyClock::now(); }
 
 inline SteadyClock::duration sinceEpoch() { return now().time_since_epoch(); }
 
-inline double GetNanoSec() {
+inline double getNanoSec() {
   return static_cast<double>(durationCast<NanoSec>(sinceEpoch()).count()) /
          1000000000;
 }
