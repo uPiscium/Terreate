@@ -1,5 +1,5 @@
-#include "../../../include/module/common/exception.hpp"
 #include "../../../include/module/opengl/compute.hpp"
+#include "../../../include/module/opengl/exception.hpp"
 #include "../../../include/module/opengl/shader.hpp"
 
 namespace Terreate::OpenGL {

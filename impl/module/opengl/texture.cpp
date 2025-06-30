@@ -1,4 +1,4 @@
-#include "../../../include/module/common/exception.hpp"
+#include "../../../include/module/opengl/exception.hpp"
 #include "../../../include/module/opengl/texture.hpp"
 
 namespace Terreate::OpenGL {

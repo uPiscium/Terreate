@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(TerreateGraphicComponent)
+project(TerreateGraphicModule)
 message(STATUS "Configuring ${PROJECT_NAME}...")
 
 if(TERREATE_DEBUG_BUILD)
@@ -45,8 +45,10 @@ add_library(
   texture.cpp
   window.cpp
   winhelper.cpp
+
+  ../opengl.cpp
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC TerreateCommonComponent)
+target_link_libraries(${PROJECT_NAME} PUBLIC TerreateCommonModule)
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 target_link_libraries(${PROJECT_NAME} PUBLIC freetype)
 target_include_directories(${PROJECT_NAME} PUBLIC ../../../include)

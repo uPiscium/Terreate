@@ -337,39 +337,75 @@ void TestApp::frame(Window *window) {
 
   window->swap();
   ++mDelflag;
-  mClock.tick();
+  mClock.tick(120);
 }
 
 void launchApp() {
-  Window window(2500, 1600, "Test Window", WindowSettings());
-  initializeGLAD();
-  glViewport(0, 0, 2500, 1600);
-  // window.disableVsync();
+  Core::Context ctx;
 
-  testCompute();
+  auto window = ctx.createWindow(2500, 1600, "Test Window", WindowSettings());
+  window->bind();
 
-  TestApp app;
-  window.getEvent().onFramebufferSizeChange.subscribe(
-      [&app](Window *window, u32 const &width, u32 const &height) {
-        app.sizeCallback(window, width, height);
+  auto &event = window->getEvent();
+  auto &property = window->getProperty();
+
+  event.onFramebufferSizeChange.subscribe(
+      [&ctx](Window *window, u32 const &width, u32 const &height) {
+        window->setViewPort(0, 0, width, height);
+        std::cout << "Framebuffer size changed: " << width << "x" << height
+                  << std::endl;
       });
-  window.getEvent().onKeyInput.subscribe(
-      [&app](Window *window, Key const &key) { app.keyCallback(window, key); });
-  window.getEvent().onCharInput.subscribe(
-      [&app](Window *window, u32 const &codepoint) {
-        app.charCallback(window, codepoint);
-      });
+  event.onKeyInput.subscribe([&ctx](Window *window, Key const &key) {
+    std::cout << "Key pressed: " << (u32)key.key << std::endl;
+  });
+  event.onCharInput.subscribe([&ctx](Window *window, u32 const &codepoint) {
+    if (codepoint == (u32)-1) {
+      std::cout << "Invalid character input." << std::endl;
+      return;
+    }
+    std::cout << "Character input: " << (char)codepoint << std::endl;
+  });
 
-  glViewport(0, 0, 2500, 1600);
-  while (window) {
-    app.frame(&window);
+  while (ctx.valid()) {
+    window->fill(0.2, 0.2, 0.2);
+    window->clear();
+
+    if (window->isPressing(Keyboard::K_ESCAPE)) {
+      break;
+    }
+
+    window->update();
+    ctx.tick(120);
   }
+
+  // Window window(2500, 1600, "Test Window", WindowSettings());
+  // initializeGLAD();
+  // glViewport(0, 0, 2500, 1600);
+  // // window.disableVsync();
+
+  // testCompute();
+
+  // TestApp app;
+  // window.getEvent().onFramebufferSizeChange.subscribe(
+  //     [&app](Window *window, u32 const &width, u32 const &height) {
+  //       app.sizeCallback(window, width, height);
+  //     });
+  // window.getEvent().onKeyInput.subscribe(
+  //     [&app](Window *window, Key const &key) { app.keyCallback(window, key);
+  //     });
+  // window.getEvent().onCharInput.subscribe(
+  //     [&app](Window *window, u32 const &codepoint) {
+  //       app.charCallback(window, codepoint);
+  //     });
+
+  // glViewport(0, 0, 2500, 1600);
+  // while (window) {
+  //   app.frame(&window);
+  // }
 }
 } // namespace Terreate::Test
 
 int main() {
-  Terreate::OpenGL::initializeGLFW();
   Terreate::Test::launchApp();
-  Terreate::OpenGL::terminate();
   return 0;
 }

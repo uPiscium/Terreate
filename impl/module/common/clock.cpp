@@ -19,8 +19,8 @@ bool Clock::isElapsed(float const &time) {
   return false;
 }
 
-void Clock::tick() {
-  while (!this->isElapsed(mTickTime)) {
+void Clock::tick(float fps) {
+  while (!this->isElapsed(1.0f / fps)) {
     // Do nothing
   }
 }

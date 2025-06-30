@@ -1,4 +1,5 @@
-project(TerreateCommonModule)
+cmake_minimum_required(VERSION 3.20)
+project(TerreateCoreModule)
 message(STATUS "Configuring ${PROJECT_NAME}...")
 
 if(TERREATE_DEBUG_BUILD)
@@ -9,15 +10,12 @@ endif()
 
 add_library(
   ${PROJECT_NAME} STATIC
-  clock.cpp
-  executor.cpp
-  uuid.cpp
+  context.cpp
 )
-
+target_link_libraries(${PROJECT_NAME} PUBLIC TerreateCommonModule TerreateGraphicModule)
 target_include_directories(${PROJECT_NAME} PUBLIC ../../../include)
 target_include_directories(${PROJECT_NAME} PUBLIC ../../../deps)
 set_target_properties(
   ${PROJECT_NAME} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
+                             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 message(STATUS "${PROJECT_NAME} configured.")
