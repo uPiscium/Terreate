@@ -3,7 +3,7 @@
 namespace Terreate::OpenGL {
 void initializeGLFW() {
   if (!glfwInit()) {
-    throw Exception::GraphicsException("Failed to initialize GLFW");
+    throw Exception::GraphicModuleError("Failed to initialize GLFW");
     return;
   }
 
@@ -17,7 +17,7 @@ void initializeGLFW() {
 
 void initializeGLAD() {
   if (!gladLoaderLoadGL()) {
-    throw Exception::GraphicsException("Failed to initialize GLAD");
+    throw Exception::GraphicModuleError("Failed to initialize GLAD");
     return;
   }
 }

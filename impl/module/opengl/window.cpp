@@ -30,6 +30,12 @@ void Window::destroy() {
   mWindow = nullptr;
 }
 
+void Window::update() const {
+  if (mWindow) {
+    this->swap();
+  }
+}
+
 void Window::bind() const {
   if (mWindow) {
     glfwMakeContextCurrent(mWindow);

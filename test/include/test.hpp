@@ -1,5 +1,6 @@
 #pragma once
 #include <module/common.hpp>
+#include <module/core.hpp>
 #include <module/opengl.hpp>
 
 #ifndef STB_IMAGE_IMPLEMENTATION
@@ -30,7 +31,7 @@ void testCompute();
 
 class TestApp {
 private:
-  Clock mClock = Clock(600, 100);
+  Clock mClock = Clock(100);
   Shader mShader;
   Shader mScreenShader;
   mat4 mTransform;

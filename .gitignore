@@ -1,4 +1,3 @@
 .direnv/
 build/
 samples/
-core.*
