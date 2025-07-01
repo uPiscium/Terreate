@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../common/clock.hpp"
-
 #include "../opengl/window.hpp"
 
 namespace Terreate::Core {
