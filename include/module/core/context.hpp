@@ -2,14 +2,19 @@
 
 #include "../common/clock.hpp"
 
-#include "../opengl/window.hpp"
+#include "../sdl/event.hpp"
+#include "../sdl/registry.hpp"
+#include "../sdl/window.hpp"
 
 namespace Terreate::Core {
 class Context {
 private:
   bool mGLADInitialized = false;
   shared<Clock> mClock;
-  shared<OpenGL::Window> mWindow;
+  shared<SDL::Window> mWindow;
+  shared<SDL::SDLObjectRegistry> mRegistry =
+      std::make_shared<SDL::SDLObjectRegistry>();
+  shared<SDL::EventHandler> mEventHandler;
 
 public:
   Context();
@@ -17,10 +22,9 @@ public:
 
   double getTime() const { return mClock->getCurrentRuntime(); }
   shared<Clock> getClock() const { return mClock; }
+  shared<SDL::EventHandler> getEventHandler() const { return mEventHandler; }
 
-  shared<OpenGL::Window> createWindow(
-      u32 width, u32 height, str const &title,
-      OpenGL::WindowSettings const &settings = OpenGL::WindowSettings());
+  shared<SDL::Window> createWindow(u32 width, u32 height, str const &title);
 
   bool valid() const { return mWindow && !mWindow->isClosed(); }
   void tick(double fps);
