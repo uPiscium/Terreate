@@ -366,15 +366,15 @@ void launchApp() {
         std::cout << "Window pixel size changed: " << width << "x" << height
                   << std::endl;
       });
-  event->onWindowCloseRequested.subscribe(
-      [](u64 timestamp, shared<Window> window) {
-        if (!window) {
-          std::cerr << "Window is null in close event." << std::endl;
-          return;
-        }
-        std::cout << "Window closed." << std::endl;
-        window->close();
-      });
+  // event->onWindowCloseRequested.subscribe(
+  //     [](u64 timestamp, shared<Window> window) {
+  //       if (!window) {
+  //         std::cerr << "Window is null in close event." << std::endl;
+  //         return;
+  //       }
+  //       std::cout << "Window closed." << std::endl;
+  //       window->close();
+  //     });
   event->onMouseMotion.subscribe([](u64 timestamp, shared<Window> window,
                                     SDL_MouseID which, vec2 const &pos,
                                     vec2 const &rel) {
@@ -383,14 +383,32 @@ void launchApp() {
               << ")" << std::endl;
   });
 
-  event->onJoystickAdd.subscribe([](u64 timestamp, shared<Joystick> joystick) {
-    std::cout << "Joystick added:" << joystick->getID() << std::endl;
-    std::cout << "Is gamepad: " << joystick->isGamepad() << std::endl;
+  event->onKey.subscribe([&window](u64 timestamp, Key const &key) {
+    std::cout << "Key event: " << (u32)key.key << " pressed: " << key.pressed
+              << std::endl;
+    if (key.key == Keyboard::K_P && key.pressed) {
+      std::cout << window->getMouse()->getCursorPosition().x << " "
+                << window->getMouse()->getCursorPosition().y << std::endl;
+    }
   });
-  event->onJoystickRemove.subscribe(
-      [](u64 timestamp, shared<Joystick> joystick) {
-        std::cout << "Joystick removed:" << joystick->getID() << std::endl;
-      });
+
+  // event->onJoystickAdd.subscribe([](u64 timestamp, shared<Joystick> joystick)
+  // {
+  //   std::cout << "Joystick added:" << joystick->getID() << std::endl;
+  //   std::cout << "Is gamepad: " << joystick->isGamepad() << std::endl;
+  // });
+  // event->onJoystickRemove.subscribe(
+  //     [](u64 timestamp, shared<Joystick> joystick) {
+  //       std::cout << "Joystick removed:" << joystick->getID() << std::endl;
+  //     });
+  // event->onMouseAdd.subscribe([](u64 timestamp, SDL_MouseID which) {
+  //   std::cout << "Mouse added: " << which << std::endl;
+  // });
+
+  for (auto &id : Mouse::getMise()) {
+    std::cout << "Mouse ID: " << id << " / Name: " << SDL_GetMouseNameForID(id)
+              << std::endl;
+  }
 
   // event.onKeyInput.subscribe([&ctx](Window *window, Key const &key) {
   //   std::cout << "Key pressed: " << (u32)key.key << std::endl;
@@ -407,12 +425,8 @@ void launchApp() {
     window->fill(0.2, 0.2, 0.2);
     window->clear();
 
-    // if (window->isPressing(Keyboard::K_ESCAPE)) {
-    //   break;
-    // }
-
     window->update();
-    ctx.tick(60);
+    ctx.tick(120);
   }
 
   // Window window(2500, 1600, "Test Window", WindowSettings());
