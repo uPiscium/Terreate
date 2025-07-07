@@ -52,6 +52,7 @@ typedef std::ofstream ofstream;
 
 // SDL types
 typedef SDL_GUID GUID;
+typedef SDL_AudioSpec AudioSpec;
 
 // OpenGL types
 typedef u32 GLObject;
