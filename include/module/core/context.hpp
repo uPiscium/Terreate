@@ -24,7 +24,8 @@ public:
   shared<Clock> getClock() const { return mClock; }
   shared<SDL::EventHandler> getEventHandler() const { return mEventHandler; }
 
-  shared<SDL::Window> createWindow(u32 width, u32 height, str const &title);
+  shared<SDL::Window> createWindow(u32 width, u32 height, str const &title,
+                                   bool autoCloseOnEvent = true);
 
   bool valid() const { return mWindow && !mWindow->isClosed(); }
   void tick(double fps);

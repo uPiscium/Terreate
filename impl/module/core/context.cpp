@@ -20,14 +20,31 @@ Context::~Context() {
 }
 
 shared<SDL::Window> Context::createWindow(u32 width, u32 height,
-                                          str const &title) {
+                                          str const &title,
+                                          bool autoCloseOnEvent) {
   if (mWindow) {
     throw Exception::ContextError("Window already exists. Currently, multiple "
                                   "windows are not supported.");
   }
 
-  mWindow = std::make_shared<SDL::Window>(width, height, title);
+  shared<SDL::Mouse> mouse;
+  if (mRegistry->hasMouse(0)) {
+    mouse = mRegistry->getMouse(0);
+  } else {
+    mouse = std::make_shared<SDL::Mouse>(0);
+    mRegistry->registerMouse(0, mouse);
+  }
+  mWindow = std::make_shared<SDL::Window>(width, height, title, mouse);
   mRegistry->registerWindow(mWindow->getId(), mWindow);
+
+  if (autoCloseOnEvent) {
+    mEventHandler->onWindowCloseRequested.subscribe(
+        [this](u64, shared<SDL::Window> window) {
+          if (window && window->getId() == mWindow->getId()) {
+            window->close();
+          }
+        });
+  }
 
   if (!mGLADInitialized) {
     mWindow->setCurrentContext();
