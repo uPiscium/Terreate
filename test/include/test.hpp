@@ -2,6 +2,7 @@
 #include <module/common.hpp>
 #include <module/core.hpp>
 #include <module/opengl.hpp>
+#include <module/sdl.hpp>
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -13,6 +14,7 @@
 
 namespace Terreate::Test {
 using namespace Terreate::OpenGL;
+using namespace Terreate::SDL;
 
 struct Uniform {
   mat4 transform;
@@ -25,8 +27,9 @@ struct Settings {
   vec4 setting;
 };
 
-void outputJoystickData(Joystick const &joystick, Text &text, u32 const &width,
-                        u32 const &height);
+// void outputJoystickData(Joystick const &joystick, Text &text, u32 const
+// &width,
+//                         u32 const &height);
 void testCompute();
 
 class TestApp {
@@ -70,9 +73,9 @@ private:
   ShaderStorageBuffer mSSBO;
 
 public:
-  void sizeCallback(Window *window, int const &width, int const &height);
-  void keyCallback(Window *window, Key const &key);
-  void charCallback(Window *window, u32 const &codepoint);
+  // void sizeCallback(Window *window, int const &width, int const &height);
+  // void keyCallback(Window *window, Key const &key);
+  // void charCallback(Window *window, u32 const &codepoint);
 
 public:
   TestApp();

@@ -26,6 +26,6 @@ public:
   void tick(float fps);
 
 public:
-  static double getCurrentRuntime() { return glfwGetTime(); }
+  static double getCurrentRuntime() { return SDL_GetTicks() / 1000.0f; }
 };
 } // namespace Terreate

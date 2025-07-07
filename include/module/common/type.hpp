@@ -11,11 +11,10 @@
 #include <unordered_set>
 #include <vector>
 
-#define GLAD_H <glad/gl.h>
-#define GLFW_H <GLFW/glfw3.h>
+#include <glad/gl.h>
 
-#include GLAD_H
-#include GLFW_H
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl.h>
 
 #ifndef UNICODE_HALF_SPACE
 #define UNICODE_HALF_SPACE 32
@@ -50,6 +49,10 @@ typedef std::wstring wstr;
 typedef std::stringstream stream;
 typedef std::ifstream ifstream;
 typedef std::ofstream ofstream;
+
+// SDL types
+typedef SDL_GUID GUID;
+typedef SDL_AudioSpec AudioSpec;
 
 // OpenGL types
 typedef u32 GLObject;
