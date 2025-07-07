@@ -9,6 +9,11 @@ public:
   SDLModuleError(str const &message) : TerreateException(message) {}
 };
 
+class AudioError : public SDLModuleError {
+public:
+  AudioError(str const &message) : SDLModuleError(message) {}
+};
+
 class GamepadError : public SDLModuleError {
 public:
   GamepadError(str const &message) : SDLModuleError(message) {}

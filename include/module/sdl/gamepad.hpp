@@ -20,6 +20,7 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(Gamepad);
 
 private:
+  SDL_JoystickID mGamepadID;
   SDL_Gamepad *mGamepad = nullptr;
 
 public:
@@ -27,10 +28,8 @@ public:
   Gamepad(Joystick const &joystick);
   ~Gamepad();
 
-  GUID getGUID() const {
-    return SDL_GetGamepadGUIDForID(SDL_GetGamepadID(mGamepad));
-  }
-  SDL_JoystickID getID() const { return SDL_GetGamepadID(mGamepad); }
+  GUID getGUID() const { return SDL_GetGamepadGUIDForID(mGamepadID); }
+  SDL_JoystickID getID() const { return mGamepadID; }
   str getName() const {
     return SDL_GetGamepadName(mGamepad) ? SDL_GetGamepadName(mGamepad) : "";
   }

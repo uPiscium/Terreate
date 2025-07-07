@@ -1,10 +1,13 @@
 #pragma once
 
-#include "sdl/cursor.hpp"
+#include "sdl/audio.hpp"
+#include "sdl/event.hpp"
 #include "sdl/exception.hpp"
 #include "sdl/gamepad.hpp"
 #include "sdl/icon.hpp"
+#include "sdl/joystick.hpp"
 #include "sdl/mouse.hpp"
+#include "sdl/registry.hpp"
 #include "sdl/window.hpp"
 #include "sdl/winhelper.hpp"
 

@@ -11,13 +11,14 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(Joystick);
 
 private:
+  SDL_JoystickID mJoystickID = 0;
   SDL_Joystick *mJoystick = nullptr;
 
 public:
   Joystick(u32 const &index);
   ~Joystick();
 
-  u32 getID() const { return SDL_GetJoystickID(mJoystick); }
+  u32 getID() const { return mJoystickID; }
   str getName() const {
     return SDL_GetJoystickName(mJoystick) ? SDL_GetJoystickName(mJoystick) : "";
   }
@@ -44,7 +45,7 @@ public:
   bool isButtonPressed(i32 const &button) const {
     return SDL_GetJoystickButton(mJoystick, button);
   }
-  bool isGamepad() const { return SDL_IsGamepad(SDL_GetJoystickID(mJoystick)); }
+  bool isGamepad() const { return SDL_IsGamepad(mJoystickID); }
   bool isConnected() const { return SDL_JoystickConnected(mJoystick); }
 
 public:

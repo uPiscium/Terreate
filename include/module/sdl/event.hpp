@@ -53,7 +53,7 @@ public:
 
 public:
   Key(SDL_KeyboardEvent const &event)
-      : key(static_cast<Keyboard>(event.key)), scancode(event.scancode),
+      : key(static_cast<Keyboard>(event.scancode)), scancode(event.scancode),
         pressed(event.down), repeat(event.repeat), mods(event.mod) {}
 };
 

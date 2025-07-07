@@ -10,7 +10,7 @@ endif()
 
 add_library(
   ${PROJECT_NAME} STATIC
-  cursor.cpp
+  audio.cpp
   event.cpp
   gamepad.cpp
   joystick.cpp

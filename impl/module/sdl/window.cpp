@@ -2,7 +2,9 @@
 #include "../../../include/module/sdl/window.hpp"
 
 namespace Terreate::SDL {
-Window::Window(u32 const &width, u32 const &height, str const &title) {
+Window::Window(u32 const &width, u32 const &height, str const &title,
+               shared<Mouse> mouse)
+    : mMouse(mouse) {
   mWindow = SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_OPENGL);
   mContext = SDL_GL_CreateContext(mWindow);
   if (!mWindow || !mContext) {
@@ -12,7 +14,30 @@ Window::Window(u32 const &width, u32 const &height, str const &title) {
   SDL_GL_MakeCurrent(mWindow, mContext);
 
   mProperty.setWindow(mWindow);
-  mMouse.setWindow(mWindow);
+}
+
+pair<vec2> Window::getMouseRect() const {
+  if (!mWindow) {
+    throw Exception::WindowError("Window is not available.");
+  }
+  SDL_Rect const *rect = SDL_GetWindowMouseRect(mWindow);
+  if (!rect) {
+    return {{0, 0}, {0, 0}};
+  }
+  if (rect->w <= 0 || rect->h <= 0) {
+    return {{0, 0}, {0, 0}};
+  }
+  return {{(float)rect->x, (float)rect->y}, {(float)rect->w, (float)rect->h}};
+}
+
+void Window::setMouseRect(pair<vec2> const &rect) const {
+  if (!mWindow) {
+    throw Exception::WindowError("Window is not available.");
+  }
+  SDL_Rect sdlRect = {
+      static_cast<i32>(rect.first.x), static_cast<i32>(rect.first.y),
+      static_cast<i32>(rect.second.x), static_cast<i32>(rect.second.y)};
+  SDL_SetWindowMouseRect(mWindow, &sdlRect);
 }
 
 bool Window::isFullScreen() const {

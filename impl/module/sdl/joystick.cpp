@@ -3,6 +3,7 @@
 
 namespace Terreate::SDL {
 Joystick::Joystick(u32 const &index) {
+  mJoystickID = index;
   mJoystick = SDL_OpenJoystick(index);
   if (!mJoystick) {
     throw Exception::SDLModuleError("Failed to open joystick: " +

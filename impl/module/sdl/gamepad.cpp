@@ -3,6 +3,7 @@
 
 namespace Terreate::SDL {
 Gamepad::Gamepad(u32 const &index) {
+  mGamepadID = index;
   mGamepad = SDL_OpenGamepad(index);
   if (!mGamepad) {
     throw Exception::GamepadError("Failed to open gamepad: " +

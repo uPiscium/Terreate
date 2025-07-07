@@ -3,7 +3,6 @@
 #include "../common/enum.hpp"
 #include "../common/type.hpp"
 
-#include "cursor.hpp"
 #include "icon.hpp"
 #include "mouse.hpp"
 #include "winhelper.hpp"
@@ -17,25 +16,26 @@ private:
   SDL_Window *mWindow = nullptr;
   SDL_GLContext mContext = nullptr;
   WindowProperty mProperty;
-  Mouse mMouse;
+  shared<Mouse> mMouse;
 
 public:
-  Window(u32 const &width, u32 const &height, str const &title);
+  Window(u32 const &width, u32 const &height, str const &title,
+         shared<Mouse> mouse);
   ~Window() { this->destroy(); }
 
   SDL_WindowID getId() const { return SDL_GetWindowID(mWindow); }
   WindowProperty const &getProperty() const { return mProperty; }
   WindowProperty &getProperty() { return mProperty; }
-  Mouse const &getMouse() const { return mMouse; }
-  Mouse &getMouse() { return mMouse; }
+  shared<Mouse> const &getMouse() const { return mMouse; }
+  shared<Mouse> &getMouse() { return mMouse; }
+  pair<vec2> getMouseRect() const;
 
   void setCurrentContext() const { SDL_GL_MakeCurrent(mWindow, mContext); }
   void setIcon(Icon const &icon) {
     SDL_SetWindowIcon(mWindow, (SDL_Surface *)icon);
   }
-  void setCursor(Cursor const &cursor) { SDL_SetCursor((SDL_Cursor *)cursor); }
-  void setCursor(SystemCursor const &cursor) {
-    SDL_SetCursor((SDL_Cursor *)cursor);
+  void setCursorPosition(float const &x, float const &y) {
+    SDL_WarpMouseInWindow(mWindow, x, y);
   }
   void setViewPort(u32 const &x0, u32 const &y0, u32 const &width,
                    u32 const &height) {
@@ -57,6 +57,13 @@ public:
   void setFloating(bool const &floating) const {
     SDL_SetWindowAlwaysOnTop(mWindow, floating);
   }
+  void setMouseGrab(bool const &grab) const {
+    SDL_SetWindowMouseGrab(mWindow, grab);
+  }
+  void setRelativeMouseMode(bool const &relative) const {
+    SDL_SetWindowRelativeMouseMode(mWindow, relative);
+  }
+  void setMouseRect(pair<vec2> const &rect) const;
 
   bool isClosed() const { return mWindow == nullptr; }
   bool isFullScreen() const;
@@ -69,6 +76,10 @@ public:
   bool isDecorated() const;
   bool isResizable() const;
   bool isFloating() const;
+  bool isGrabbingMouse() const { return SDL_GetWindowMouseGrab(mWindow); }
+  bool isRelativeMouseMode() const {
+    return SDL_GetWindowRelativeMouseMode(mWindow);
+  }
 
   void enableVsync() const {
     SDL_SetWindowSurfaceVSync(mWindow, SDL_WINDOW_SURFACE_VSYNC_ADAPTIVE);
