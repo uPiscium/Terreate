@@ -4,33 +4,33 @@
 #include <cstring>
 
 namespace Terreate::SDL {
-void RawImage::allocate() {
+void SDLImage::allocate() {
   u8 pixelSize = SDL_BITSPERPIXEL((SDL_PixelFormat)mFormat);
   mPixelArray.resize(mSize.first * mSize.second * pixelSize);
 }
 
-RawImage::RawImage(PixelFormat const &format, pair<u32> const &size, u32 pitch,
+SDLImage::SDLImage(PixelFormat const &format, pair<u32> const &size, u32 pitch,
                    void *pixels)
     : mFormat(format), mSize(size), mPitch(pitch) {
   this->allocate();
   this->loadData(pixels, size, format);
 }
 
-void RawImage::setFormat(PixelFormat const &format) {
+void SDLImage::setFormat(PixelFormat const &format) {
   if (mFormat != format) {
     mFormat = format;
     this->allocate();
   }
 }
 
-void RawImage::setSize(pair<u32> const &size) {
+void SDLImage::setSize(pair<u32> const &size) {
   if (mSize != size) {
     mSize = size;
     this->allocate();
   }
 }
 
-void RawImage::allocate(PixelFormat const &format, pair<u32> const &size) {
+void SDLImage::allocate(PixelFormat const &format, pair<u32> const &size) {
   if (mFormat != format || mSize != size) {
     mFormat = format;
     mSize = size;
@@ -38,7 +38,7 @@ void RawImage::allocate(PixelFormat const &format, pair<u32> const &size) {
   }
 }
 
-void RawImage::loadData(void *pixels, pair<u32> const &size,
+void SDLImage::loadData(void *pixels, pair<u32> const &size,
                         PixelFormat const &format) {
   if (mFormat != format || mSize != size) {
     this->allocate(format, size);

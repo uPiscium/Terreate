@@ -4,7 +4,7 @@
 #include "../common/type.hpp"
 
 namespace Terreate::SDL {
-class RawImage {
+class SDLImage {
 private:
   PixelFormat mFormat = PixelFormat::UNKNOWN;
   pair<u32> mSize = {0, 0};
@@ -15,12 +15,12 @@ private:
   void allocate();
 
 public:
-  RawImage() = default;
-  RawImage(PixelFormat const &format) : mFormat(format) {}
-  RawImage(PixelFormat const &format, pair<u32> const &size) : mFormat(format) {
+  SDLImage() = default;
+  SDLImage(PixelFormat const &format) : mFormat(format) {}
+  SDLImage(PixelFormat const &format, pair<u32> const &size) : mFormat(format) {
     this->allocate();
   }
-  RawImage(PixelFormat const &format, pair<u32> const &size, u32 pitch,
+  SDLImage(PixelFormat const &format, pair<u32> const &size, u32 pitch,
            void *pixels);
 
   pair<u32> const &getSize() const { return mSize; }

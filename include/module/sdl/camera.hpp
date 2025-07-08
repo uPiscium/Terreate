@@ -9,7 +9,7 @@ namespace Terreate::SDL {
 struct CameraFrame {
 public:
   u64 timestamp = 0;
-  RawImage image;
+  SDLImage image;
 };
 
 class Camera {
