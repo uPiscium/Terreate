@@ -10,7 +10,6 @@ private:
   float mSamplingTime = 0.0f;
   u32 mNumSamples = 0u;
   u32 mSampleCount = 0u;
-  float mTickTime = 0.0f;
   float mFPS = 0.0f;
   float mSPF = 0.0f;
 
@@ -18,16 +17,15 @@ private:
   bool isElapsed(float const &time);
 
 public:
-  Clock(float const &fps = 60, u32 const &samples = 10)
-      : mTickTime(1.0f / fps), mNumSamples(samples) {}
+  Clock(u32 const &samples = 10) : mNumSamples(samples) {}
   ~Clock() {}
 
   float getFPS() const { return mFPS; }
   float getSPF() const { return mSPF; }
 
-  void tick();
+  void tick(float fps);
 
 public:
-  static double getCurrentRuntime() { return glfwGetTime(); }
+  static double getCurrentRuntime() { return SDL_GetTicks() / 1000.0f; }
 };
 } // namespace Terreate

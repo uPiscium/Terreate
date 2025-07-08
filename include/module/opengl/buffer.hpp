@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../common/enum.hpp"
-#include "../common/exception.hpp"
 #include "../common/type.hpp"
 
 #include "compute.hpp"
+#include "exception.hpp"
 #include "shader.hpp"
 
 namespace Terreate::OpenGL {

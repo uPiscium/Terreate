@@ -1,4 +1,4 @@
-project(TerreateCommonComponent)
+project(TerreateCommonModule)
 message(STATUS "Configuring ${PROJECT_NAME}...")
 
 if(TERREATE_DEBUG_BUILD)

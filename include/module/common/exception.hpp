@@ -21,103 +21,52 @@ public:
   ResourceException(str const &message) noexcept : TerreateException(message) {}
 };
 
-class CoreException : public TerreateException {
+class CommonModuleError : public TerreateException {
 public:
-  CoreException(str const &message) noexcept : TerreateException(message) {}
+  CommonModuleError(str const &message) noexcept : TerreateException(message) {}
 };
 
-class ExecutorError : public CoreException {
+class ExecutorError : public CommonModuleError {
 public:
-  ExecutorError(str const &message) noexcept : CoreException(message) {}
+  ExecutorError(str const &message) noexcept : CommonModuleError(message) {}
 };
 
-class TaskError : public CoreException {
+class TaskError : public CommonModuleError {
 public:
-  TaskError(str const &message) noexcept : CoreException(message) {}
+  TaskError(str const &message) noexcept : CommonModuleError(message) {}
 };
 
-class NullReferenceException : public CoreException {
+class NullReferenceException : public CommonModuleError {
 public:
   NullReferenceException(str const &message) noexcept
-      : CoreException(message) {}
+      : CommonModuleError(message) {}
 };
 
-class NullObjectException : public CoreException {
+class NullObjectException : public CommonModuleError {
 public:
-  NullObjectException() : CoreException("Null object") {}
+  NullObjectException() : CommonModuleError("Null object") {}
 };
 
-class NotImplementedException : public CoreException {
+class NotImplementedException : public CommonModuleError {
 public:
-  NotImplementedException() noexcept : CoreException("Not implemented") {}
+  NotImplementedException() noexcept : CommonModuleError("Not implemented") {}
   NotImplementedException(str const &message) noexcept
-      : CoreException(message) {}
+      : CommonModuleError(message) {}
 };
 
-class AudioException : public TerreateException {
-public:
-  AudioException(str const &message) noexcept : TerreateException(message) {}
-};
+// class AudioException : public TerreateException {
+// public:
+//   AudioException(str const &message) noexcept : TerreateException(message) {}
+// };
 
-class OpenALException : public AudioException {
-public:
-  OpenALException(str const &message) noexcept : AudioException(message) {}
-};
+// class OpenALException : public AudioException {
+// public:
+//   OpenALException(str const &message) noexcept : AudioException(message) {}
+// };
 
-class SourceError : public AudioException {
-public:
-  SourceError(str const &message) noexcept : AudioException(message) {}
-};
+// class SourceError : public AudioException {
+// public:
+//   SourceError(str const &message) noexcept : AudioException(message) {}
+// };
 
-class GraphicsException : public TerreateException {
-private:
-  str mMessage;
-
-public:
-  GraphicsException(str const &message) : TerreateException(message) {}
-
-  virtual const char *what() const noexcept override {
-    return mMessage.c_str();
-  }
-};
-
-class BufferError : public GraphicsException {
-public:
-  BufferError(str const &message) : GraphicsException(message) {}
-};
-
-class FontError : public GraphicsException {
-public:
-  FontError(str const &message) : GraphicsException(message) {}
-};
-
-class JobError : public GraphicsException {
-public:
-  JobError(str const &message) : GraphicsException(message) {}
-};
-
-class ScreenError : public GraphicsException {
-public:
-  ScreenError(str const &message) : GraphicsException(message) {}
-};
-
-class ShaderError : public GraphicsException {
-public:
-  ShaderError(str const &message) : GraphicsException(message) {}
-};
-
-class TextError : public GraphicsException {
-public:
-  TextError(str const &message) : GraphicsException(message) {}
-};
-
-class TextureError : public GraphicsException {
-public:
-  TextureError(str const &message) : GraphicsException(message) {}
-};
-
-class WindowError : public GraphicsException {
-public:
-  WindowError(str const &message) : GraphicsException(message) {}
-};
 } // namespace Terreate::Exception
