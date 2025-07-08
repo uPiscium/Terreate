@@ -13,17 +13,16 @@ add_library(
   buffer.cpp
   compute.cpp
   converter.cpp
-  font.cpp
+  # font.cpp
   gl.cpp
   screen.cpp
   shader.cpp
-  text.cpp
+  # text.cpp
   texture.cpp
 )
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC
   TerreateCommonModule
-  freetype
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ../../../include)
 target_include_directories(${PROJECT_NAME} PUBLIC ../../../deps)

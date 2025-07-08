@@ -161,186 +161,187 @@ namespace Terreate::Test {
 //   mText.loadText(mTextString);
 // }
 
-TestApp::TestApp() : mScreen(1000, 1000, 4) {
-  mFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 128);
-  mInfoFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 32);
+// TestApp::TestApp() : mScreen(1000, 1000, 4) {
+//   mFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 128);
+//   mInfoFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 32);
 
-  mText.loadFont(mFont.get());
-  mText.loadShader("resources/shaders/textVert.glsl",
-                   "resources/shaders/textFrag.glsl");
+//   mText.loadFont(mFont.get());
+//   mText.loadShader("resources/shaders/textVert.glsl",
+//                    "resources/shaders/textFrag.glsl");
 
-  mInfoText.loadFont(mInfoFont.get());
-  mInfoText.loadShader("resources/shaders/textVert.glsl",
-                       "resources/shaders/textFrag.glsl");
+//   mInfoText.loadFont(mInfoFont.get());
+//   mInfoText.loadShader("resources/shaders/textVert.glsl",
+//                        "resources/shaders/textFrag.glsl");
 
-  mShader.addVertexShaderSource(
-      Shader::loadShaderSource("resources/shaders/mainVert.glsl"));
-  mShader.addFragmentShaderSource(
-      Shader::loadShaderSource("resources/shaders/mainFrag.glsl"));
-  mShader.compile();
-  mShader.link();
+//   mShader.addVertexShaderSource(
+//       Shader::loadShaderSource("resources/shaders/mainVert.glsl"));
+//   mShader.addFragmentShaderSource(
+//       Shader::loadShaderSource("resources/shaders/mainFrag.glsl"));
+//   mShader.compile();
+//   mShader.link();
 
-  mScreenShader.addVertexShaderSource(
-      Shader::loadShaderSource("resources/shaders/screenVert.glsl"));
-  mScreenShader.addFragmentShaderSource(
-      Shader::loadShaderSource("resources/shaders/screenFrag.glsl"));
-  mScreenShader.compile();
-  mScreenShader.link();
+//   mScreenShader.addVertexShaderSource(
+//       Shader::loadShaderSource("resources/shaders/screenVert.glsl"));
+//   mScreenShader.addFragmentShaderSource(
+//       Shader::loadShaderSource("resources/shaders/screenFrag.glsl"));
+//   mScreenShader.compile();
+//   mScreenShader.link();
 
-  umap<str, u32> attrs = {{"iPosition", 0}, {"iUV", 1}, {"iColor", 2}};
-  BufferDataConstructor bdc;
+//   umap<str, u32> attrs = {{"iPosition", 0}, {"iUV", 1}, {"iColor", 2}};
+//   BufferDataConstructor bdc;
 
-  bdc.AddVertexComponent("iPosition", {{-600.0f, -600.0f, 600.0f},
-                                       {600.0f, -600.0f, 600.0f},
-                                       {600.0f, -600.0f, -600.0f},
-                                       {-600.0f, -600.0f, -600.0f},
-                                       {-600.0f, 600.0f, 600.0f},
-                                       {600.0f, 600.0f, 600.0f},
-                                       {600.0f, 600.0f, -600.0f},
-                                       {-600.0f, 600.0f, -600.0f}});
-  bdc.AddVertexComponent(
-      "iUV", {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
-  bdc.SetVertexIndices({
-      {0, 0}, {1, 1}, {5, 2}, {4, 3}, {1, 0}, {2, 1}, {6, 2}, {5, 3},
-      {2, 0}, {3, 1}, {7, 2}, {6, 3}, {3, 0}, {0, 1}, {4, 2}, {7, 3},
-      {3, 0}, {2, 1}, {1, 2}, {0, 3}, {4, 0}, {5, 1}, {6, 2}, {7, 3},
-  });
-  bdc.Construct();
-  mBuffer.loadData(bdc, attrs);
+//   bdc.AddVertexComponent("iPosition", {{-600.0f, -600.0f, 600.0f},
+//                                        {600.0f, -600.0f, 600.0f},
+//                                        {600.0f, -600.0f, -600.0f},
+//                                        {-600.0f, -600.0f, -600.0f},
+//                                        {-600.0f, 600.0f, 600.0f},
+//                                        {600.0f, 600.0f, 600.0f},
+//                                        {600.0f, 600.0f, -600.0f},
+//                                        {-600.0f, 600.0f, -600.0f}});
+//   bdc.AddVertexComponent(
+//       "iUV", {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
+//   bdc.SetVertexIndices({
+//       {0, 0}, {1, 1}, {5, 2}, {4, 3}, {1, 0}, {2, 1}, {6, 2}, {5, 3},
+//       {2, 0}, {3, 1}, {7, 2}, {6, 3}, {3, 0}, {0, 1}, {4, 2}, {7, 3},
+//       {3, 0}, {2, 1}, {1, 2}, {0, 3}, {4, 0}, {5, 1}, {6, 2}, {7, 3},
+//   });
+//   bdc.Construct();
+//   mBuffer.loadData(bdc, attrs);
 
-  BufferDataConstructor screenBDC;
-  screenBDC.AddVertexComponent("iPosition", {{-0.8f, -0.8f, 0.2f},
-                                             {0.8f, -0.8f, 0.2f},
-                                             {0.8f, 0.8f, 0.2f},
-                                             {-0.8f, 0.8f, 0.2f}});
-  screenBDC.AddVertexComponent(
-      "iUV", {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
-  screenBDC.SetVertexIndices({{0, 0}, {1, 1}, {2, 2}, {3, 3}});
-  screenBDC.Construct();
-  mScreenBuffer.loadData(screenBDC, attrs);
+//   BufferDataConstructor screenBDC;
+//   screenBDC.AddVertexComponent("iPosition", {{-0.8f, -0.8f, 0.2f},
+//                                              {0.8f, -0.8f, 0.2f},
+//                                              {0.8f, 0.8f, 0.2f},
+//                                              {-0.8f, 0.8f, 0.2f}});
+//   screenBDC.AddVertexComponent(
+//       "iUV", {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
+//   screenBDC.SetVertexIndices({{0, 0}, {1, 1}, {2, 2}, {3, 3}});
+//   screenBDC.Construct();
+//   mScreenBuffer.loadData(screenBDC, attrs);
 
-  mColorDataConstructor.AddVertexComponent("iColor", {{1, 0, 0}});
-  mColorDataConstructor.SetVertexIndices(
-      {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-       {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}});
-  mColorDataConstructor.Construct();
-  mBuffer.loadData(mColorDataConstructor, attrs);
+//   mColorDataConstructor.AddVertexComponent("iColor", {{1, 0, 0}});
+//   mColorDataConstructor.SetVertexIndices(
+//       {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+//        {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}});
+//   mColorDataConstructor.Construct();
+//   mBuffer.loadData(mColorDataConstructor, attrs);
 
-  mBuffer.loadIndices({{0, 1, 2, 2, 3, 0},
-                       {4, 5, 6, 6, 7, 4},
-                       {8, 9, 10, 10, 11, 8},
-                       {12, 13, 14, 14, 15, 12},
-                       {16, 17, 18, 18, 19, 16},
-                       {20, 21, 22, 22, 23, 20}});
-  mScreenBuffer.loadIndices({0, 1, 2, 2, 3, 0});
+//   mBuffer.loadIndices({{0, 1, 2, 2, 3, 0},
+//                        {4, 5, 6, 6, 7, 4},
+//                        {8, 9, 10, 10, 11, 8},
+//                        {12, 13, 14, 14, 15, 12},
+//                        {16, 17, 18, 18, 19, 16},
+//                        {20, 21, 22, 22, 23, 20}});
+//   mScreenBuffer.loadIndices({0, 1, 2, 2, 3, 0});
 
-  mat4 view = lookAt(vec3(0, 0, 2), vec3(0, 0, 0), vec3(0, 1, 0));
-  mat4 proj = perspective(45.0f, 1.0f, mNear, mFar);
-  mUniform.view = view;
-  mScreenUniform.view = identity<mat4>();
-  mUniform.proj = proj;
-  mScreenUniform.proj = identity<mat4>();
-  mUniform.model = identity<mat4>();
-  mScreenUniform.model = identity<mat4>();
-  mUBO.loadData(mUniform);
-  mScreenUBO.loadData(mScreenUniform);
-  mUBO.bind(mShader, "Matrices");
-  mScreenUBO.bind(mScreenShader, "Matrices");
+//   mat4 view = lookAt(vec3(0, 0, 2), vec3(0, 0, 0), vec3(0, 1, 0));
+//   mat4 proj = perspective(45.0f, 1.0f, mNear, mFar);
+//   mUniform.view = view;
+//   mScreenUniform.view = identity<mat4>();
+//   mUniform.proj = proj;
+//   mScreenUniform.proj = identity<mat4>();
+//   mUniform.model = identity<mat4>();
+//   mScreenUniform.model = identity<mat4>();
+//   mUBO.loadData(mUniform);
+//   mScreenUBO.loadData(mScreenUniform);
+//   mUBO.bind(mShader, "Matrices");
+//   mScreenUBO.bind(mScreenShader, "Matrices");
 
-  mSettings = {{1.0f, 1.0f, 1.0f, 0.5f}};
-  mSSBO.loadData(mSettings);
-  mSSBO.bind(mShader, "Settings");
+//   mSettings = {{1.0f, 1.0f, 1.0f, 0.5f}};
+//   mSSBO.loadData(mSettings);
+//   mSSBO.bind(mShader, "Settings");
 
-  // Uncomment if you want to break your brain...
-  /* mShader.UseDepth(false); */
+//   // Uncomment if you want to break your brain...
+//   /* mShader.UseDepth(false); */
 
-  mShader.bind();
-  mShader.setUniform("uTexture", 0);
-  Shader::activateTexture(TextureTargets::TEX_0);
+//   mShader.bind();
+//   mShader.setUniform("uTexture", 0);
+//   Shader::activateTexture(TextureTargets::TEX_0);
 
-  mScreenShader.bind();
-  mScreenShader.setUniform("uTexture", 0);
-  Shader::activateTexture(TextureTargets::TEX_0);
+//   mScreenShader.bind();
+//   mScreenShader.setUniform("uTexture", 0);
+//   Shader::activateTexture(TextureTargets::TEX_0);
 
-  mTexture2 = std::make_unique<Texture>(800, 800, 2);
-  ImageConverter converter;
-  i32 width = 0, height = 0, channels = 0;
-  stbi_set_flip_vertically_on_load(true);
-  ubyte *pixels =
-      stbi_load("resources/testImage2.png", &width, &height, &channels, 4);
-  converter.convert("testImage2", 1, width, height, channels, pixels,
-                    *mTexture2);
-  stbi_image_free(pixels);
-}
+//   mTexture2 = std::make_unique<Texture>(800, 800, 2);
+//   ImageConverter converter;
+//   i32 width = 0, height = 0, channels = 0;
+//   stbi_set_flip_vertically_on_load(true);
+//   ubyte *pixels =
+//       stbi_load("resources/testImage2.png", &width, &height, &channels, 4);
+//   converter.convert("testImage2", 1, width, height, channels, pixels,
+//                     *mTexture2);
+//   stbi_image_free(pixels);
+// }
 
-void TestApp::frame(Window *window) {
-  // window->pollEvents();
-  window->fill(0.2, 0.2, 0.2);
-  window->clear();
+// void TestApp::frame(Window *window) {
+//   // window->pollEvents();
+//   window->fill(0.2, 0.2, 0.2);
+//   window->clear();
 
-  /* auto state = */
-  /*     Joystick::GetJoystick(JoystickID::JOYSTICK1).GetAxisState(); */
-  /* float angleX = state.leftStick[0]; */
-  /* float angleY = state.leftStick[1]; */
-  /* mat4 model = rotate(identity<mat4>(), angleX, vec3(0, 1, 0)); */
-  /* model = rotate(model, angleY, vec3(1, 0, 0)); */
-  float angle = mClock.getCurrentRuntime();
-  mat4 model = rotate(identity<mat4>(), angle, vec3(1, 1, 1));
-  mUniform.model = model;
-  mScreenUniform.model = model;
-  mUBO.reloadData(mUniform);
-  mScreenUBO.reloadData(mScreenUniform);
+//   /* auto state = */
+//   /*     Joystick::GetJoystick(JoystickID::JOYSTICK1).GetAxisState(); */
+//   /* float angleX = state.leftStick[0]; */
+//   /* float angleY = state.leftStick[1]; */
+//   /* mat4 model = rotate(identity<mat4>(), angleX, vec3(0, 1, 0)); */
+//   /* model = rotate(model, angleY, vec3(1, 0, 0)); */
+//   float angle = mClock.getCurrentRuntime();
+//   mat4 model = rotate(identity<mat4>(), angle, vec3(1, 1, 1));
+//   mUniform.model = model;
+//   mScreenUniform.model = model;
+//   mUBO.reloadData(mUniform);
+//   mScreenUBO.reloadData(mScreenUniform);
 
-  Texture *texture = mScreen.getTexture();
+//   Texture *texture = mScreen.getTexture();
 
-  mScreen.fill({0, 0, 0});
-  mScreen.clear();
-  mScreen.bind();
-  mScreenShader.bind();
-  /* mInfoFont.Use(); */
-  mTexture2->bind();
-  mScreenBuffer.draw(DrawMode::TRIANGLES);
-  mTexture2->unbind();
-  /* mInfoFont.Unuse(); */
-  mScreenShader.unbind();
-  mText.loadText(wstr(L"Cube"));
-  auto size = mFont->getTextSize(wstr(L"Cube"));
-  mText.render(500 - size.first / 2.0, 500 - size.second / 2.0,
-               mScreen.getWidth(), mScreen.getHeight());
-  mScreen.unbind();
+//   mScreen.fill({0, 0, 0});
+//   mScreen.clear();
+//   mScreen.bind();
+//   mScreenShader.bind();
+//   /* mInfoFont.Use(); */
+//   mTexture2->bind();
+//   mScreenBuffer.draw(DrawMode::TRIANGLES);
+//   mTexture2->unbind();
+//   /* mInfoFont.Unuse(); */
+//   mScreenShader.unbind();
+//   mText.loadText(wstr(L"Cube"));
+//   auto size = mFont->getTextSize(wstr(L"Cube"));
+//   mText.render(500 - size.first / 2.0, 500 - size.second / 2.0,
+//                mScreen.getWidth(), mScreen.getHeight());
+//   mScreen.unbind();
 
-  mSettings = {
-      {(std::sin(angle) + 1) / 2.0, (std::cos(angle) + 1) / 2.0, 1.0f, 0.5f}};
-  mSSBO.reloadData(mSettings);
+//   mSettings = {
+//       {(std::sin(angle) + 1) / 2.0, (std::cos(angle) + 1) / 2.0, 1.0f,
+//       0.5f}};
+//   mSSBO.reloadData(mSettings);
 
-  window->bind();
-  mShader.bind();
-  texture->bind();
-  mBuffer.draw(DrawMode::TRIANGLES);
-  texture->unbind();
-  mShader.unbind();
+//   window->bind();
+//   mShader.bind();
+//   texture->bind();
+//   mBuffer.draw(DrawMode::TRIANGLES);
+//   texture->unbind();
+//   mShader.unbind();
 
-  mText = mTextString;
-  mText.render(0, 0, mWidth, mHeight);
+//   mText = mTextString;
+//   mText.render(0, 0, mWidth, mHeight);
 
-  /* AttributeData color = mBuffer["iColor"]; */
-  /* float r = (state.leftTrigger + 1) / 2; */
-  /* float g = (state.rightTrigger + 1) / 2; */
-  /* mColorDataConstructor.ReloadVertexComponent("iColor", {{r, g, 1}}); */
-  /* mColorDataConstructor.Construct(); */
-  /* mBuffer.ReloadData(color, mColorDataConstructor); */
-  mText.setColor({1, 0, 0});
+//   /* AttributeData color = mBuffer["iColor"]; */
+//   /* float r = (state.leftTrigger + 1) / 2; */
+//   /* float g = (state.rightTrigger + 1) / 2; */
+//   /* mColorDataConstructor.ReloadVertexComponent("iColor", {{r, g, 1}}); */
+//   /* mColorDataConstructor.Construct(); */
+//   /* mBuffer.ReloadData(color, mColorDataConstructor); */
+//   mText.setColor({1, 0, 0});
 
-  mInfoText = L"FPS: " + std::to_wstring(mClock.getFPS());
-  mInfoText.render(0, 180, mWidth, mHeight);
+//   mInfoText = L"FPS: " + std::to_wstring(mClock.getFPS());
+//   mInfoText.render(0, 180, mWidth, mHeight);
 
-  // Joystick const &joystick = Joystick::getJoystick(JoystickID::JOYSTICK1);
-  // outputJoystickData(joystick, mInfoText, mWidth, mHeight);
+//   // Joystick const &joystick = Joystick::getJoystick(JoystickID::JOYSTICK1);
+//   // outputJoystickData(joystick, mInfoText, mWidth, mHeight);
 
-  window->swap();
-  ++mDelflag;
-  mClock.tick(120);
-}
+//   window->swap();
+//   ++mDelflag;
+//   mClock.tick(120);
+// }
 
 void launchApp() {
   Core::Context ctx;
@@ -376,11 +377,11 @@ void launchApp() {
   //       window->close();
   //     });
   event->onMouseMotion.subscribe([](u64 timestamp, shared<Window> window,
-                                    SDL_MouseID which, vec2 const &pos,
+                                    shared<Mouse> mouse, vec2 const &pos,
                                     vec2 const &rel) {
-    std::cout << "Mouse motion: " << (u32)which << " at (" << pos.x << ", "
-              << pos.y << ") with relative movement (" << rel.x << ", " << rel.y
-              << ")" << std::endl;
+    std::cout << "Mouse motion: " << mouse->getName() << " at (" << pos.x
+              << ", " << pos.y << ") with relative movement (" << rel.x << ", "
+              << rel.y << ")" << std::endl;
   });
 
   event->onKey.subscribe([&window](u64 timestamp, Key const &key) {

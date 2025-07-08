@@ -103,14 +103,14 @@ typedef SDLEvent<SDL_KeyboardID> KeyboardRemoveEvent;
 typedef SDLEvent<shared<Window>, vec<str>, u32, TextCandidateOrientation>
     TextEditingCandidatesEvent;
 
-typedef SDLEvent<shared<Window>, SDL_MouseID, vec2, vec2> MouseMotionEvent;
-typedef SDLEvent<shared<Window>, SDL_MouseID, MouseButton, bool, u8, vec2>
+typedef SDLEvent<shared<Window>, shared<Mouse>, vec2, vec2> MouseMotionEvent;
+typedef SDLEvent<shared<Window>, shared<Mouse>, MouseButton, bool, u8, vec2>
     MouseButtonEvent;
-typedef SDLEvent<shared<Window>, SDL_MouseID, MouseWheelDirection, vec2, vec2,
+typedef SDLEvent<shared<Window>, shared<Mouse>, MouseWheelDirection, vec2, vec2,
                  pair<u32>>
     MouseWheelEvent;
-typedef SDLEvent<SDL_MouseID> MouseAddEvent;
-typedef SDLEvent<SDL_MouseID> MouseRemoveEvent;
+typedef SDLEvent<shared<Mouse>> MouseAddEvent;
+typedef SDLEvent<shared<Mouse>> MouseRemoveEvent;
 
 typedef SDLEvent<shared<Joystick>, u8, i16> JoystickAxisEvent;
 typedef SDLEvent<shared<Joystick>, u8, pair<i16>> JoystickBallEvent;
@@ -138,9 +138,9 @@ typedef SDLEvent<bool, vec<str>> ClipboardEvent;
 
 typedef SDLEvent<shared<Window>, vec2, str, str> DropEvent;
 
-typedef SDLEvent<SDL_AudioDeviceID, bool> AudioDeviceAddEvent;
-typedef SDLEvent<SDL_AudioDeviceID, bool> AudioDeviceRemoveEvent;
-typedef SDLEvent<SDL_AudioDeviceID, bool, AudioFormat, i32, i32, i32>
+typedef SDLEvent<shared<AudioDevice>, bool> AudioDeviceAddEvent;
+typedef SDLEvent<shared<AudioDevice>, bool> AudioDeviceRemoveEvent;
+typedef SDLEvent<shared<AudioDevice>, bool, AudioFormat, i32, i32, i32>
     AudioDeviceFormatChangeEvent;
 
 typedef SDLEvent<SDL_SensorID, vec<float>> SensorEvent;

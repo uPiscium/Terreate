@@ -179,20 +179,41 @@ void EventHandler::handle(SDL_TextEditingCandidatesEvent const &event) {
 
 void EventHandler::handle(SDL_MouseMotionEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
-  this->onMouseMotion.publish(event.timestamp, window, event.which,
+  shared<Mouse> mouse;
+  if (mRegistry->hasMouse(event.which)) {
+    mouse = mRegistry->getMouse(event.which);
+  } else {
+    mouse = std::make_shared<Mouse>(event.which);
+    mRegistry->registerMouse(event.which, mouse);
+  }
+  this->onMouseMotion.publish(event.timestamp, window, mouse,
                               {event.x, event.y}, {event.xrel, event.yrel});
 }
 
 void EventHandler::handle(SDL_MouseButtonEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
-  this->onMouseButton.publish(event.timestamp, window, event.which,
+  shared<Mouse> mouse;
+  if (mRegistry->hasMouse(event.which)) {
+    mouse = mRegistry->getMouse(event.which);
+  } else {
+    mouse = std::make_shared<Mouse>(event.which);
+    mRegistry->registerMouse(event.which, mouse);
+  }
+  this->onMouseButton.publish(event.timestamp, window, mouse,
                               (MouseButton)event.button, event.down,
                               event.clicks, {event.x, event.y});
 }
 
 void EventHandler::handle(SDL_MouseWheelEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
-  this->onMouseWheel.publish(event.timestamp, window, event.which,
+  shared<Mouse> mouse;
+  if (mRegistry->hasMouse(event.which)) {
+    mouse = mRegistry->getMouse(event.which);
+  } else {
+    mouse = std::make_shared<Mouse>(event.which);
+    mRegistry->registerMouse(event.which, mouse);
+  }
+  this->onMouseWheel.publish(event.timestamp, window, mouse,
                              (MouseWheelDirection)event.direction,
                              {event.x, event.y}, {event.mouse_x, event.mouse_y},
                              {event.integer_x, event.integer_y});
@@ -201,10 +222,18 @@ void EventHandler::handle(SDL_MouseWheelEvent const &event) {
 void EventHandler::handle(SDL_MouseDeviceEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_MOUSE_ADDED:
-    this->onMouseAdd.publish(event.timestamp, event.which);
+    if (!mRegistry->hasMouse(event.which)) {
+      mRegistry->registerMouse(event.which,
+                               std::make_shared<Mouse>(event.which));
+    }
+    this->onMouseAdd.publish(event.timestamp, mRegistry->getMouse(event.which));
     break;
   case SDL_EVENT_MOUSE_REMOVED:
-    this->onMouseRemove.publish(event.timestamp, event.which);
+    this->onMouseRemove.publish(event.timestamp,
+                                mRegistry->getMouse(event.which));
+    if (mRegistry->hasMouse(event.which)) {
+      mRegistry->unregisterMouse(event.which);
+    }
     break;
   default:
     throw Exception::SDLModuleError(
@@ -239,19 +268,21 @@ void EventHandler::handle(SDL_JoyButtonEvent const &event) {
 }
 
 void EventHandler::handle(SDL_JoyDeviceEvent const &event) {
-  if (!mRegistry->hasJoystick(event.which)) {
-    shared<Joystick> joystick = std::make_shared<Joystick>(event.which);
-    mRegistry->registerJoystick(event.which, joystick);
-  }
   switch (event.type) {
   case SDL_EVENT_JOYSTICK_ADDED:
+    if (!mRegistry->hasJoystick(event.which)) {
+      mRegistry->registerJoystick(event.which,
+                                  std::make_shared<Joystick>(event.which));
+    }
     this->onJoystickAdd.publish(event.timestamp,
                                 mRegistry->getJoystick(event.which));
     break;
   case SDL_EVENT_JOYSTICK_REMOVED:
     this->onJoystickRemove.publish(event.timestamp,
                                    mRegistry->getJoystick(event.which));
-    mRegistry->unregisterJoystick(event.which);
+    if (mRegistry->hasJoystick(event.which)) {
+      mRegistry->unregisterJoystick(event.which);
+    }
     break;
   case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE:
     this->onJoystickUpdateComplete.publish(event.timestamp,
@@ -292,6 +323,10 @@ void EventHandler::handle(SDL_GamepadButtonEvent const &event) {
 void EventHandler::handle(SDL_GamepadDeviceEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_GAMEPAD_ADDED:
+    if (!mRegistry->hasGamepad(event.which)) {
+      mRegistry->registerGamepad(event.which,
+                                 std::make_shared<Gamepad>(event.which));
+    }
     this->onGamepadAdd.publish(event.timestamp,
                                mRegistry->getGamepad(event.which));
     break;
@@ -362,17 +397,27 @@ void EventHandler::handle(SDL_AudioDeviceEvent const &event) {
   SDL_GetAudioDeviceFormat(event.which, &spec, &sampleRate);
   switch (event.type) {
   case SDL_EVENT_AUDIO_DEVICE_ADDED:
-    this->onAudioDeviceAdd.publish(event.timestamp, event.which,
+    if (!mRegistry->hasAudioDevice(event.which)) {
+      mRegistry->registerAudioDevice(
+          event.which, std::make_shared<AudioDevice>(event.which));
+    }
+    this->onAudioDeviceAdd.publish(event.timestamp,
+                                   mRegistry->getAudioDevice(event.which),
                                    event.recording);
     break;
   case SDL_EVENT_AUDIO_DEVICE_REMOVED:
-    this->onAudioDeviceRemove.publish(event.timestamp, event.which,
+    this->onAudioDeviceRemove.publish(event.timestamp,
+                                      mRegistry->getAudioDevice(event.which),
                                       event.recording);
+    if (mRegistry->hasAudioDevice(event.which)) {
+      mRegistry->unregisterAudioDevice(event.which);
+    }
     break;
   case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED:
     this->onAudioDeviceFormatChange.publish(
-        event.timestamp, event.which, event.recording, (AudioFormat)spec.format,
-        spec.channels, spec.freq, sampleRate);
+        event.timestamp, mRegistry->getAudioDevice(event.which),
+        event.recording, (AudioFormat)spec.format, spec.channels, spec.freq,
+        sampleRate);
     break;
   default:
     throw Exception::SDLModuleError(
