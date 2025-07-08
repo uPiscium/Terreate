@@ -4,160 +4,162 @@
 #include <iostream>
 
 namespace Terreate::Test {
-void outputJoystickData(Joystick const &joystick, Text &text, u32 const &width,
-                        u32 const &height) {
-  JoystickAxisState axisState = joystick.getAxisState();
-  JoystickButtonState buttonState = joystick.getButtonState();
-  JoystickHatState hatState = joystick.getHatState();
+// void outputJoystickData(Joystick const &joystick, Text &text, u32 const
+// &width,
+//                         u32 const &height) {
+//   JoystickAxisState axisState = joystick.getAxisState();
+//   JoystickButtonState buttonState = joystick.getButtonState();
+//   JoystickHatState hatState = joystick.getHatState();
 
-  stream ss;
-  if (joystick.isGamepad()) {
-    ss << "Gamepad: " << (u32)joystick.getJoystickId();
-  } else {
-    ss << "Joystick: " << (u32)joystick.getJoystickId();
-  }
+//   stream ss;
+//   if (joystick.isGamepad()) {
+//     ss << "Gamepad: " << (u32)joystick.getJoystickId();
+//   } else {
+//     ss << "Joystick: " << (u32)joystick.getJoystickId();
+//   }
 
-  if (!joystick.isConnected()) {
-    ss << " Disconnected";
-    text.loadText(ss.str());
-    text.render(0, 1500, width, height);
-    return;
-  } else {
-    ss << " Connected";
-    text.loadText(ss.str());
-    text.render(0, 1500, width, height);
-  }
+//   if (!joystick.isConnected()) {
+//     ss << " Disconnected";
+//     text.loadText(ss.str());
+//     text.render(0, 1500, width, height);
+//     return;
+//   } else {
+//     ss << " Connected";
+//     text.loadText(ss.str());
+//     text.render(0, 1500, width, height);
+//   }
 
-  ss.str("");
-  ss << "Left Stick: (" << std::fixed << std::setprecision(3)
-     << axisState.leftStick[0] << ", " << axisState.leftStick[1] << ")";
-  ss << " / Right Stick: (" << std::fixed << std::setprecision(3)
-     << axisState.rightStick[0] << ", " << axisState.rightStick[1] << ")";
-  ss << std::fixed << std::setprecision(3)
-     << " / Left Trigger: " << axisState.leftTrigger
-     << " / Right Trigger: " << axisState.rightTrigger;
-  text.loadText(ss.str());
-  text.render(0, 1450, width, height);
+//   ss.str("");
+//   ss << "Left Stick: (" << std::fixed << std::setprecision(3)
+//      << axisState.leftStick[0] << ", " << axisState.leftStick[1] << ")";
+//   ss << " / Right Stick: (" << std::fixed << std::setprecision(3)
+//      << axisState.rightStick[0] << ", " << axisState.rightStick[1] << ")";
+//   ss << std::fixed << std::setprecision(3)
+//      << " / Left Trigger: " << axisState.leftTrigger
+//      << " / Right Trigger: " << axisState.rightTrigger;
+//   text.loadText(ss.str());
+//   text.render(0, 1450, width, height);
 
-  ss.str("");
-  ss << "A: " << buttonState.a << " / B: " << buttonState.b
-     << " / X: " << buttonState.x << " / Y: " << buttonState.y;
-  ss << " / Cross: " << buttonState.cross << " / Circle: " << buttonState.circle
-     << " / Square: " << buttonState.square
-     << " / Triangle: " << buttonState.triangle;
-  text.loadText(ss.str());
-  text.render(0, 1400, width, height);
+//   ss.str("");
+//   ss << "A: " << buttonState.a << " / B: " << buttonState.b
+//      << " / X: " << buttonState.x << " / Y: " << buttonState.y;
+//   ss << " / Cross: " << buttonState.cross << " / Circle: " <<
+//   buttonState.circle
+//      << " / Square: " << buttonState.square
+//      << " / Triangle: " << buttonState.triangle;
+//   text.loadText(ss.str());
+//   text.render(0, 1400, width, height);
 
-  ss.str("");
-  ss << "Left Bumper: " << buttonState.leftBumper
-     << " / Right Bumper: " << buttonState.rightBumper
-     << " / Back: " << buttonState.back << " / Start: " << buttonState.start
-     << " / Guide: " << buttonState.guide
-     << " / Left Thumb: " << buttonState.leftThumb
-     << " / Right Thumb: " << buttonState.rightThumb;
-  text.loadText(ss.str());
-  text.render(0, 1350, width, height);
+//   ss.str("");
+//   ss << "Left Bumper: " << buttonState.leftBumper
+//      << " / Right Bumper: " << buttonState.rightBumper
+//      << " / Back: " << buttonState.back << " / Start: " << buttonState.start
+//      << " / Guide: " << buttonState.guide
+//      << " / Left Thumb: " << buttonState.leftThumb
+//      << " / Right Thumb: " << buttonState.rightThumb;
+//   text.loadText(ss.str());
+//   text.render(0, 1350, width, height);
 
-  ss.str("");
-  ss << "D-Pad: Up: " << buttonState.dpadUp
-     << " / Right: " << buttonState.dpadRight
-     << " / Down: " << buttonState.dpadDown
-     << " / Left: " << buttonState.dpadLeft;
-  text.loadText(ss.str());
-  text.render(0, 1300, width, height);
+//   ss.str("");
+//   ss << "D-Pad: Up: " << buttonState.dpadUp
+//      << " / Right: " << buttonState.dpadRight
+//      << " / Down: " << buttonState.dpadDown
+//      << " / Left: " << buttonState.dpadLeft;
+//   text.loadText(ss.str());
+//   text.render(0, 1300, width, height);
 
-  ss.str("");
-  ss << "Hat: Up: " << hatState.up << " / Right: " << hatState.right
-     << " / Down: " << hatState.down << " / Left: " << hatState.left;
-  text.loadText(ss.str());
-  text.render(0, 1250, width, height);
-}
+//   ss.str("");
+//   ss << "Hat: Up: " << hatState.up << " / Right: " << hatState.right
+//      << " / Down: " << hatState.down << " / Left: " << hatState.left;
+//   text.loadText(ss.str());
+//   text.render(0, 1250, width, height);
+// }
 
-void testCompute() {
-  vec<float> inputData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+// void testCompute() {
+//   vec<float> inputData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-  ShaderStorageBuffer input, input2, output, output2;
-  input.loadData(inputData);
-  output.allocate(input.getSize());
-  input2.loadData(inputData);
-  output2.allocate(input2.getSize());
-  std::cout << "input size: " << input.getSize() << std::endl;
-  std::cout << "output size: " << output.getSize() << std::endl;
+//   ShaderStorageBuffer input, input2, output, output2;
+//   input.loadData(inputData);
+//   output.allocate(input.getSize());
+//   input2.loadData(inputData);
+//   output2.allocate(input2.getSize());
+//   std::cout << "input size: " << input.getSize() << std::endl;
+//   std::cout << "output size: " << output.getSize() << std::endl;
 
-  ComputeKernel kernel;
-  kernel.addKernelSource(
-      Shader::loadShaderSource("resources/shaders/compute.glsl"));
-  kernel.compile();
-  kernel.link();
-  std::cout << "kernel compiled" << std::endl;
+//   ComputeKernel kernel;
+//   kernel.addKernelSource(
+//       Shader::loadShaderSource("resources/shaders/compute.glsl"));
+//   kernel.compile();
+//   kernel.link();
+//   std::cout << "kernel compiled" << std::endl;
 
-  input.bind(kernel, "InputBuffer");
-  output.bind(kernel, "OutputBuffer");
-  std::cout << "buffers bound" << std::endl;
+//   input.bind(kernel, "InputBuffer");
+//   output.bind(kernel, "OutputBuffer");
+//   std::cout << "buffers bound" << std::endl;
 
-  kernel.setUniform("scaleFactor", 2.0f);
-  kernel.dispatch(10, 1, 1);
-  std::cout << "dispatching kernel" << std::endl;
+//   kernel.setUniform("scaleFactor", 2.0f);
+//   kernel.dispatch(10, 1, 1);
+//   std::cout << "dispatching kernel" << std::endl;
 
-  ComputeKernel kernel2;
-  kernel2.addKernelSource(
-      Shader::loadShaderSource("resources/shaders/compute.glsl"));
-  kernel2.compile();
-  kernel2.link();
-  std::cout << "kernel2 compiled" << std::endl;
+//   ComputeKernel kernel2;
+//   kernel2.addKernelSource(
+//       Shader::loadShaderSource("resources/shaders/compute.glsl"));
+//   kernel2.compile();
+//   kernel2.link();
+//   std::cout << "kernel2 compiled" << std::endl;
 
-  input2.bind(kernel2, "InputBuffer");
-  output2.bind(kernel2, "OutputBuffer");
-  std::cout << "buffers bound" << std::endl;
+//   input2.bind(kernel2, "InputBuffer");
+//   output2.bind(kernel2, "OutputBuffer");
+//   std::cout << "buffers bound" << std::endl;
 
-  kernel2.setUniform("scaleFactor", 3.0f);
-  kernel2.dispatch(10, 1, 1);
-  std::cout << "dispatching kernel2" << std::endl;
+//   kernel2.setUniform("scaleFactor", 3.0f);
+//   kernel2.dispatch(10, 1, 1);
+//   std::cout << "dispatching kernel2" << std::endl;
 
-  vec<float> outputData, outputData2;
-  output.getData(outputData);
-  output2.getData(outputData2);
-  for (int i = 0; i < inputData.size(); ++i) {
-    std::cout << "output[" << i << "] = " << outputData[i] << std::endl;
-  }
-  for (int i = 0; i < inputData.size(); ++i) {
-    std::cout << "output2[" << i << "] = " << outputData2[i] << std::endl;
-  }
-}
+//   vec<float> outputData, outputData2;
+//   output.getData(outputData);
+//   output2.getData(outputData2);
+//   for (int i = 0; i < inputData.size(); ++i) {
+//     std::cout << "output[" << i << "] = " << outputData[i] << std::endl;
+//   }
+//   for (int i = 0; i < inputData.size(); ++i) {
+//     std::cout << "output2[" << i << "] = " << outputData2[i] << std::endl;
+//   }
+// }
 
-void TestApp::sizeCallback(Window *window, int const &width,
-                           int const &height) {
-  glViewport(0, 0, width, height);
-  mWidth = (float)width;
-  mHeight = (float)height;
-  mShader.bind();
-  mUniform.transform = scale(
-      identity<mat4>(), vec3(1.0f / mWidth, 1.0f / mHeight, 1.0f / mDepth));
-  mUBO.reloadData(mUniform);
-}
+// void TestApp::sizeCallback(Window *window, int const &width,
+//                            int const &height) {
+//   glViewport(0, 0, width, height);
+//   mWidth = (float)width;
+//   mHeight = (float)height;
+//   mShader.bind();
+//   mUniform.transform = scale(
+//       identity<mat4>(), vec3(1.0f / mWidth, 1.0f / mHeight, 1.0f / mDepth));
+//   mUBO.reloadData(mUniform);
+// }
 
-void TestApp::keyCallback(Window *window, Key const &key) {
-  if (key.key == Keyboard::K_ESCAPE) {
-    window->close();
-  }
+// void TestApp::keyCallback(Window *window, Key const &key) {
+//   if (key.key == Keyboard::K_ESCAPE) {
+//     window->close();
+//   }
 
-  if (key.key == Keyboard::K_BACKSPACE && key.pressed) {
-    if (!mTextString.empty() &&
-        (mDelflag > mDelInterval || mPressingFlag > 1)) {
-      mDelflag = 0u;
-      ++mPressingFlag;
-      mTextString.pop_back();
-      mText.loadText(mTextString);
-    }
-  } else {
-    mPressingFlag = 0u;
-  }
-}
+//   if (key.key == Keyboard::K_BACKSPACE && key.pressed) {
+//     if (!mTextString.empty() &&
+//         (mDelflag > mDelInterval || mPressingFlag > 1)) {
+//       mDelflag = 0u;
+//       ++mPressingFlag;
+//       mTextString.pop_back();
+//       mText.loadText(mTextString);
+//     }
+//   } else {
+//     mPressingFlag = 0u;
+//   }
+// }
 
-void TestApp::charCallback(Window *window, u32 const &codepoint) {
-  mTextString.push_back(codepoint);
-  mText.loadText(mTextString);
-}
+// void TestApp::charCallback(Window *window, u32 const &codepoint) {
+//   mTextString.push_back(codepoint);
+//   mText.loadText(mTextString);
+// }
 
 TestApp::TestApp() : mScreen(1000, 1000, 4) {
   mFont = std::make_unique<Font>("resources/AsebiMin-Light.otf", 128);
@@ -272,7 +274,7 @@ TestApp::TestApp() : mScreen(1000, 1000, 4) {
 }
 
 void TestApp::frame(Window *window) {
-  window->pollEvents();
+  // window->pollEvents();
   window->fill(0.2, 0.2, 0.2);
   window->clear();
 
@@ -332,8 +334,8 @@ void TestApp::frame(Window *window) {
   mInfoText = L"FPS: " + std::to_wstring(mClock.getFPS());
   mInfoText.render(0, 180, mWidth, mHeight);
 
-  Joystick const &joystick = Joystick::getJoystick(JoystickID::JOYSTICK1);
-  outputJoystickData(joystick, mInfoText, mWidth, mHeight);
+  // Joystick const &joystick = Joystick::getJoystick(JoystickID::JOYSTICK1);
+  // outputJoystickData(joystick, mInfoText, mWidth, mHeight);
 
   window->swap();
   ++mDelflag;
@@ -343,36 +345,85 @@ void TestApp::frame(Window *window) {
 void launchApp() {
   Core::Context ctx;
 
-  auto window = ctx.createWindow(2500, 1600, "Test Window", WindowSettings());
+  auto window = ctx.createWindow(1500, 750, "Test Window");
+  window->setBordered(true);
+  window->setResizable(true);
+  window->setFloating(false);
   window->bind();
 
-  auto &event = window->getEvent();
+  auto event = ctx.getEventHandler();
   auto &property = window->getProperty();
 
-  event.onFramebufferSizeChange.subscribe(
-      [&ctx](Window *window, u32 const &width, u32 const &height) {
+  event->onWindowPixelSizeChange.subscribe(
+      [](u64 timestamp, shared<Window> window, i32 const &width,
+         i32 const &height) {
+        if (!window) {
+          std::cerr << "Window is null in pixel size change event."
+                    << std::endl;
+          return;
+        }
         window->setViewPort(0, 0, width, height);
-        std::cout << "Framebuffer size changed: " << width << "x" << height
+        std::cout << "Window pixel size changed: " << width << "x" << height
                   << std::endl;
       });
-  event.onKeyInput.subscribe([&ctx](Window *window, Key const &key) {
-    std::cout << "Key pressed: " << (u32)key.key << std::endl;
+  // event->onWindowCloseRequested.subscribe(
+  //     [](u64 timestamp, shared<Window> window) {
+  //       if (!window) {
+  //         std::cerr << "Window is null in close event." << std::endl;
+  //         return;
+  //       }
+  //       std::cout << "Window closed." << std::endl;
+  //       window->close();
+  //     });
+  event->onMouseMotion.subscribe([](u64 timestamp, shared<Window> window,
+                                    SDL_MouseID which, vec2 const &pos,
+                                    vec2 const &rel) {
+    std::cout << "Mouse motion: " << (u32)which << " at (" << pos.x << ", "
+              << pos.y << ") with relative movement (" << rel.x << ", " << rel.y
+              << ")" << std::endl;
   });
-  event.onCharInput.subscribe([&ctx](Window *window, u32 const &codepoint) {
-    if (codepoint == (u32)-1) {
-      std::cout << "Invalid character input." << std::endl;
-      return;
+
+  event->onKey.subscribe([&window](u64 timestamp, Key const &key) {
+    std::cout << "Key event: " << (u32)key.key << " pressed: " << key.pressed
+              << std::endl;
+    if (key.key == Keyboard::K_P && key.pressed) {
+      std::cout << window->getMouse()->getCursorPosition().x << " "
+                << window->getMouse()->getCursorPosition().y << std::endl;
     }
-    std::cout << "Character input: " << (char)codepoint << std::endl;
   });
+
+  // event->onJoystickAdd.subscribe([](u64 timestamp, shared<Joystick> joystick)
+  // {
+  //   std::cout << "Joystick added:" << joystick->getID() << std::endl;
+  //   std::cout << "Is gamepad: " << joystick->isGamepad() << std::endl;
+  // });
+  // event->onJoystickRemove.subscribe(
+  //     [](u64 timestamp, shared<Joystick> joystick) {
+  //       std::cout << "Joystick removed:" << joystick->getID() << std::endl;
+  //     });
+  // event->onMouseAdd.subscribe([](u64 timestamp, SDL_MouseID which) {
+  //   std::cout << "Mouse added: " << which << std::endl;
+  // });
+
+  for (auto &id : Mouse::getMise()) {
+    std::cout << "Mouse ID: " << id << " / Name: " << SDL_GetMouseNameForID(id)
+              << std::endl;
+  }
+
+  // event.onKeyInput.subscribe([&ctx](Window *window, Key const &key) {
+  //   std::cout << "Key pressed: " << (u32)key.key << std::endl;
+  // });
+  // event.onCharInput.subscribe([&ctx](Window *window, u32 const &codepoint) {
+  //   if (codepoint == (u32)-1) {
+  //     std::cout << "Invalid character input." << std::endl;
+  //     return;
+  //   }
+  //   std::cout << "Character input: " << (char)codepoint << std::endl;
+  // });
 
   while (ctx.valid()) {
     window->fill(0.2, 0.2, 0.2);
     window->clear();
-
-    if (window->isPressing(Keyboard::K_ESCAPE)) {
-      break;
-    }
 
     window->update();
     ctx.tick(120);

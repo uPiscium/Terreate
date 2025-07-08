@@ -4,48 +4,38 @@
 #include "../common/type.hpp"
 
 namespace Terreate::Exception {
-class GraphicModuleError : public TerreateException {
+class OpenGLModuleError : public TerreateException {
 public:
-  GraphicModuleError(str const &message) : TerreateException(message) {}
+  OpenGLModuleError(str const &message) : TerreateException(message) {}
 };
 
-class BufferError : public GraphicModuleError {
+class BufferError : public OpenGLModuleError {
 public:
-  BufferError(str const &message) : GraphicModuleError(message) {}
+  BufferError(str const &message) : OpenGLModuleError(message) {}
 };
 
-class FontError : public GraphicModuleError {
+class FontError : public OpenGLModuleError {
 public:
-  FontError(str const &message) : GraphicModuleError(message) {}
+  FontError(str const &message) : OpenGLModuleError(message) {}
 };
 
-class JobError : public GraphicModuleError {
+class ScreenError : public OpenGLModuleError {
 public:
-  JobError(str const &message) : GraphicModuleError(message) {}
+  ScreenError(str const &message) : OpenGLModuleError(message) {}
 };
 
-class ScreenError : public GraphicModuleError {
+class ShaderError : public OpenGLModuleError {
 public:
-  ScreenError(str const &message) : GraphicModuleError(message) {}
+  ShaderError(str const &message) : OpenGLModuleError(message) {}
 };
 
-class ShaderError : public GraphicModuleError {
+class TextError : public OpenGLModuleError {
 public:
-  ShaderError(str const &message) : GraphicModuleError(message) {}
+  TextError(str const &message) : OpenGLModuleError(message) {}
 };
 
-class TextError : public GraphicModuleError {
+class TextureError : public OpenGLModuleError {
 public:
-  TextError(str const &message) : GraphicModuleError(message) {}
-};
-
-class TextureError : public GraphicModuleError {
-public:
-  TextureError(str const &message) : GraphicModuleError(message) {}
-};
-
-class WindowError : public GraphicModuleError {
-public:
-  WindowError(str const &message) : GraphicModuleError(message) {}
+  TextureError(str const &message) : OpenGLModuleError(message) {}
 };
 } // namespace Terreate::Exception

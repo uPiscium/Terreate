@@ -1,6 +1,6 @@
 # Terreate
 license : [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)\
-Terreate is a 3D game library for C++. This repository is designed for creating 3D games with OpenGL and OpenAL without the annoying of state based programming.
+Terreate is a 3D game library for C++. This repository is designed for creating 3D games with OpenGL without the annoying of state based programming.
 > [!NOTE]
 > `Terreate` has its own wiki page that provides more details about, including a quick start guide, API definitions, and more!
 > - [Terreate wiki](https://upiscium.github.io/Terreate-Wiki/)
@@ -8,15 +8,15 @@ Terreate is a 3D game library for C++. This repository is designed for creating 
 # Dependencies
 ## Library dependence
 These packages are used in this library.
-- [glfw](https://www.glfw.org/docs/latest/)
-  > GLFW is a free, Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.\
-  *from glfw website*
+- [SDL](https://www.libsdl.org/)
+  > Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D. It is used by video playback software, emulators, and popular games including Valve's award winning catalog and many Humble Bundle games.
+  > SDL officially supports Windows, macOS, Linux, iOS, and Android. Support for other platforms may be found in the source code.
+  > SDL is written in C, works natively with C++, and there are bindings available for several other languages, including C# and Python.
+  > SDL is distributed under the zlib license. This license allows you to use SDL freely in any software.\
+  *from SDL website*
 - [glad](https://glad.dav1d.de/)
   > Multi-Language GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs.\
   *from glad website*
-- [OpenAL-soft](https://github.com/kcat/openal-soft.git)
-  > OpenAL Soft is an LGPL-licensed, cross-platform, software implementation of the OpenAL 3D audio API. It's forked from the open-sourced Windows version available originally from openal.org's SVN repository (now defunct). OpenAL provides capabilities for playing audio in a virtual 3D environment. Distance attenuation, doppler shift, and directional sound emitters are among the features handled by the API. More advanced effects, including air absorption, occlusion, and environmental reverb, are available through the EFX extension. It also facilitates streaming audio, multi-channel buffers, and audio capture.\
-  *from OpenAL-soft README.md*
 
 ## Build dependence
 This library uses `cmake` to build the projects so make sure to install `cmake` before building this library. 

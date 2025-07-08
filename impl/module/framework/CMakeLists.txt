@@ -12,7 +12,12 @@ add_library(
   ${PROJECT_NAME} STATIC
   context.cpp
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC TerreateCommonModule TerreateGraphicModule)
+target_link_libraries(
+  ${PROJECT_NAME} PUBLIC
+  TerreateCommonModule
+  TerreateOpenGLModule
+  TerreateSDLModule
+)
 target_include_directories(${PROJECT_NAME} PUBLIC ../../../include)
 target_include_directories(${PROJECT_NAME} PUBLIC ../../../deps)
 set_target_properties(

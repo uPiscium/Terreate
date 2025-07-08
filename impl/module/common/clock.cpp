@@ -2,7 +2,7 @@
 
 namespace Terreate {
 bool Clock::isElapsed(float const &time) {
-  float const now = glfwGetTime();
+  float const now = SDL_GetTicks() / 1000.0f; // Get current time in seconds
   float const delta = now - mLastTime;
   if (delta >= time) {
     mLastTime = now;
