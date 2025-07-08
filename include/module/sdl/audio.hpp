@@ -6,7 +6,7 @@
 namespace Terreate::SDL {
 class AudioDevice;
 
-class AudioBuffer {
+class SDLAudioBuffer {
 private:
   union RawAudioData {
     vec<i8> *i8data;
@@ -21,8 +21,8 @@ private:
   RawAudioData mData;
 
 public:
-  AudioBuffer(AudioFormat format);
-  ~AudioBuffer();
+  SDLAudioBuffer(AudioFormat format);
+  ~SDLAudioBuffer();
 
   AudioFormat const &getFormat() const { return mFormat; }
   RawAudioData const &getRawData() const { return mData; }
@@ -68,7 +68,7 @@ public:
   i32 getQueued() const { return SDL_GetAudioStreamQueued(mStream); }
   vec<i32> getInputChannelMap() const;
   vec<i32> getOutputChannelMap() const;
-  shared<AudioBuffer> getStreamData(u32 const &size);
+  shared<SDLAudioBuffer> getStreamData(u32 const &size);
 
   void setFormat(AudioSpec const &srcSpec, AudioSpec const &dstSpec);
   void setFrequencyRatio(float ratio) {
@@ -89,7 +89,7 @@ public:
   void resume();
   void lock();
   void unlock();
-  void pushData(shared<AudioBuffer> const &data);
+  void pushData(shared<SDLAudioBuffer> const &data);
   void clear();
   void flush();
 };

@@ -2,7 +2,7 @@
 #include "../../../include/module/sdl/exception.hpp"
 
 namespace Terreate::SDL {
-AudioBuffer::AudioBuffer(AudioFormat format) : mFormat(format) {
+SDLAudioBuffer::SDLAudioBuffer(AudioFormat format) : mFormat(format) {
   switch (format) {
   case AudioFormat::UNKNOWN:
     throw Exception::AudioError("UNKNOWN format is detected.");
@@ -27,7 +27,7 @@ AudioBuffer::AudioBuffer(AudioFormat format) : mFormat(format) {
   }
 }
 
-AudioBuffer::~AudioBuffer() {
+SDLAudioBuffer::~SDLAudioBuffer() {
   switch (mFormat) {
   case AudioFormat::UNKNOWN:
     break;
@@ -52,42 +52,42 @@ AudioBuffer::~AudioBuffer() {
   }
 }
 
-vec<i8> const &AudioBuffer::getI8Data() {
+vec<i8> const &SDLAudioBuffer::getI8Data() {
   if (mFormat != AudioFormat::S8) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   return *mData.i8data;
 }
 
-vec<u8> const &AudioBuffer::getU8Data() {
+vec<u8> const &SDLAudioBuffer::getU8Data() {
   if (mFormat != AudioFormat::U8) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   return *mData.u8data;
 }
 
-vec<i16> const &AudioBuffer::getI16Data() {
+vec<i16> const &SDLAudioBuffer::getI16Data() {
   if (mFormat != AudioFormat::S16LE && mFormat != AudioFormat::S16BE) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   return *mData.i16data;
 }
 
-vec<i32> const &AudioBuffer::getI32Data() {
+vec<i32> const &SDLAudioBuffer::getI32Data() {
   if (mFormat != AudioFormat::S32LE && mFormat != AudioFormat::S32BE) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   return *mData.i32data;
 }
 
-vec<float> const &AudioBuffer::getF32Data() {
+vec<float> const &SDLAudioBuffer::getF32Data() {
   if (mFormat != AudioFormat::F32LE && mFormat != AudioFormat::F32BE) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   return *mData.f32data;
 }
 
-void AudioBuffer::allocate(u32 size) {
+void SDLAudioBuffer::allocate(u32 size) {
   switch (mFormat) {
   case AudioFormat::UNKNOWN:
     throw Exception::AudioError("UNKNOWN format is detected.");
@@ -112,35 +112,35 @@ void AudioBuffer::allocate(u32 size) {
   }
 }
 
-void AudioBuffer::loadData(vec<i8> const &data) {
+void SDLAudioBuffer::loadData(vec<i8> const &data) {
   if (mFormat != AudioFormat::S8) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   *mData.i8data = data;
 }
 
-void AudioBuffer::loadData(vec<u8> const &data) {
+void SDLAudioBuffer::loadData(vec<u8> const &data) {
   if (mFormat != AudioFormat::U8) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   *mData.u8data = data;
 }
 
-void AudioBuffer::loadData(vec<i16> const &data) {
+void SDLAudioBuffer::loadData(vec<i16> const &data) {
   if (mFormat != AudioFormat::S16LE && mFormat != AudioFormat::S16BE) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   *mData.i16data = data;
 }
 
-void AudioBuffer::loadData(vec<i32> const &data) {
+void SDLAudioBuffer::loadData(vec<i32> const &data) {
   if (mFormat != AudioFormat::S32LE && mFormat != AudioFormat::S32BE) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
   *mData.i32data = data;
 }
 
-void AudioBuffer::loadData(vec<float> const &data) {
+void SDLAudioBuffer::loadData(vec<float> const &data) {
   if (mFormat != AudioFormat::F32LE && mFormat != AudioFormat::F32BE) {
     throw Exception::AudioError("Data format does not match buffer format.");
   }
@@ -198,11 +198,11 @@ vec<i32> AudioStream::getOutputChannelMap() const {
   return channelMap;
 }
 
-shared<AudioBuffer> AudioStream::getStreamData(u32 const &size) {
+shared<SDLAudioBuffer> AudioStream::getStreamData(u32 const &size) {
   bool isRecorder = SDL_IsAudioDevicePlayback(this->getBoundDeviceID());
   AudioFormat format =
       isRecorder ? (AudioFormat)mSrcSpec.format : (AudioFormat)mDstSpec.format;
-  shared<AudioBuffer> buffer = std::make_shared<AudioBuffer>(format);
+  shared<SDLAudioBuffer> buffer = std::make_shared<SDLAudioBuffer>(format);
   buffer->allocate(size);
   void *ptr = nullptr;
   switch (format) {
@@ -269,7 +269,7 @@ void AudioStream::unlock() {
   }
 }
 
-void AudioStream::pushData(shared<AudioBuffer> const &data) {
+void AudioStream::pushData(shared<SDLAudioBuffer> const &data) {
   bool isRecorder = SDL_IsAudioDevicePlayback(this->getBoundDeviceID());
   AudioFormat format =
       isRecorder ? (AudioFormat)mSrcSpec.format : (AudioFormat)mDstSpec.format;
