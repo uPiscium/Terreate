@@ -462,16 +462,27 @@ void EventHandler::handle(SDL_PenAxisEvent const &event) {
 void EventHandler::handle(SDL_CameraDeviceEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_CAMERA_DEVICE_ADDED:
-    this->onCameraAdd.publish(event.timestamp, event.which);
+    if (!mRegistry->hasCamera(event.which)) {
+      mRegistry->registerCamera(event.which,
+                                std::make_shared<Camera>(event.which));
+    }
+    this->onCameraAdd.publish(event.timestamp,
+                              mRegistry->getCamera(event.which));
     break;
   case SDL_EVENT_CAMERA_DEVICE_REMOVED:
-    this->onCameraRemove.publish(event.timestamp, event.which);
+    this->onCameraRemove.publish(event.timestamp,
+                                 mRegistry->getCamera(event.which));
+    if (mRegistry->hasCamera(event.which)) {
+      mRegistry->unregisterCamera(event.which);
+    }
     break;
   case SDL_EVENT_CAMERA_DEVICE_APPROVED:
-    this->onCameraApproved.publish(event.timestamp, event.which);
+    this->onCameraApproved.publish(event.timestamp,
+                                   mRegistry->getCamera(event.which));
     break;
   case SDL_EVENT_CAMERA_DEVICE_DENIED:
-    this->onCameraDenied.publish(event.timestamp, event.which);
+    this->onCameraDenied.publish(event.timestamp,
+                                 mRegistry->getCamera(event.which));
     break;
   default:
     throw Exception::SDLModuleError(

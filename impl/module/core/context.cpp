@@ -16,6 +16,8 @@ Context::~Context() {
     mWindow.reset();
   }
   mClock.reset();
+  mEventHandler.reset();
+  mRegistry.reset();
   SDL::terminate();
 }
 

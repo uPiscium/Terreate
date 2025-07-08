@@ -3,6 +3,7 @@
 #include "../common/type.hpp"
 
 #include "audio.hpp"
+#include "camera.hpp"
 #include "gamepad.hpp"
 #include "joystick.hpp"
 #include "mouse.hpp"
@@ -15,6 +16,7 @@ private:
 
 private:
   umap<SDL_AudioDeviceID, shared<AudioDevice>> mAudioDevices;
+  umap<SDL_CameraID, shared<Camera>> mCameras;
   umap<SDL_JoystickID, shared<Gamepad>> mGamepads;
   umap<SDL_JoystickID, shared<Joystick>> mJoysticks;
   umap<SDL_MouseID, shared<Mouse>> mMice;
@@ -25,6 +27,7 @@ public:
   ~SDLObjectRegistry() = default;
 
   shared<AudioDevice> getAudioDevice(SDL_AudioDeviceID id) const;
+  shared<Camera> getCamera(SDL_CameraID id) const;
   shared<Gamepad> getGamepad(SDL_JoystickID id) const;
   shared<Joystick> getJoystick(SDL_JoystickID id) const;
   shared<Mouse> getMouse(SDL_MouseID id) const;
@@ -32,6 +35,9 @@ public:
 
   bool hasAudioDevice(SDL_AudioDeviceID id) const {
     return mAudioDevices.find(id) != mAudioDevices.end();
+  }
+  bool hasCamera(SDL_CameraID id) const {
+    return mCameras.find(id) != mCameras.end();
   }
   bool hasGamepad(SDL_JoystickID id) const {
     return mGamepads.find(id) != mGamepads.end();
@@ -46,6 +52,8 @@ public:
 
   void registerAudioDevice(SDL_AudioDeviceID id, shared<AudioDevice> device);
   void unregisterAudioDevice(SDL_AudioDeviceID id);
+  void registerCamera(SDL_CameraID id, shared<Camera> camera);
+  void unregisterCamera(SDL_CameraID id);
   void registerGamepad(SDL_JoystickID id, shared<Gamepad> gamepad);
   void unregisterGamepad(SDL_JoystickID id);
   void registerJoystick(SDL_JoystickID id, shared<Joystick> joystick);

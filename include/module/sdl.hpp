@@ -1,10 +1,12 @@
 #pragma once
 
 #include "sdl/audio.hpp"
+#include "sdl/camera.hpp"
 #include "sdl/event.hpp"
 #include "sdl/exception.hpp"
 #include "sdl/gamepad.hpp"
 #include "sdl/icon.hpp"
+#include "sdl/image.hpp"
 #include "sdl/joystick.hpp"
 #include "sdl/mouse.hpp"
 #include "sdl/registry.hpp"

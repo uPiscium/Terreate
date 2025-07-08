@@ -11,6 +11,14 @@ SDLObjectRegistry::getAudioDevice(SDL_AudioDeviceID id) const {
   return nullptr;
 }
 
+shared<Camera> SDLObjectRegistry::getCamera(SDL_CameraID id) const {
+  auto it = mCameras.find(id);
+  if (it != mCameras.end()) {
+    return it->second;
+  }
+  return nullptr;
+}
+
 shared<Gamepad> SDLObjectRegistry::getGamepad(SDL_JoystickID id) const {
   auto it = mGamepads.find(id);
   if (it != mGamepads.end()) {
@@ -59,6 +67,24 @@ void SDLObjectRegistry::unregisterAudioDevice(SDL_AudioDeviceID id) {
   } else {
     throw Exception::SDLModuleError("Audio device with ID " +
                                     std::to_string(id) + " not found.");
+  }
+}
+
+void SDLObjectRegistry::registerCamera(SDL_CameraID id, shared<Camera> camera) {
+  if (mCameras.find(id) != mCameras.end()) {
+    throw Exception::SDLModuleError("Camera with ID " + std::to_string(id) +
+                                    " already registered.");
+  }
+  mCameras[id] = camera;
+}
+
+void SDLObjectRegistry::unregisterCamera(SDL_CameraID id) {
+  auto it = mCameras.find(id);
+  if (it != mCameras.end()) {
+    mCameras.erase(it);
+  } else {
+    throw Exception::SDLModuleError("Camera with ID " + std::to_string(id) +
+                                    " not found.");
   }
 }
 

@@ -393,6 +393,17 @@ void launchApp() {
     }
   });
 
+  event->onCameraAdd.subscribe([](u64 timestamp, shared<Camera> camera) {
+    camera->open();
+    std::cout << "Camera added: " << camera->getID() << std::endl;
+    std::cout << "Camera spec: " << camera->getSpec().width << "x"
+              << camera->getSpec().height << std::endl;
+  });
+  event->onCameraRemove.subscribe([](u64 timestamp, shared<Camera> camera) {
+    std::cout << "Camera removed: " << camera->getID() << std::endl;
+    camera->close();
+  });
+
   // event->onJoystickAdd.subscribe([](u64 timestamp, shared<Joystick> joystick)
   // {
   //   std::cout << "Joystick added:" << joystick->getID() << std::endl;
@@ -406,10 +417,11 @@ void launchApp() {
   //   std::cout << "Mouse added: " << which << std::endl;
   // });
 
-  for (auto &id : Mouse::getMise()) {
-    std::cout << "Mouse ID: " << id << " / Name: " << SDL_GetMouseNameForID(id)
-              << std::endl;
-  }
+  // for (auto &id : Mouse::getMise()) {
+  //   std::cout << "Mouse ID: " << id << " / Name: " <<
+  //   SDL_GetMouseNameForID(id)
+  //             << std::endl;
+  // }
 
   // event.onKeyInput.subscribe([&ctx](Window *window, Key const &key) {
   //   std::cout << "Key pressed: " << (u32)key.key << std::endl;
@@ -423,7 +435,7 @@ void launchApp() {
   // });
 
   while (ctx.valid()) {
-    window->fill(0.2, 0.2, 0.2);
+    window->fill(0.85, 0, 0);
     window->clear();
 
     window->update();

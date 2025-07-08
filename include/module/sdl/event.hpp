@@ -4,6 +4,7 @@
 #include "../common/event.hpp"
 #include "../common/type.hpp"
 
+#include "camera.hpp"
 #include "gamepad.hpp"
 #include "joystick.hpp"
 #include "registry.hpp"
@@ -154,10 +155,10 @@ typedef SDLEvent<shared<Window>, SDL_PenID, Bitflag<PenState>, vec2>
     PenMotionEvent;
 typedef SDLEvent<shared<Window>, SDL_PenID, PenAxis, vec2, float> PenAxisEvent;
 
-typedef SDLEvent<SDL_CameraID> CameraAddEvent;
-typedef SDLEvent<SDL_CameraID> CameraRemoveEvent;
-typedef SDLEvent<SDL_CameraID> CameraApprovedEvent;
-typedef SDLEvent<SDL_CameraID> CameraDeniedEvent;
+typedef SDLEvent<shared<Camera>> CameraAddEvent;
+typedef SDLEvent<shared<Camera>> CameraRemoveEvent;
+typedef SDLEvent<shared<Camera>> CameraApprovedEvent;
+typedef SDLEvent<shared<Camera>> CameraDeniedEvent;
 
 typedef SDLEvent<shared<Window>, u32, pair<void *>> UserEvent;
 

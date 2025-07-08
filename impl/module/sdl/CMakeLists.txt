@@ -11,8 +11,10 @@ endif()
 add_library(
   ${PROJECT_NAME} STATIC
   audio.cpp
+  camera.cpp
   event.cpp
   gamepad.cpp
+  image.cpp
   joystick.cpp
   mouse.cpp
   registry.cpp
