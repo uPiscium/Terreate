@@ -125,6 +125,7 @@ void Window::update() const {
 void Window::bind() const {
   if (mWindow) {
     this->setCurrentContext();
+    SDL_StartTextInput(mWindow);
     pair<u32> size = mProperty.getFramebufferSize();
     glViewport(0, 0, size.first, size.second);
   }

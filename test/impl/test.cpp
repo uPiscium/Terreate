@@ -391,18 +391,28 @@ void launchApp() {
       std::cout << window->getMouse()->getCursorPosition().x << " "
                 << window->getMouse()->getCursorPosition().y << std::endl;
     }
+
+    if (key.key == Keyboard::K_ESCAPE && key.pressed) {
+      std::cout << "Escape key pressed, closing window." << std::endl;
+      window->close();
+    }
   });
 
-  event->onCameraAdd.subscribe([](u64 timestamp, shared<Camera> camera) {
-    camera->open();
-    std::cout << "Camera added: " << camera->getID() << std::endl;
-    std::cout << "Camera spec: " << camera->getSpec().width << "x"
-              << camera->getSpec().height << std::endl;
-  });
-  event->onCameraRemove.subscribe([](u64 timestamp, shared<Camera> camera) {
-    std::cout << "Camera removed: " << camera->getID() << std::endl;
-    camera->close();
-  });
+  event->onTextInput.subscribe(
+      [](u64 timestamp, shared<Window> window, str const &text) {
+        std::cout << "Text input: " << text << std::endl;
+      });
+
+  // event->onCameraAdd.subscribe([](u64 timestamp, shared<Camera> camera) {
+  //   camera->open();
+  //   std::cout << "Camera added: " << camera->getID() << std::endl;
+  //   std::cout << "Camera spec: " << camera->getSpec().width << "x"
+  //             << camera->getSpec().height << std::endl;
+  // });
+  // event->onCameraRemove.subscribe([](u64 timestamp, shared<Camera> camera) {
+  //   std::cout << "Camera removed: " << camera->getID() << std::endl;
+  //   camera->close();
+  // });
 
   // event->onJoystickAdd.subscribe([](u64 timestamp, shared<Joystick> joystick)
   // {
@@ -435,7 +445,7 @@ void launchApp() {
   // });
 
   while (ctx.valid()) {
-    window->fill(0.85, 0, 0);
+    window->fill(0.2, 0.2, 0.2);
     window->clear();
 
     window->update();
