@@ -12,6 +12,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 message(STATUS "C++ standard : " ${CMAKE_CXX_STANDARD})
 
+message(STATUS "Cloning Freetype...")
+FetchContent_Declare(
+  freetype
+  GIT_REPOSITORY https://github.com/freetype/freetype.git
+  GIT_TAG VER-2-13-3
+)
+message(STATUS "Freetype cloned.")
+message(STATUS "Configuring Freetype.")
+FetchContent_MakeAvailable(freetype)
+message(STATUS "Freetype configured.")
+
 message(STATUS "Cloning SDL...")
 include(FetchContent)
 set(SDL_SHARED OFF)

@@ -16,14 +16,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
 
-#ifndef UNICODE_HALF_SPACE
-#define UNICODE_HALF_SPACE 32
-#endif // UNICODE_HALF_SPACE
-
-#ifndef UNICODE_FULL_SPACE
-#define UNICODE_FULL_SPACE 32306
-#endif // UNICODE_FULL_SPACE
-
 #ifndef PROHIBIT_COPY_AND_ASSIGN
 #define PROHIBIT_COPY_AND_ASSIGN(TypeName)                                     \
   TypeName(TypeName const &) = delete;                                         \
