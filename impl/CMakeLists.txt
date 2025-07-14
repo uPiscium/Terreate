@@ -37,11 +37,11 @@ message(STATUS "Configuring SDL.")
 FetchContent_MakeAvailable(SDL3)
 message(STATUS "SDL configured.")
 
-add_subdirectory(module/common)
-add_subdirectory(module/opengl)
-add_subdirectory(module/sdl)
+add_subdirectory(common)
+add_subdirectory(opengl)
+add_subdirectory(sdl)
 
-add_subdirectory(module/core)
+add_subdirectory(core)
 
 add_library(
   ${PROJECT_NAME} STATIC
