@@ -13,4 +13,9 @@ class ContextError : public CoreModuleError {
 public:
   ContextError(str const &msg) : CoreModuleError(msg) {}
 };
+
+class EntityError : public CoreModuleError {
+public:
+  EntityError(str const &msg) : CoreModuleError(msg) {}
+};
 } // namespace Terreate::Exception
