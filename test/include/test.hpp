@@ -1,7 +1,7 @@
 #pragma once
-#include <module/common.hpp>
-#include <module/core.hpp>
-#include <module/opengl.hpp>
-#include <module/sdl.hpp>
+#include <common/common.hpp>
+#include <core/core.hpp>
+#include <opengl/opengl.hpp>
+#include <sdl/sdl.hpp>
 
 int main();
