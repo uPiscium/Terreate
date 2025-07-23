@@ -1,17 +1,17 @@
 #pragma once
 
-#include "sdl/audio.hpp"
-#include "sdl/camera.hpp"
-#include "sdl/event.hpp"
-#include "sdl/exception.hpp"
-#include "sdl/gamepad.hpp"
-#include "sdl/icon.hpp"
-#include "sdl/image.hpp"
-#include "sdl/joystick.hpp"
-#include "sdl/mouse.hpp"
-#include "sdl/registry.hpp"
-#include "sdl/window.hpp"
-#include "sdl/winhelper.hpp"
+#include "audio.hpp"
+#include "camera.hpp"
+#include "event.hpp"
+#include "exception.hpp"
+#include "gamepad.hpp"
+#include "icon.hpp"
+#include "image.hpp"
+#include "joystick.hpp"
+#include "mouse.hpp"
+#include "registry.hpp"
+#include "window.hpp"
+#include "winhelper.hpp"
 
 namespace Terreate::SDL {
 void initializeSDL();

@@ -164,7 +164,7 @@ typedef SDLEvent<shared<Window>, u32, pair<void *>> UserEvent;
 
 class EventHandler {
 private:
-  shared<SDLObjectRegistry> mRegistry = nullptr;
+  shared<SDLRegistry> mRegistry = nullptr;
 
 public:
   QuitEvent onQuit;
@@ -304,10 +304,14 @@ private:
   void handle(SDL_UserEvent const &event);
 
 public:
-  EventHandler(shared<SDLObjectRegistry> const &registry)
-      : mRegistry(registry) {}
+  EventHandler(shared<SDLRegistry> const &registry) : mRegistry(registry) {}
   ~EventHandler() = default;
 
   void poll();
+
+public:
+  static shared<EventHandler> create(shared<SDLRegistry> const &registry) {
+    return std::make_shared<EventHandler>(registry);
+  }
 };
 } // namespace Terreate::SDL
