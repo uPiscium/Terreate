@@ -10,7 +10,7 @@ endif()
 
 add_library(
   ${PROJECT_NAME} STATIC
-  context.cpp
+  mesh.cpp
 )
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC

@@ -9,7 +9,7 @@ using namespace Terreate::OpenGL;
 int main() {
   Core::Context ctx;
 
-  auto window = ctx.createWindow(1500, 750, "Test Window");
+  auto window = ctx.createWindow(1200, 1200, "Test Window");
   auto event = ctx.getEventHandler();
   auto &property = window->getProperty();
 
@@ -22,36 +22,33 @@ int main() {
           return;
         }
         window->setViewPort(0, 0, width, height);
-        std::cout << "Window pixel size changed: " << width << "x" << height
-                  << std::endl;
       });
-  event->onMouseMotion.subscribe([](u64 timestamp, shared<Window> window,
-                                    shared<Mouse> mouse, vec2 const &pos,
-                                    vec2 const &rel) {
-    std::cout << "Mouse motion: " << mouse->getName() << " at (" << pos.x
-              << ", " << pos.y << ") with relative movement (" << rel.x << ", "
-              << rel.y << ")" << std::endl;
-  });
+  // event->onMouseMotion.subscribe([](u64 timestamp, shared<Window> window,
+  //                                   shared<Mouse> mouse, vec2 const &pos,
+  //                                   vec2 const &rel) {
+  //   std::cout << "Mouse motion: " << mouse->getName() << " at (" << pos.x
+  //             << ", " << pos.y << ") with relative movement (" << rel.x << ",
+  //             "
+  //             << rel.y << ")" << std::endl;
+  // });
 
   event->onKey.subscribe([&window](u64 timestamp, Key const &key) {
-    std::cout << "Key event: " << (u32)key.key << " pressed: " << key.pressed
-              << std::endl;
-    if (key.key == Keyboard::K_P && key.pressed) {
-      std::cout << window->getMouse()->getCursorPosition().x << " "
-                << window->getMouse()->getCursorPosition().y << std::endl;
+    if (key.pressed && key.key == Keyboard::K_ESCAPE) {
+      std::cout << "Escape key pressed, closing window." << std::endl;
+      window->close();
     }
   });
 
-  event->onCameraAdd.subscribe([](u64 timestamp, shared<Camera> camera) {
-    camera->open();
-    std::cout << "Camera added: " << camera->getID() << std::endl;
-    std::cout << "Camera spec: " << camera->getSpec().width << "x"
-              << camera->getSpec().height << std::endl;
-  });
-  event->onCameraRemove.subscribe([](u64 timestamp, shared<Camera> camera) {
-    std::cout << "Camera removed: " << camera->getID() << std::endl;
-    camera->close();
-  });
+  // event->onCameraAdd.subscribe([](u64 timestamp, shared<Camera> camera) {
+  //   camera->open();
+  //   std::cout << "Camera added: " << camera->getID() << std::endl;
+  //   std::cout << "Camera spec: " << camera->getSpec().width << "x"
+  //             << camera->getSpec().height << std::endl;
+  // });
+  // event->onCameraRemove.subscribe([](u64 timestamp, shared<Camera> camera) {
+  //   std::cout << "Camera removed: " << camera->getID() << std::endl;
+  //   camera->close();
+  // });
 
   // event->onJoystickAdd.subscribe([](u64 timestamp, shared<Joystick> joystick)
   // {
@@ -83,9 +80,25 @@ int main() {
   //   std::cout << "Character input: " << (char)codepoint << std::endl;
   // });
 
+  Resource::Cube m(1.0f);
+  shared<Resource::Mesh> mesh = std::make_shared<Resource::Mesh>();
+  mesh->loadMesh(m.getMesh());
+
+  OpenGL::Shader shader;
+  str vert = shader.loadShaderSource("resources/shaders/rect.vert.glsl");
+  str frag = shader.loadShaderSource("resources/shaders/rect.frag.glsl");
+  shader.addVertexShaderSource(vert);
+  shader.addFragmentShaderSource(frag);
+  shader.compile();
+  shader.link();
+
   while (ctx.valid()) {
-    window->fill(0.85, 0, 0);
+    window->fill(0, 0, 0);
     window->clear();
+
+    shader.bind();
+    mesh->draw();
+    shader.unbind();
 
     window->update();
     ctx.tick(120);
