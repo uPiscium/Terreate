@@ -1,65 +1,6 @@
 #include <opengl/buffer.hpp>
 
 namespace Terreate::OpenGL {
-vec<float> const &BufferDataConstructor::GetVertexData() const {
-  if (!mConstructed) {
-    throw Exception::BufferError("Data not constructed.");
-  }
-  return mVertexData;
-}
-
-void BufferDataConstructor::AddVertexComponent(str const &name,
-                                               vec<vec<float>> const &data) {
-  mUpdated = true;
-  mVertexDataComponents.push_back(data);
-  mAttributeNames.push_back(name);
-  mAttributes.insert(
-      {name,
-       {0, mVertexDataComponents.size() - 1, data[0].size(), 0, mOffset}});
-  mOffset += data[0].size() * sizeof(float);
-}
-
-void BufferDataConstructor::ReloadVertexComponent(str const &name,
-                                                  vec<vec<float>> const &data) {
-  mUpdated = true;
-  if (mAttributes.find(name) == mAttributes.end()) {
-    this->AddVertexComponent(name, data);
-    return;
-  }
-
-  u32 index = mAttributes.at(name).index;
-  mVertexDataComponents[index] = data;
-}
-
-void BufferDataConstructor::Construct() {
-  if (mVertexDataComponents.size() == 0) {
-    throw Exception::BufferError("No data components added.");
-  }
-
-  if (mVertexIndices.size() == 0) {
-    throw Exception::BufferError("No indices added.");
-  }
-
-  if (mVertexIndices[0].size() != mVertexDataComponents.size()) {
-    throw Exception::BufferError("Indices and data components mismatch.");
-  }
-
-  for (auto &attr : mAttributes) {
-    attr.second.stride = mOffset;
-  }
-
-  mVertexData.clear();
-  for (auto &indices : mVertexIndices) {
-    for (u32 i = 0; i < indices.size(); ++i) {
-      auto &data = mVertexDataComponents[i];
-      u32 &index = indices[i];
-      mVertexData.insert(mVertexData.end(), data[index].begin(),
-                         data[index].end());
-    }
-  }
-  mConstructed = true;
-}
-
 Buffer::~Buffer() {
   if (mVAO != 0) {
     glDeleteVertexArrays(1, &mVAO);
@@ -77,17 +18,14 @@ Buffer::~Buffer() {
   mBuffers.clear();
 }
 
-void Buffer::setAttributeDivisor(AttributeData const &attribute,
+void Buffer::setAttributeDivisor(str const &attrName,
                                  u32 const &divisor) const {
   this->bind();
-  glVertexAttribDivisor(attribute.index, divisor);
+  glVertexAttribDivisor(GLSL_ATTRIBUTE_LOCATIONS.at(attrName), divisor);
   this->unbind();
 }
 
-void Buffer::loadData(vec<float> const &raw,
-                      umap<str, AttributeData> const &attrs,
-                      umap<str, u32> const &locations,
-                      BufferUsage const &usage) {
+void Buffer::loadData(vec<float> const &raw, BufferUsage const &usage) {
   u64 size = raw.size() * sizeof(float);
   this->bind();
   GLObject buffer = 0;
@@ -95,69 +33,41 @@ void Buffer::loadData(vec<float> const &raw,
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
   glBufferData(GL_ARRAY_BUFFER, size, raw.data(), (GLenum)usage);
 
-  for (auto &[name, attr] : attrs) {
-    if (locations.find(name) == locations.end()) {
-      throw Exception::BufferError("Attribute location not found.");
+  for (auto &[name, attr] : GLSL_INPUT_ATTRIBUTES) {
+    if (!GLSL_ATTRIBUTE_LOCATIONS.contains(
+            name)) { // This check should always pass
+      throw Exception::BufferError(
+          "Attribute location not found. This is a "
+          "critical bug. Please report as 'ATTRIBUTE_LOCATION_MISMATCH'.");
     }
-    u32 index = locations.at(name);
+    u32 index = GLSL_ATTRIBUTE_LOCATIONS.at(name);
     glEnableVertexAttribArray(index);
     glVertexAttribPointer(index, attr.size, GL_FLOAT, GL_FALSE, attr.stride,
                           reinterpret_cast<void const *>(attr.offset));
-    mAttributes.insert(
-        {name, {mBuffers.size(), index, attr.size, attr.stride, attr.offset}});
+    mBufferAttributeMap.insert({name, mBuffers.size()});
   }
   this->unbind();
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   mBuffers.push_back(buffer);
 }
 
-void Buffer::loadData(BufferDataConstructor const &bdc,
-                      umap<str, u32> const &locations,
-                      BufferUsage const &usage) {
-  umap<str, AttributeData> const &attributes = bdc.GetAttributes();
-  vec<float> data = bdc.GetVertexData();
-  u64 size = data.size() * sizeof(float);
+void Buffer::reloadData(vec<float> const &raw) {
+  u64 size = raw.size() * sizeof(float);
   this->bind();
-  GLObject buffer = 0;
-  glGenBuffers(1, &buffer);
-  glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  glBufferData(GL_ARRAY_BUFFER, size, data.data(), (GLenum)usage);
+  glBindBuffer(GL_ARRAY_BUFFER, mBuffers[0]);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, size, raw.data());
+  this->unbind();
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 
-  for (auto &name : bdc.GetAttributeNames()) {
-    if (locations.find(name) == locations.end()) {
-      throw Exception::BufferError("Attribute location not found.");
-    }
-    AttributeData const &attr = attributes.at(name);
-    u32 index = locations.at(name);
-    glEnableVertexAttribArray(index);
-    glVertexAttribPointer(index, attr.size, GL_FLOAT, GL_FALSE, attr.stride,
-                          reinterpret_cast<void const *>(attr.offset));
-    mAttributes.insert(
-        {name, {mBuffers.size(), index, attr.size, attr.stride, attr.offset}});
+void Buffer::reloadDataTo(vec<float> const &raw, u32 const &index) {
+  if (index >= mBuffers.size()) {
+    throw Exception::BufferError("Index out of bounds for buffer.");
   }
-  this->unbind();
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  mBuffers.push_back(buffer);
-}
-
-void Buffer::reloadData(AttributeData const &target,
-                        BufferDataConstructor const &bdc) {
-  vec<float> data = bdc.GetVertexData();
-  u64 size = data.size() * sizeof(float);
+  u64 size = raw.size() * sizeof(float);
   this->bind();
-  glBindBuffer(GL_ARRAY_BUFFER, mBuffers[target.vboIndex]);
-  glBufferSubData(GL_ARRAY_BUFFER, target.offset, size, data.data());
-  this->unbind();
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void Buffer::reloadData(AttributeData const &target,
-                        BufferDataConstructor const &bdc, u32 const &offset) {
-  vec<float> data = bdc.GetVertexData();
-  u64 size = data.size() * sizeof(float);
-  this->bind();
-  glBindBuffer(GL_ARRAY_BUFFER, mBuffers[target.vboIndex]);
-  glBufferSubData(GL_ARRAY_BUFFER, offset, size, data.data());
+  glBindBuffer(GL_ARRAY_BUFFER, mBuffers[index]);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, size, raw.data());
   this->unbind();
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
