@@ -6,6 +6,7 @@
 namespace Terreate {
 float const PI = glm::pi<float>();
 float const HALF_PI = glm::half_pi<float>();
+float const TWO_PI = glm::two_pi<float>();
 
 // glm types
 typedef glm::vec2 vec2;
