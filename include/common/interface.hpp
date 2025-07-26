@@ -1,27 +1,14 @@
 #pragma once
 
 #include "type.hpp"
-#include "uuid.hpp"
 
-namespace Terreate {
-class IRegisterable {
+namespace Terreate::Interface {
+class IController {
 public:
-  virtual ~IRegisterable() = default;
-
-  virtual UUID getID() const = 0;
-  virtual bool operator==(IRegisterable const &other) const {
-    return this->getID() == other.getID();
-  }
+  virtual ~IController() = default;
+  virtual void update(float const &delta) = 0;
 };
 
 template <typename T>
-concept Registerable = extends<T, IRegisterable>;
-
-class IRegistry {
-public:
-  virtual ~IRegistry() = default;
-};
-
-template <typename T>
-concept Registry = extends<T, IRegistry>;
-} // namespace Terreate
+concept Controller = extends<T, IController>;
+} // namespace Terreate::Interface

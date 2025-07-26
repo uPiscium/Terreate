@@ -1,8 +1,11 @@
 #pragma once
 
+#include "../common/event.hpp"
 #include "../common/type.hpp"
 #include "../common/uuid.hpp"
+
 #include "../component/interface.hpp"
+#include "../component/registry.hpp"
 
 #include "exception.hpp"
 
@@ -15,42 +18,73 @@ typedef Event<Entity, shared<Component::IComponent>>
 class Entity {
 private:
   UUID mID;
-  shared<Component::ComponentManager> mComponentManager;
+  shared<Component::ComponentRegistry> mComponentRegistry;
 
 public:
   EntityComponentEvent onComponentAdded;
   EntityComponentEvent onComponentRemoved;
 
 public:
-  Entity(shared<Component::ComponentManager> componentManager)
-      : mComponentManager(componentManager) {}
+  Entity(shared<Component::ComponentRegistry> registry)
+      : mComponentRegistry(registry) {}
   ~Entity() = default;
 
   UUID const &getID() const { return mID; }
-  template <Component::ComponentType T> shared<T> getComponent() const {
-    if (!mComponentManager) {
-      throw Exception::ComponentModuleError(
-          "Component manager is not initialized.");
-    }
-    return mComponentManager->getComponent<T>(mID);
-  }
-
-  template <Component::ComponentType T> void addComponent(shared<T> component) {
-    if (!mComponentManager) {
-      throw Exception::ComponentModuleError(
-          "Component manager is not initialized.");
-    }
-    mComponentManager->addComponent<T>(mID, component);
-  }
-
-  template <Component::ComponentType T> void removeComponent() {
-    if (!mComponentManager) {
-      throw Exception::ComponentModuleError(
-          "Component manager is not initialized.");
-    }
-    mComponentManager->removeComponent<T>(mID);
-  }
-
+  template <Component::Component T> shared<T> getComponent() const;
+  template <Component::Component T> void addComponent(shared<T> component);
+  template <Component::Component T> void removeComponent();
+  template <Component::Component T> void removeComponent(shared<T> component);
   operator UUID const &() const { return mID; }
 };
+
+class EntityManager {
+private:
+  PROHIBIT_COPY_AND_ASSIGN(EntityManager);
+
+private:
+  shared<Component::ComponentRegistry> mComponentRegistry;
+  umap<UUID, shared<Entity>> mEntities;
+
+public:
+  EntityManager(shared<Component::ComponentRegistry> registry)
+      : mComponentRegistry(registry) {}
+  ~EntityManager() = default;
+
+  shared<Entity> get(UUID const &id) const;
+
+  bool has(UUID const &id) const { return mEntities.contains(id); }
+
+  shared<Entity> create();
+  void destroy(UUID const &id);
+};
+} // namespace Terreate::Core
+
+// Implementation of EntityManager methods
+namespace Terreate::Core {
+template <Component::Component T> shared<T> Entity::getComponent() const {
+  if (!mComponentRegistry) {
+    throw Exception::EntityError("Component manager is not initialized.");
+  }
+  return mComponentRegistry->get<T>(mID);
+}
+
+template <Component::Component T>
+void Entity::addComponent(shared<T> component) {
+  if (!mComponentRegistry) {
+    throw Exception::EntityError("Component manager is not initialized.");
+  }
+  mComponentRegistry->add<T>(mID, component);
+}
+
+template <Component::Component T> void Entity::removeComponent() {
+  if (!mComponentRegistry) {
+    throw Exception::EntityError("Component manager is not initialized.");
+  }
+  mComponentRegistry->remove<T>(mID);
+}
+
+template <Component::Component T>
+void Entity::removeComponent(shared<T> component) {
+  this->removeComponent<T>();
+}
 } // namespace Terreate::Core

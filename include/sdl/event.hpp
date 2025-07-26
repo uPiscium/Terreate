@@ -164,7 +164,7 @@ typedef SDLEvent<shared<Window>, u32, pair<void *>> UserEvent;
 
 class EventHandler {
 private:
-  shared<SDLRegistry> mRegistry = nullptr;
+  shared<ObjectRegistry> mRegistry = nullptr;
 
 public:
   QuitEvent onQuit;
@@ -304,13 +304,13 @@ private:
   void handle(SDL_UserEvent const &event);
 
 public:
-  EventHandler(shared<SDLRegistry> const &registry) : mRegistry(registry) {}
+  EventHandler(shared<ObjectRegistry> const &registry) : mRegistry(registry) {}
   ~EventHandler() = default;
 
   void poll();
 
 public:
-  static shared<EventHandler> create(shared<SDLRegistry> const &registry) {
+  static shared<EventHandler> create(shared<ObjectRegistry> const &registry) {
     return std::make_shared<EventHandler>(registry);
   }
 };

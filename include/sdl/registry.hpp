@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../common/interface.hpp"
 #include "../common/type.hpp"
 
 #include "audio.hpp"
@@ -11,9 +10,9 @@
 #include "window.hpp"
 
 namespace Terreate::SDL {
-class SDLRegistry : public IRegistry {
+class ObjectRegistry {
 private:
-  PROHIBIT_COPY_AND_ASSIGN(SDLRegistry);
+  PROHIBIT_COPY_AND_ASSIGN(ObjectRegistry);
 
 private:
   umap<SDL_AudioDeviceID, shared<AudioDevice>> mAudioDevices;
@@ -24,8 +23,8 @@ private:
   umap<SDL_WindowID, shared<Window>> mWindows;
 
 public:
-  SDLRegistry() = default;
-  ~SDLRegistry() = default;
+  ObjectRegistry() = default;
+  ~ObjectRegistry() = default;
 
   shared<AudioDevice> getAudioDevice(SDL_AudioDeviceID id) const;
   shared<Camera> getCamera(SDL_CameraID id) const;

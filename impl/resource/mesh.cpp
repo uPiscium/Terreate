@@ -1,6 +1,6 @@
-#include <algorithm>
 #include <cmath>
 #include <resource/mesh.hpp>
+#include <resource/registry.hpp>
 
 namespace Terreate::Resource {
 Triangle::Triangle(vec2 const &a, vec2 const &b, vec2 const &c) {
@@ -83,11 +83,12 @@ ConvexPolygon::ConvexPolygon(vec<vec2> const &vertices) {
 }
 
 Circle::Circle(float radius, u32 numSubdivision) {
-  mMesh.position.reserve(numSubdivision);
-  mMesh.indices.reserve(numSubdivision * 3);
+  u32 const numVertices = 1 << numSubdivision; // 2^numSubdivision vertices
+  mMesh.position.reserve(numVertices);
+  mMesh.indices.reserve(numVertices * 3);
 
-  for (u32 i = 0; i < numSubdivision; ++i) {
-    float angle = (2.0f * PI * i) / numSubdivision;
+  for (u32 i = 0; i < numVertices; ++i) {
+    float angle = (2.0f * PI * i) / numVertices;
     mMesh.position.push_back(
         vec3(radius * cos(angle), radius * sin(angle), 0.0f));
   }
@@ -95,11 +96,11 @@ Circle::Circle(float radius, u32 numSubdivision) {
   mMesh.tangent = {vec4(1.0f, 0.0f, 0.0f, 0.0f)};
   mMesh.bitangent = {vec4(0.0f, 1.0f, 0.0f, 0.0f)};
 
-  for (i32 i = 0; i < numSubdivision; ++i) {
+  for (i32 i = 0; i < numVertices; ++i) {
     mMesh.vertices.push_back({i, -1, -1, -1, 0, 0, 0});
   }
 
-  for (i32 i = 1; i < numSubdivision - 1; ++i) {
+  for (i32 i = 1; i < numVertices - 1; ++i) {
     mMesh.indices.push_back(0);     // First vertex
     mMesh.indices.push_back(i);     // Current vertex
     mMesh.indices.push_back(i + 1); // Next vertex
@@ -353,7 +354,6 @@ Cube::Cube(float size) {
 // Plane::Plane(float width, float height, u32 numSubdivision) {}
 
 void Mesh::loadMesh(GeometryData const &data) {
-  mGeometryData = data;
   mRawMesh = Mesh::construct(data);
   vec<float> buffer = Mesh::flatten(mRawMesh.vertices);
   if (!mLoaded) {
@@ -415,7 +415,31 @@ vec<float> Mesh::flatten(vec<Vertex> const &vertices) {
     flatData.insert(flatData.end(), (float *)&v,
                     (float *)&v + sizeof(Vertex) / sizeof(float));
   }
-
   return flatData;
+}
+
+shared<Mesh> MeshManager::get(UUID const &id) const {
+  if (this->has(id)) {
+    return mRegistry->get<Mesh>(id);
+  }
+  return nullptr;
+}
+
+shared<Mesh> MeshManager::create() {
+  shared<Mesh> mesh = std::make_shared<Mesh>();
+  mRegistry->load(mesh);
+  return mesh;
+}
+
+shared<Mesh> MeshManager::create(GeometryData const &data) {
+  shared<Mesh> mesh = this->create();
+  mesh->loadMesh(data);
+  return mesh;
+}
+
+void MeshManager::destroy(UUID const &id) {
+  if (this->has(id)) {
+    mRegistry->unload<Mesh>(id);
+  }
 }
 } // namespace Terreate::Resource

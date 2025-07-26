@@ -80,9 +80,24 @@ int main() {
   //   std::cout << "Character input: " << (char)codepoint << std::endl;
   // });
 
-  Resource::Cube m(1.0f);
-  shared<Resource::Mesh> mesh = std::make_shared<Resource::Mesh>();
-  mesh->loadMesh(m.getMesh());
+  auto resourceController =
+      ctx.createController<Resource::ResourceController>();
+  auto componentController =
+      ctx.createController<Component::ComponentController>();
+
+  shared<Resource::MeshManager> meshManager =
+      resourceController->createManager<Resource::MeshManager>();
+  shared<Resource::Mesh> mesh =
+      meshManager->createPrimitive<Resource::Circle>(0.5f);
+  // mesh->setDrawMode(DrawMode::LINE_LOOP);
+
+  shared<Core::Entity> entity = ctx.createEntity();
+
+  shared<Component::MeshSystem> meshSystem =
+      componentController->createSystem<Component::MeshSystem>();
+  shared<Component::Mesh> meshComponent = meshSystem->create(mesh);
+
+  entity->addComponent(meshComponent);
 
   OpenGL::Shader shader;
   str vert = shader.loadShaderSource("resources/shaders/rect.vert.glsl");
@@ -97,7 +112,7 @@ int main() {
     window->clear();
 
     shader.bind();
-    mesh->draw();
+    meshComponent->draw();
     shader.unbind();
 
     window->update();

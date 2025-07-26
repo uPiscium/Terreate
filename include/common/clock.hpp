@@ -20,8 +20,9 @@ public:
   Clock(u32 const &samples = 10) : mNumSamples(samples) {}
   ~Clock() {}
 
-  float getFPS() const { return mFPS; }
-  float getSPF() const { return mSPF; }
+  float const &getFPS() const { return mFPS; }
+  float const &getSPF() const { return mSPF; }
+  float const &getDeltaTime() const { return mDeltaTime; }
 
   void tick(float fps);
 

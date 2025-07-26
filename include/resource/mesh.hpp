@@ -6,6 +6,7 @@
 #include "../opengl/buffer.hpp"
 
 #include "interface.hpp"
+#include "registry.hpp"
 
 namespace Terreate::Resource {
 enum class MeshFlags : u8 {
@@ -66,6 +67,9 @@ public:
   virtual GeometryData getMesh() const = 0;
 };
 
+template <typename T>
+concept Primitive = extends<T, IPrimitive>;
+
 class Triangle : public IPrimitive {
 private:
   GeometryData mMesh;
@@ -112,7 +116,7 @@ private:
   GeometryData mMesh;
 
 public:
-  Circle(float radius, u32 numSubdivision = 32);
+  Circle(float radius, u32 numSubdivision = 8);
   ~Circle() override = default;
 
   GeometryData getMesh() const override { return mMesh; }
@@ -248,7 +252,6 @@ private:
   UUID mID;
   bool mLoaded = false;
   RawMesh mRawMesh;
-  GeometryData mGeometryData;
   shared<OpenGL::Buffer> mBuffer;
 
 public:
@@ -256,6 +259,7 @@ public:
   ~Mesh() override = default;
 
   UUID const &getID() const override { return mID; }
+  void setDrawMode(DrawMode mode) { mRawMesh.drawMode = mode; }
 
   void loadMesh(GeometryData const &data);
   void draw();
@@ -271,13 +275,34 @@ private:
   shared<ResourceRegistry> mRegistry;
 
 public:
-  MeshManager();
+  MeshManager() = default;
+  MeshManager(shared<ResourceRegistry> registry) : mRegistry(registry) {}
   ~MeshManager() override = default;
 
   UUID const &getID() const override { return mID; }
+  shared<Mesh> get(UUID const &id) const;
 
-  void setRegistry(shared<ResourceRegistry> registry) override {
+  void inject(shared<ResourceRegistry> registry) override {
     mRegistry = registry;
   }
+
+  bool has(UUID const &id) const {
+    return mRegistry && mRegistry->has<Mesh>(id);
+  }
+
+  shared<Mesh> create();
+  shared<Mesh> create(GeometryData const &data);
+  template <Primitive T, typename... Args>
+  shared<Mesh> createPrimitive(Args &&...args);
+  void destroy(UUID const &id);
 };
+} // namespace Terreate::Resource
+
+// template implementation
+namespace Terreate::Resource {
+template <Primitive T, typename... Args>
+shared<Mesh> MeshManager::createPrimitive(Args &&...args) {
+  auto primitive = std::make_shared<T>(std::forward<Args>(args)...);
+  return this->create(primitive->getMesh());
+}
 } // namespace Terreate::Resource
