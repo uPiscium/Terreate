@@ -10,7 +10,6 @@
         buildInputs = with pkgs; [
           pkg-config
           cmake
-          wayland
           alsa-lib
           hidapi
           ibus
@@ -30,21 +29,18 @@
           xorg.libXext
           xorg.libXrender
           xorg.libXtst
-          # libxss
           libxkbcommon
           mesa
-          ninja
           pipewire
           sndio
-          # vulkan-driver
-          # vulkan-headers
           wayland
           wayland-protocols
+          # vulkan-driver
+          # vulkan-headers
         ];
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
           pkg-config
           cmake
-          wayland
           alsa-lib
           hidapi
           ibus
@@ -64,16 +60,14 @@
           xorg.libXext
           xorg.libXrender
           xorg.libXtst
-          # libxss
           libxkbcommon
           mesa
-          ninja
           pipewire
           sndio
-          # vulkan-driver
-          # vulkan-headers
           wayland
           wayland-protocols
+          # vulkan-driver
+          # vulkan-headers
         ]);
       };
     };

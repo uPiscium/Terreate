@@ -35,10 +35,10 @@ public:
   operator mat4() const { return this->getTransformMatrix(); }
 };
 
-class TransformSystem : public ISystem {
+class TransformSystem : public IComponentSystem {
 private:
   UUID mID;
-  shared<Component::ComponentManager> mComponentManager;
+  shared<Component::ComponentRegistry> mComponentRegistry;
 
 public:
   TransformSystem() = default;
@@ -46,9 +46,8 @@ public:
 
   UUID const &getID() const override { return mID; }
 
-  void
-  setComponentManager(shared<Component::ComponentManager> manager) override {
-    mComponentManager = manager;
+  void inject(shared<Component::ComponentRegistry> registry) override {
+    mComponentRegistry = registry;
   }
 
   void update(float const &delta) override;

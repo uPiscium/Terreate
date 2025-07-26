@@ -62,6 +62,18 @@ template <typename... Args> using SDLEvent = Event<u64, Args...>;
 
 typedef SDLEvent<> QuitEvent;
 
+typedef SDLEvent<> TerminateEvent;
+typedef SDLEvent<> LowMemoryEvent;
+typedef SDLEvent<> WillEnterBackgroundEvent;
+typedef SDLEvent<> DidEnterBackgroundEvent;
+typedef SDLEvent<> LocaleChangeEvent;
+typedef SDLEvent<> SystemThemeChangeEvent;
+typedef SDLEvent<> PrivateEvent;
+typedef SDLEvent<> PollStencilEvent;
+typedef SDLEvent<> RenderTargetResetEvent;
+typedef SDLEvent<> RenderDeviceResetEvent;
+typedef SDLEvent<> RenderDeviceLostEvent;
+
 typedef SDLEvent<SDL_DisplayID, u32> DisplayOrientationEvent;
 typedef SDLEvent<SDL_DisplayID> DisplayAddEvent;
 typedef SDLEvent<SDL_DisplayID> DisplayRemoveEvent;
@@ -162,20 +174,65 @@ typedef SDLEvent<shared<Camera>> CameraDeniedEvent;
 
 typedef SDLEvent<shared<Window>, u32, pair<void *>> UserEvent;
 
-class EventHandler {
+class IEventHandler {
+public:
+  virtual ~IEventHandler() = default;
+  virtual void inject(shared<ObjectRegistry> const &registry) = 0;
+};
+
+class CommonEventHandler : public IEventHandler {
 private:
-  shared<SDLObjectRegistry> mRegistry = nullptr;
+  shared<ObjectRegistry> mRegistry = nullptr;
 
 public:
-  QuitEvent onQuit;
+  TerminateEvent onTerminate;
+  LowMemoryEvent onLowMemory;
+  WillEnterBackgroundEvent onWillEnterBackground;
+  DidEnterBackgroundEvent onDidEnterBackground;
+  LocaleChangeEvent onLocaleChange;
+  SystemThemeChangeEvent onSystemThemeChange;
+  PrivateEvent onPrivate0;
+  PrivateEvent onPrivate1;
+  PrivateEvent onPrivate2;
+  PrivateEvent onPrivate3;
+  PollStencilEvent onPollStencil;
+  RenderTargetResetEvent onRenderTargetReset;
+  RenderDeviceResetEvent onRenderDeviceReset;
+  RenderDeviceLostEvent onRenderDeviceLost;
 
-  DisplayOrientationEvent onOrientation;
+public:
+  CommonEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_CommonEvent const &event);
+};
+
+class DisplayEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
+  DisplayOrientationEvent onOrientationChange;
   DisplayAddEvent onDisplayAdd;
   DisplayRemoveEvent onDisplayRemove;
   DisplayModeChangeEvent onDisplayModeChange;
   DisplayCurrentModeChangeEvent onDisplayCurrentModeChange;
   DisplayContentScaleChangeEvent onDisplayContentScaleChange;
 
+public:
+  DisplayEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_DisplayEvent const &event);
+};
+
+class WindowEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
   WindowVisibilityChangeEvent onWindowVisibilityChange;
   WindowExposeEvent onWindowExpose;
   WindowMoveEvent onWindowMove;
@@ -198,23 +255,83 @@ public:
   WindowFullscreenChangeEvent onWindowFullscreenChange;
   WindowDestroyEvent onWindowDestroy;
   WindowHDRStateChangeEvent onWindowHDRStateChange;
+  DropEvent onDrop;
 
-  KeyEvent onKey;
+public:
+  WindowEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_WindowEvent const &event);
+  void handle(SDL_DropEvent const &event);
+};
 
-  TextEditingEvent onTextEditing;
-  TextInputEvent onTextInput;
+class KeyboardEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
 
+public:
+  KeyEvent onKeyInput;
   KeyboardAddEvent onKeyboardAdd;
   KeyboardRemoveEvent onKeyboardRemove;
 
-  TextEditingCandidatesEvent onTextEditingCandidates;
+public:
+  KeyboardEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_KeyboardEvent const &event);
+  void handle(SDL_KeyboardDeviceEvent const &event);
+};
 
+class TextEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
+  TextEditingEvent onTextEditing;
+  TextInputEvent onTextInput;
+  TextEditingCandidatesEvent onTextEditingCandidates;
+  ClipboardEvent onClipboard;
+
+public:
+  TextEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_TextEditingEvent const &event);
+  void handle(SDL_TextInputEvent const &event);
+  void handle(SDL_TextEditingCandidatesEvent const &event);
+  void handle(SDL_ClipboardEvent const &event);
+};
+
+class MouseEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
   MouseMotionEvent onMouseMotion;
   MouseButtonEvent onMouseButton;
   MouseWheelEvent onMouseWheel;
   MouseAddEvent onMouseAdd;
   MouseRemoveEvent onMouseRemove;
 
+public:
+  MouseEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_MouseMotionEvent const &event);
+  void handle(SDL_MouseButtonEvent const &event);
+  void handle(SDL_MouseWheelEvent const &event);
+  void handle(SDL_MouseDeviceEvent const &event);
+};
+
+class JoystickEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
   JoystickAxisEvent onJoystickAxisMotion;
   JoystickBallEvent onJoystickBallMotion;
   JoystickHatEvent onJoystickHatMotion;
@@ -224,6 +341,24 @@ public:
   JoystickUpdateCompleteEvent onJoystickUpdateComplete;
   JoystickBatteryUpdateEvent onJoystickBatteryUpdate;
 
+public:
+  JoystickEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_JoyAxisEvent const &event);
+  void handle(SDL_JoyBallEvent const &event);
+  void handle(SDL_JoyHatEvent const &event);
+  void handle(SDL_JoyButtonEvent const &event);
+  void handle(SDL_JoyDeviceEvent const &event);
+  void handle(SDL_JoyBatteryEvent const &event);
+};
+
+class GamepadEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
   GamepadAxisEvent onGamepadAxisMotion;
   GamepadButtonEvent onGamepadButton;
   GamepadAddEvent onGamepadAdd;
@@ -234,80 +369,160 @@ public:
   GamepadTouchpadEvent onGamepadTouchpadEvent;
   GamepadSensorEvent onGamepadSensorEvent;
 
-  TouchFingerEvent onTouchFinger;
+public:
+  GamepadEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_GamepadAxisEvent const &event);
+  void handle(SDL_GamepadButtonEvent const &event);
+  void handle(SDL_GamepadDeviceEvent const &event);
+  void handle(SDL_GamepadTouchpadEvent const &event);
+  void handle(SDL_GamepadSensorEvent const &event);
+};
 
-  ClipboardEvent onClipboard;
+class AudioDeviceEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
 
-  DropEvent onDrop;
-
+public:
   AudioDeviceAddEvent onAudioDeviceAdd;
   AudioDeviceRemoveEvent onAudioDeviceRemove;
   AudioDeviceFormatChangeEvent onAudioDeviceFormatChange;
 
-  SensorEvent onSensor;
+public:
+  AudioDeviceEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_AudioDeviceEvent const &event);
+};
 
+class PenEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
   PenProximityEvent onPenProximity;
   PenTouchEvent onPenTouch;
   PenButtonEvent onPenButton;
   PenMotionEvent onPenMotion;
   PenAxisEvent onPenAxis;
 
-  CameraAddEvent onCameraAdd;
-  CameraRemoveEvent onCameraRemove;
-  CameraApprovedEvent onCameraApproved;
-  CameraDeniedEvent onCameraDenied;
-
-  UserEvent onUser;
-
-private:
-  void handle(SDL_QuitEvent const &event) {
-    this->onQuit.publish(event.timestamp);
-  }
-  void handle(SDL_CommonEvent const &event);
-  void handle(SDL_DisplayEvent const &event);
-  void handle(SDL_WindowEvent const &event);
-  void handle(SDL_KeyboardEvent const &event);
-  void handle(SDL_TextEditingEvent const &event);
-  void handle(SDL_TextInputEvent const &event);
-  void handle(SDL_KeyboardDeviceEvent const &event);
-  void handle(SDL_TextEditingCandidatesEvent const &event);
-  void handle(SDL_MouseMotionEvent const &event);
-  void handle(SDL_MouseButtonEvent const &event);
-  void handle(SDL_MouseWheelEvent const &event);
-  void handle(SDL_MouseDeviceEvent const &event);
-  void handle(SDL_JoyAxisEvent const &event);
-  void handle(SDL_JoyBallEvent const &event);
-  void handle(SDL_JoyHatEvent const &event);
-  void handle(SDL_JoyButtonEvent const &event);
-  void handle(SDL_JoyDeviceEvent const &event);
-  void handle(SDL_JoyBatteryEvent const &event);
-  void handle(SDL_GamepadAxisEvent const &event);
-  void handle(SDL_GamepadButtonEvent const &event);
-  void handle(SDL_GamepadDeviceEvent const &event);
-  void handle(SDL_GamepadTouchpadEvent const &event);
-  void handle(SDL_GamepadSensorEvent const &event);
-  void handle(SDL_TouchFingerEvent const &event);
-  void handle(SDL_ClipboardEvent const &event);
-  void handle(SDL_DropEvent const &event);
-  void handle(SDL_AudioDeviceEvent const &event);
-  void handle(SDL_SensorEvent const &event) {
-    this->onSensor.publish(event.timestamp, event.which,
-                           {event.data[0], event.data[1], event.data[2],
-                            event.data[3], event.data[4], event.data[5]});
+public:
+  PenEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
   }
   void handle(SDL_PenProximityEvent const &event);
   void handle(SDL_PenTouchEvent const &event);
   void handle(SDL_PenButtonEvent const &event);
   void handle(SDL_PenMotionEvent const &event);
   void handle(SDL_PenAxisEvent const &event);
-  void handle(SDL_CameraDeviceEvent const &event);
-  void handle(SDL_UserEvent const &event);
+};
+
+class CameraEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
 
 public:
-  EventHandler(shared<SDLObjectRegistry> const &registry)
-      : mRegistry(registry) {}
+  CameraAddEvent onCameraAdd;
+  CameraRemoveEvent onCameraRemove;
+  CameraApprovedEvent onCameraApproved;
+  CameraDeniedEvent onCameraDenied;
+
+public:
+  CameraEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_CameraDeviceEvent const &event);
+};
+
+class TouchFingerEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
+  TouchFingerEvent onFingerTouch;
+
+public:
+  TouchFingerEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_TouchFingerEvent const &event);
+};
+
+class SensorEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
+  SensorEvent onSensorInput;
+
+public:
+  SensorEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_SensorEvent const &event) {
+    this->onSensorInput.publish(event.timestamp, event.which,
+                                {event.data[0], event.data[1], event.data[2],
+                                 event.data[3], event.data[4], event.data[5]});
+  }
+};
+
+class UserEventHandler : public IEventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
+  UserEvent onUser;
+
+public:
+  UserEventHandler() = default;
+  void inject(shared<ObjectRegistry> const &registry) override {
+    mRegistry = registry;
+  }
+  void handle(SDL_UserEvent const &event);
+};
+
+class EventHandler {
+private:
+  shared<ObjectRegistry> mRegistry = nullptr;
+
+public:
+  QuitEvent onQuit;
+  CommonEventHandler common;
+  DisplayEventHandler display;
+  WindowEventHandler window;
+  KeyboardEventHandler keyboard;
+  TextEventHandler text;
+  MouseEventHandler mouse;
+  JoystickEventHandler joystick;
+  GamepadEventHandler gamepad;
+  AudioDeviceEventHandler audioDevice;
+  PenEventHandler pen;
+  CameraEventHandler camera;
+  TouchFingerEventHandler touchFinger;
+  SensorEventHandler sensor;
+  UserEventHandler user;
+
+private:
+  void handle(SDL_QuitEvent const &event) {
+    this->onQuit.publish(event.timestamp);
+  }
+
+public:
+  EventHandler(shared<ObjectRegistry> const &registry);
   ~EventHandler() = default;
 
   void poll();
+
+public:
+  static shared<EventHandler> create(shared<ObjectRegistry> const &registry) {
+    return std::make_shared<EventHandler>(registry);
+  }
 };
 } // namespace Terreate::SDL

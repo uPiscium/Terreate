@@ -1,5 +1,9 @@
+#include <component/controller.hpp>
+
 #include <core/context.hpp>
 #include <core/exception.hpp>
+
+#include <resource/resource.hpp>
 
 #include <sdl/sdl.hpp>
 
@@ -7,8 +11,14 @@ namespace Terreate::Core {
 Context::Context() {
   SDL::initializeSDL();
   mClock = std::make_shared<Clock>();
-  mSDLObjectRegistry = std::make_shared<SDL::SDLObjectRegistry>();
-  mEventHandler = std::make_shared<SDL::EventHandler>(mSDLObjectRegistry);
+  mSDLObjectRegistry = std::make_shared<SDL::ObjectRegistry>();
+  mEventHandler = SDL::EventHandler::create(mSDLObjectRegistry);
+
+  auto compController =
+      this->createController<Component::ComponentController>();
+
+  mEntityManager =
+      std::make_shared<EntityManager>(compController->getRegistry());
 }
 
 Context::~Context() {
@@ -16,9 +26,13 @@ Context::~Context() {
     mWindow->close();
     mWindow.reset();
   }
-  mClock.reset();
+  mEntityManager.reset();
+  for (auto &controller : mControllers) {
+    controller.second.reset();
+  }
   mEventHandler.reset();
   mSDLObjectRegistry.reset();
+  mClock.reset();
   SDL::terminate();
 }
 
@@ -41,7 +55,7 @@ shared<SDL::Window> Context::createWindow(u32 width, u32 height,
   mSDLObjectRegistry->registerWindow(mWindow->getId(), mWindow);
 
   if (autoCloseOnEvent) {
-    mEventHandler->onWindowCloseRequested.subscribe(
+    mEventHandler->window.onWindowCloseRequested.subscribe(
         [this](u64, shared<SDL::Window> window) {
           if (window && window->getId() == mWindow->getId()) {
             window->close();
@@ -64,6 +78,9 @@ void Context::tick(double fps) {
     return;
 
   mEventHandler->poll();
+  for (auto &controller : mControllers) {
+    controller.second->update(mClock->getDeltaTime());
+  }
   mClock->tick(fps);
 }
 } // namespace Terreate::Core

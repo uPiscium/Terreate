@@ -9,7 +9,9 @@ endif()
 
 add_library(
   ${PROJECT_NAME} STATIC
+  controller.cpp
   mesh.cpp
+  transform.cpp
 )
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC

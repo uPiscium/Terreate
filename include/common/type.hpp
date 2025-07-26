@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <typeindex>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -42,6 +43,9 @@ typedef std::stringstream stream;
 typedef std::ifstream ifstream;
 typedef std::ofstream ofstream;
 
+typedef std::type_info typeinfo;
+typedef std::type_index typeindex;
+
 // SDL types
 typedef SDL_GUID GUID;
 typedef SDL_AudioSpec AudioSpec;
@@ -49,9 +53,11 @@ typedef SDL_AudioSpec AudioSpec;
 // OpenGL types
 typedef u32 GLObject;
 
-template <typename S, typename T> using umap = std::unordered_map<S, T>;
+template <typename S, typename T, typename Hash = std::hash<S>>
+using umap = std::unordered_map<S, T, Hash>;
 template <typename S, typename T = S> using pair = std::pair<S, T>;
 template <typename T> using uset = std::unordered_set<T>;
+template <typename T, u64 N> using array = std::array<T, N>;
 template <typename T> using vec = std::vector<T>;
 template <typename T> using shared = std::shared_ptr<T>;
 template <typename T> using unique = std::unique_ptr<T>;
@@ -61,4 +67,10 @@ template <typename Derived, typename Base>
 concept extends = std::derived_from<Derived, Base>;
 template <typename Enum>
 concept enumtype = std::is_enum_v<Enum>;
+
+struct Attribute {
+  i32 size = 0;
+  u32 stride = 0;
+  u32 offset = 0;
+};
 } // namespace Terreate

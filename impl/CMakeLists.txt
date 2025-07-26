@@ -41,6 +41,8 @@ add_subdirectory(common)
 add_subdirectory(opengl)
 add_subdirectory(sdl)
 
+add_subdirectory(component)
+add_subdirectory(resource)
 add_subdirectory(core)
 
 add_library(
@@ -53,7 +55,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../deps)
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC
   TerreateCommonModule
+  TerreateComponentModule
   TerreateCoreModule
   TerreateOpenGLModule
+  TerreateResourceModule
   TerreateSDLModule
 )

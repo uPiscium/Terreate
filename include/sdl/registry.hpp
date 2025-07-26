@@ -10,9 +10,9 @@
 #include "window.hpp"
 
 namespace Terreate::SDL {
-class SDLObjectRegistry {
+class ObjectRegistry {
 private:
-  PROHIBIT_COPY_AND_ASSIGN(SDLObjectRegistry);
+  PROHIBIT_COPY_AND_ASSIGN(ObjectRegistry);
 
 private:
   umap<SDL_AudioDeviceID, shared<AudioDevice>> mAudioDevices;
@@ -23,8 +23,8 @@ private:
   umap<SDL_WindowID, shared<Window>> mWindows;
 
 public:
-  SDLObjectRegistry() = default;
-  ~SDLObjectRegistry() = default;
+  ObjectRegistry() = default;
+  ~ObjectRegistry() = default;
 
   shared<AudioDevice> getAudioDevice(SDL_AudioDeviceID id) const;
   shared<Camera> getCamera(SDL_CameraID id) const;
@@ -34,21 +34,13 @@ public:
   shared<Window> getWindow(SDL_WindowID id) const;
 
   bool hasAudioDevice(SDL_AudioDeviceID id) const {
-    return mAudioDevices.find(id) != mAudioDevices.end();
+    return mAudioDevices.contains(id);
   }
-  bool hasCamera(SDL_CameraID id) const {
-    return mCameras.find(id) != mCameras.end();
-  }
-  bool hasGamepad(SDL_JoystickID id) const {
-    return mGamepads.find(id) != mGamepads.end();
-  }
-  bool hasJoystick(SDL_JoystickID id) const {
-    return mJoysticks.find(id) != mJoysticks.end();
-  }
-  bool hasMouse(SDL_MouseID id) const { return mMice.find(id) != mMice.end(); }
-  bool hasWindow(SDL_WindowID id) const {
-    return mWindows.find(id) != mWindows.end();
-  }
+  bool hasCamera(SDL_CameraID id) const { return mCameras.contains(id); }
+  bool hasGamepad(SDL_JoystickID id) const { return mGamepads.contains(id); }
+  bool hasJoystick(SDL_JoystickID id) const { return mJoysticks.contains(id); }
+  bool hasMouse(SDL_MouseID id) const { return mMice.contains(id); }
+  bool hasWindow(SDL_WindowID id) const { return mWindows.contains(id); }
 
   void registerAudioDevice(SDL_AudioDeviceID id, shared<AudioDevice> device);
   void unregisterAudioDevice(SDL_AudioDeviceID id);
