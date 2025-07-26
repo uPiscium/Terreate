@@ -26,35 +26,13 @@ message(STATUS "Configuring SDL.")
 FetchContent_MakeAvailable(SDL3)
 message(STATUS "SDL configured.")
 
-# message(STATUS "Cloining GLEW...")
-# set(glew-cmake_BUILD_SHARED OFF)
-# FetchContent_Declare(
-#   glew
-#   GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
-#   GIT_TAG glew-cmake-2.2.0
-# )
-# message(STATUS "GLEW cloned.")
-# message(STATUS "Configuring GLEW.")
-# FetchContent_MakeAvailable(glew)
-# message(STATUS "GLEW configured.")
+add_subdirectory(common)
+add_subdirectory(opengl)
+add_subdirectory(sdl)
 
-message(STATUS "Cloning Freetype...")
-FetchContent_Declare(
-  freetype
-  GIT_REPOSITORY https://github.com/freetype/freetype.git
-  GIT_TAG VER-2-13-3
-)
-message(STATUS "Freetype cloned.")
-message(STATUS "Configuring Freetype.")
-FetchContent_MakeAvailable(freetype)
-message(STATUS "Freetype configured.")
-
-
-add_subdirectory(module/common)
-add_subdirectory(module/opengl)
-add_subdirectory(module/sdl)
-
-add_subdirectory(module/core)
+add_subdirectory(component)
+add_subdirectory(resource)
+add_subdirectory(core)
 
 add_library(
   ${PROJECT_NAME} STATIC
@@ -66,7 +44,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../deps)
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC
   TerreateCommonModule
+  TerreateComponentModule
   TerreateCoreModule
   TerreateOpenGLModule
+  TerreateResourceModule
   TerreateSDLModule
 )
