@@ -2,15 +2,65 @@
 #include <sdl/exception.hpp>
 
 namespace Terreate::SDL {
-void EventHandler::handle(SDL_CommonEvent const &event) {
-  // Common events are handled here, but they are not used in this module.
-  // This is a placeholder for future common event handling.
+void CommonEventHandler::handle(SDL_CommonEvent const &event) {
+  switch (event.type) {
+  case SDL_EVENT_TERMINATING:
+    this->onTerminate.publish(event.timestamp);
+    break;
+  case SDL_EVENT_LOW_MEMORY:
+    this->onLowMemory.publish(event.timestamp);
+    break;
+  case SDL_EVENT_WILL_ENTER_BACKGROUND:
+    this->onWillEnterBackground.publish(event.timestamp);
+    break;
+  case SDL_EVENT_DID_ENTER_BACKGROUND:
+    this->onDidEnterBackground.publish(event.timestamp);
+    break;
+  case SDL_EVENT_LOCALE_CHANGED:
+    this->onLocaleChange.publish(event.timestamp);
+    break;
+  case SDL_EVENT_SYSTEM_THEME_CHANGED:
+    this->onSystemThemeChange.publish(event.timestamp);
+    break;
+  case SDL_EVENT_KEYMAP_CHANGED:
+    // This event is not supported yet.
+    break;
+  case SDL_EVENT_PRIVATE0:
+    this->onPrivate0.publish(event.timestamp);
+    break;
+  case SDL_EVENT_PRIVATE1:
+    this->onPrivate1.publish(event.timestamp);
+    break;
+  case SDL_EVENT_PRIVATE2:
+    this->onPrivate2.publish(event.timestamp);
+    break;
+  case SDL_EVENT_PRIVATE3:
+    this->onPrivate3.publish(event.timestamp);
+    break;
+  case SDL_EVENT_POLL_SENTINEL:
+    this->onPollStencil.publish(event.timestamp);
+    break;
+  case SDL_EVENT_RENDER_TARGETS_RESET:
+    this->onRenderTargetReset.publish(event.timestamp);
+    break;
+  case SDL_EVENT_RENDER_DEVICE_RESET:
+    this->onRenderDeviceReset.publish(event.timestamp);
+    break;
+  case SDL_EVENT_RENDER_DEVICE_LOST:
+    this->onRenderDeviceLost.publish(event.timestamp);
+    break;
+  default:
+    throw Exception::SDLModuleError(
+        "Unhandled SDL_CommonEvent type: " +
+        std::to_string(static_cast<int>(event.type)));
+  }
 }
 
-void EventHandler::handle(SDL_DisplayEvent const &event) {
+void DisplayEventHandler::handle(SDL_DisplayEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_DISPLAY_ORIENTATION:
-    this->onOrientation.publish(event.timestamp, event.displayID, event.data1);
+    this->onOrientationChange.publish(event.timestamp, event.displayID,
+                                      event.data1);
     break;
   case SDL_EVENT_DISPLAY_ADDED:
     this->onDisplayAdd.publish(event.timestamp, event.displayID);
@@ -41,7 +91,7 @@ void EventHandler::handle(SDL_DisplayEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_WindowEvent const &event) {
+void WindowEventHandler::handle(SDL_WindowEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   switch (event.type) {
   case SDL_EVENT_WINDOW_SHOWN:
@@ -133,24 +183,20 @@ void EventHandler::handle(SDL_WindowEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_KeyboardEvent const &event) {
+void WindowEventHandler::handle(SDL_DropEvent const &event) {
+  shared<Window> window = mRegistry->getWindow(event.windowID);
+  str filePath(event.source);
+  str text(event.data);
+  this->onDrop.publish(event.timestamp, window, {event.x, event.y}, filePath,
+                       text);
+}
+
+void KeyboardEventHandler::handle(SDL_KeyboardEvent const &event) {
   Key key = Key(event);
-  this->onKey.publish(event.timestamp, key);
+  this->onKeyInput.publish(event.timestamp, key);
 }
 
-void EventHandler::handle(SDL_TextEditingEvent const &event) {
-  str text(event.text, event.length);
-  shared<Window> window = mRegistry->getWindow(event.windowID);
-  this->onTextEditing.publish(event.timestamp, window, text, event.start);
-}
-
-void EventHandler::handle(SDL_TextInputEvent const &event) {
-  str text(event.text);
-  shared<Window> window = mRegistry->getWindow(event.windowID);
-  this->onTextInput.publish(event.timestamp, window, text);
-}
-
-void EventHandler::handle(SDL_KeyboardDeviceEvent const &event) {
+void KeyboardEventHandler::handle(SDL_KeyboardDeviceEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_KEYBOARD_ADDED:
     this->onKeyboardAdd.publish(event.timestamp, event.which);
@@ -166,7 +212,19 @@ void EventHandler::handle(SDL_KeyboardDeviceEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_TextEditingCandidatesEvent const &event) {
+void TextEventHandler::handle(SDL_TextEditingEvent const &event) {
+  str text(event.text, event.length);
+  shared<Window> window = mRegistry->getWindow(event.windowID);
+  this->onTextEditing.publish(event.timestamp, window, text, event.start);
+}
+
+void TextEventHandler::handle(SDL_TextInputEvent const &event) {
+  str text(event.text);
+  shared<Window> window = mRegistry->getWindow(event.windowID);
+  this->onTextInput.publish(event.timestamp, window, text);
+}
+
+void TextEventHandler::handle(SDL_TextEditingCandidatesEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   vec<str> candidates(event.candidates,
                       event.candidates + event.num_candidates);
@@ -177,7 +235,12 @@ void EventHandler::handle(SDL_TextEditingCandidatesEvent const &event) {
                                         event.selected_candidate, orientation);
 }
 
-void EventHandler::handle(SDL_MouseMotionEvent const &event) {
+void TextEventHandler::handle(SDL_ClipboardEvent const &event) {
+  vec<str> mimeTypes(event.mime_types, event.mime_types + event.num_mime_types);
+  this->onClipboard.publish(event.timestamp, event.owner, mimeTypes);
+}
+
+void MouseEventHandler::handle(SDL_MouseMotionEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   shared<Mouse> mouse;
   if (mRegistry->hasMouse(event.which)) {
@@ -190,7 +253,7 @@ void EventHandler::handle(SDL_MouseMotionEvent const &event) {
                               {event.x, event.y}, {event.xrel, event.yrel});
 }
 
-void EventHandler::handle(SDL_MouseButtonEvent const &event) {
+void MouseEventHandler::handle(SDL_MouseButtonEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   shared<Mouse> mouse;
   if (mRegistry->hasMouse(event.which)) {
@@ -204,7 +267,7 @@ void EventHandler::handle(SDL_MouseButtonEvent const &event) {
                               event.clicks, {event.x, event.y});
 }
 
-void EventHandler::handle(SDL_MouseWheelEvent const &event) {
+void MouseEventHandler::handle(SDL_MouseWheelEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   shared<Mouse> mouse;
   if (mRegistry->hasMouse(event.which)) {
@@ -219,7 +282,7 @@ void EventHandler::handle(SDL_MouseWheelEvent const &event) {
                              {event.integer_x, event.integer_y});
 }
 
-void EventHandler::handle(SDL_MouseDeviceEvent const &event) {
+void MouseEventHandler::handle(SDL_MouseDeviceEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_MOUSE_ADDED:
     if (!mRegistry->hasMouse(event.which)) {
@@ -243,31 +306,31 @@ void EventHandler::handle(SDL_MouseDeviceEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_JoyAxisEvent const &event) {
+void JoystickEventHandler::handle(SDL_JoyAxisEvent const &event) {
   shared<Joystick> joystick = mRegistry->getJoystick(event.which);
   this->onJoystickAxisMotion.publish(event.timestamp, joystick, event.axis,
                                      event.value);
 }
 
-void EventHandler::handle(SDL_JoyBallEvent const &event) {
+void JoystickEventHandler::handle(SDL_JoyBallEvent const &event) {
   shared<Joystick> joystick = mRegistry->getJoystick(event.which);
   this->onJoystickBallMotion.publish(event.timestamp, joystick, event.ball,
                                      {event.xrel, event.yrel});
 }
 
-void EventHandler::handle(SDL_JoyHatEvent const &event) {
+void JoystickEventHandler::handle(SDL_JoyHatEvent const &event) {
   shared<Joystick> joystick = mRegistry->getJoystick(event.which);
   this->onJoystickHatMotion.publish(event.timestamp, joystick, event.hat,
                                     (JoystickHatState)event.value);
 }
 
-void EventHandler::handle(SDL_JoyButtonEvent const &event) {
+void JoystickEventHandler::handle(SDL_JoyButtonEvent const &event) {
   shared<Joystick> joystick = mRegistry->getJoystick(event.which);
   this->onJoystickButton.publish(event.timestamp, joystick, event.button,
                                  event.down);
 }
 
-void EventHandler::handle(SDL_JoyDeviceEvent const &event) {
+void JoystickEventHandler::handle(SDL_JoyDeviceEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_JOYSTICK_ADDED:
     if (!mRegistry->hasJoystick(event.which)) {
@@ -296,7 +359,7 @@ void EventHandler::handle(SDL_JoyDeviceEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_JoyBatteryEvent const &event) {
+void JoystickEventHandler::handle(SDL_JoyBatteryEvent const &event) {
   shared<Joystick> joystick = mRegistry->getJoystick(event.which);
   if (joystick) {
     this->onJoystickBatteryUpdate.publish(
@@ -308,19 +371,19 @@ void EventHandler::handle(SDL_JoyBatteryEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_GamepadAxisEvent const &event) {
+void GamepadEventHandler::handle(SDL_GamepadAxisEvent const &event) {
   shared<Gamepad> gamepad = mRegistry->getGamepad(event.which);
   this->onGamepadAxisMotion.publish(event.timestamp, gamepad,
                                     (GamepadAxis)event.axis, event.value);
 }
 
-void EventHandler::handle(SDL_GamepadButtonEvent const &event) {
+void GamepadEventHandler::handle(SDL_GamepadButtonEvent const &event) {
   shared<Gamepad> gamepad = mRegistry->getGamepad(event.which);
   this->onGamepadButton.publish(event.timestamp, gamepad,
                                 (GamepadButton)event.button, event.down);
 }
 
-void EventHandler::handle(SDL_GamepadDeviceEvent const &event) {
+void GamepadEventHandler::handle(SDL_GamepadDeviceEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_GAMEPAD_ADDED:
     if (!mRegistry->hasGamepad(event.which)) {
@@ -357,41 +420,28 @@ void EventHandler::handle(SDL_GamepadDeviceEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_GamepadTouchpadEvent const &event) {
+void GamepadEventHandler::handle(SDL_GamepadTouchpadEvent const &event) {
   shared<Gamepad> gamepad = mRegistry->getGamepad(event.which);
   this->onGamepadTouchpadEvent.publish(event.timestamp, gamepad, event.touchpad,
                                        event.finger, {event.x, event.y},
                                        event.pressure);
 }
 
-void EventHandler::handle(SDL_GamepadSensorEvent const &event) {
+void GamepadEventHandler::handle(SDL_GamepadSensorEvent const &event) {
   shared<Gamepad> gamepad = mRegistry->getGamepad(event.which);
   this->onGamepadSensorEvent.publish(
       event.timestamp, gamepad, (SDLSensor)event.sensor,
       {event.data[0], event.data[1], event.data[2]}, event.timestamp);
 }
 
-void EventHandler::handle(SDL_TouchFingerEvent const &event) {
+void TouchFingerEventHandler::handle(SDL_TouchFingerEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
-  this->onTouchFinger.publish(event.timestamp, window, event.touchID,
+  this->onFingerTouch.publish(event.timestamp, window, event.touchID,
                               event.fingerID, {event.x, event.y},
                               {event.dx, event.dy}, event.pressure);
 }
 
-void EventHandler::handle(SDL_ClipboardEvent const &event) {
-  vec<str> mimeTypes(event.mime_types, event.mime_types + event.num_mime_types);
-  this->onClipboard.publish(event.timestamp, event.owner, mimeTypes);
-}
-
-void EventHandler::handle(SDL_DropEvent const &event) {
-  shared<Window> window = mRegistry->getWindow(event.windowID);
-  str filePath(event.source);
-  str text(event.data);
-  this->onDrop.publish(event.timestamp, window, {event.x, event.y}, filePath,
-                       text);
-}
-
-void EventHandler::handle(SDL_AudioDeviceEvent const &event) {
+void AudioDeviceEventHandler::handle(SDL_AudioDeviceEvent const &event) {
   SDL_AudioSpec spec;
   i32 sampleRate = 0;
   SDL_GetAudioDeviceFormat(event.which, &spec, &sampleRate);
@@ -427,39 +477,39 @@ void EventHandler::handle(SDL_AudioDeviceEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_PenProximityEvent const &event) {
+void PenEventHandler::handle(SDL_PenProximityEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   this->onPenProximity.publish(event.timestamp, window, event.which);
 }
 
-void EventHandler::handle(SDL_PenTouchEvent const &event) {
+void PenEventHandler::handle(SDL_PenTouchEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   this->onPenTouch.publish(event.timestamp, window, event.which,
                            (Bitflag<PenState>)event.pen_state,
                            {event.x, event.y}, event.eraser, event.down);
 }
 
-void EventHandler::handle(SDL_PenButtonEvent const &event) {
+void PenEventHandler::handle(SDL_PenButtonEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   this->onPenButton.publish(event.timestamp, window, event.which,
                             (Bitflag<PenState>)event.pen_state,
                             {event.x, event.y}, event.button, event.down);
 }
 
-void EventHandler::handle(SDL_PenMotionEvent const &event) {
+void PenEventHandler::handle(SDL_PenMotionEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   this->onPenMotion.publish(event.timestamp, window, event.which,
                             (Bitflag<PenState>)event.pen_state,
                             {event.x, event.y});
 }
 
-void EventHandler::handle(SDL_PenAxisEvent const &event) {
+void PenEventHandler::handle(SDL_PenAxisEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   this->onPenAxis.publish(event.timestamp, window, event.which,
                           (PenAxis)event.axis, {event.x, event.y}, event.value);
 }
 
-void EventHandler::handle(SDL_CameraDeviceEvent const &event) {
+void CameraEventHandler::handle(SDL_CameraDeviceEvent const &event) {
   switch (event.type) {
   case SDL_EVENT_CAMERA_DEVICE_ADDED:
     if (!mRegistry->hasCamera(event.which)) {
@@ -492,10 +542,28 @@ void EventHandler::handle(SDL_CameraDeviceEvent const &event) {
   }
 }
 
-void EventHandler::handle(SDL_UserEvent const &event) {
+void UserEventHandler::handle(SDL_UserEvent const &event) {
   shared<Window> window = mRegistry->getWindow(event.windowID);
   this->onUser.publish(event.timestamp, window, event.type,
                        {event.data1, event.data2});
+}
+
+EventHandler::EventHandler(shared<ObjectRegistry> const &registry)
+    : mRegistry(registry) {
+  this->common.inject(registry);
+  this->display.inject(registry);
+  this->window.inject(registry);
+  this->keyboard.inject(registry);
+  this->text.inject(registry);
+  this->mouse.inject(registry);
+  this->joystick.inject(registry);
+  this->gamepad.inject(registry);
+  this->audioDevice.inject(registry);
+  this->pen.inject(registry);
+  this->camera.inject(registry);
+  this->touchFinger.inject(registry);
+  this->sensor.inject(registry);
+  this->user.inject(registry);
 }
 
 void EventHandler::poll() {
@@ -521,162 +589,159 @@ void EventHandler::poll() {
     case SDL_EVENT_RENDER_TARGETS_RESET:
     case SDL_EVENT_RENDER_DEVICE_RESET:
     case SDL_EVENT_RENDER_DEVICE_LOST:
-      this->handle(handle.common);
+      this->common.handle(handle.common);
       break;
 
     case SDL_EVENT_DISPLAY_FIRST ... SDL_EVENT_DISPLAY_LAST:
-      this->handle(handle.display);
+      this->display.handle(handle.display);
       break;
 
     case SDL_EVENT_WINDOW_FIRST ... SDL_EVENT_WINDOW_LAST:
-      this->handle(handle.window);
+      this->window.handle(handle.window);
+      break;
+    case SDL_EVENT_DROP_FILE:
+    case SDL_EVENT_DROP_TEXT:
+    case SDL_EVENT_DROP_BEGIN:
+    case SDL_EVENT_DROP_COMPLETE:
+    case SDL_EVENT_DROP_POSITION:
+      this->window.handle(handle.drop);
       break;
 
     case SDL_EVENT_KEY_DOWN:
     case SDL_EVENT_KEY_UP:
-      this->handle(handle.key);
-      break;
-
-    case SDL_EVENT_TEXT_EDITING:
-      this->handle(handle.edit);
-      break;
-    case SDL_EVENT_TEXT_INPUT:
-      this->handle(handle.text);
+      this->keyboard.handle(handle.key);
       break;
     case SDL_EVENT_KEYBOARD_ADDED:
     case SDL_EVENT_KEYBOARD_REMOVED:
-      this->handle(handle.kdevice);
+      this->keyboard.handle(handle.kdevice);
+      break;
+
+    case SDL_EVENT_TEXT_EDITING:
+      this->text.handle(handle.edit);
+      break;
+    case SDL_EVENT_TEXT_INPUT:
+      this->text.handle(handle.text);
       break;
     case SDL_EVENT_TEXT_EDITING_CANDIDATES:
-      this->handle(handle.edit_candidates);
+      this->text.handle(handle.edit_candidates);
+      break;
+    case SDL_EVENT_CLIPBOARD_UPDATE:
+      this->text.handle(handle.clipboard);
       break;
 
     case SDL_EVENT_MOUSE_MOTION:
-      this->handle(handle.motion);
+      this->mouse.handle(handle.motion);
       break;
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
     case SDL_EVENT_MOUSE_BUTTON_UP:
-      this->handle(handle.button);
+      this->mouse.handle(handle.button);
       break;
     case SDL_EVENT_MOUSE_WHEEL:
-      this->handle(handle.wheel);
+      this->mouse.handle(handle.wheel);
       break;
     case SDL_EVENT_MOUSE_ADDED:
     case SDL_EVENT_MOUSE_REMOVED:
-      this->handle(handle.mdevice);
+      this->mouse.handle(handle.mdevice);
       break;
 
     case SDL_EVENT_JOYSTICK_AXIS_MOTION:
-      this->handle(handle.jaxis);
+      this->joystick.handle(handle.jaxis);
       break;
     case SDL_EVENT_JOYSTICK_BALL_MOTION:
-      this->handle(handle.jball);
+      this->joystick.handle(handle.jball);
       break;
     case SDL_EVENT_JOYSTICK_HAT_MOTION:
-      this->handle(handle.jhat);
+      this->joystick.handle(handle.jhat);
       break;
     case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
     case SDL_EVENT_JOYSTICK_BUTTON_UP:
-      this->handle(handle.jbutton);
+      this->joystick.handle(handle.jbutton);
       break;
     case SDL_EVENT_JOYSTICK_ADDED:
     case SDL_EVENT_JOYSTICK_REMOVED:
     case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE:
-      this->handle(handle.jdevice);
+      this->joystick.handle(handle.jdevice);
       break;
     case SDL_EVENT_JOYSTICK_BATTERY_UPDATED:
-      this->handle(handle.jbattery);
+      this->joystick.handle(handle.jbattery);
       break;
 
     case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-      this->handle(handle.gaxis);
+      this->gamepad.handle(handle.gaxis);
       break;
     case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
     case SDL_EVENT_GAMEPAD_BUTTON_UP:
-      this->handle(handle.gbutton);
+      this->gamepad.handle(handle.gbutton);
       break;
     case SDL_EVENT_GAMEPAD_ADDED:
     case SDL_EVENT_GAMEPAD_REMOVED:
     case SDL_EVENT_GAMEPAD_REMAPPED:
     case SDL_EVENT_GAMEPAD_UPDATE_COMPLETE:
     case SDL_EVENT_GAMEPAD_STEAM_HANDLE_UPDATED:
-      this->handle(handle.gdevice);
+      this->gamepad.handle(handle.gdevice);
       break;
     case SDL_EVENT_GAMEPAD_TOUCHPAD_DOWN:
     case SDL_EVENT_GAMEPAD_TOUCHPAD_MOTION:
     case SDL_EVENT_GAMEPAD_TOUCHPAD_UP:
-      this->handle(handle.gtouchpad);
+      this->gamepad.handle(handle.gtouchpad);
       break;
     case SDL_EVENT_GAMEPAD_SENSOR_UPDATE:
-      this->handle(handle.gsensor);
-      break;
-
-    case SDL_EVENT_FINGER_DOWN:
-    case SDL_EVENT_FINGER_UP:
-    case SDL_EVENT_FINGER_MOTION:
-    case SDL_EVENT_FINGER_CANCELED:
-      this->handle(handle.tfinger);
-      break;
-
-    case SDL_EVENT_CLIPBOARD_UPDATE:
-      this->handle(handle.clipboard);
-      break;
-
-    case SDL_EVENT_DROP_FILE:
-    case SDL_EVENT_DROP_TEXT:
-    case SDL_EVENT_DROP_BEGIN:
-    case SDL_EVENT_DROP_COMPLETE:
-    case SDL_EVENT_DROP_POSITION:
-      this->handle(handle.drop);
+      this->gamepad.handle(handle.gsensor);
       break;
 
     case SDL_EVENT_AUDIO_DEVICE_ADDED:
     case SDL_EVENT_AUDIO_DEVICE_REMOVED:
     case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED:
-      this->handle(handle.adevice);
-      break;
-
-    case SDL_EVENT_SENSOR_UPDATE:
-      this->handle(handle.sensor);
+      this->audioDevice.handle(handle.adevice);
       break;
 
     case SDL_EVENT_PEN_PROXIMITY_IN:
     case SDL_EVENT_PEN_PROXIMITY_OUT:
-      this->handle(handle.pproximity);
+      this->pen.handle(handle.pproximity);
       break;
     case SDL_EVENT_PEN_DOWN:
     case SDL_EVENT_PEN_UP:
-      this->handle(handle.ptouch);
+      this->pen.handle(handle.ptouch);
       break;
     case SDL_EVENT_PEN_BUTTON_DOWN:
     case SDL_EVENT_PEN_BUTTON_UP:
-      this->handle(handle.pbutton);
+      this->pen.handle(handle.pbutton);
       break;
     case SDL_EVENT_PEN_MOTION:
-      this->handle(handle.pmotion);
+      this->pen.handle(handle.pmotion);
       break;
     case SDL_EVENT_PEN_AXIS:
-      this->handle(handle.paxis);
+      this->pen.handle(handle.paxis);
       break;
 
     case SDL_EVENT_CAMERA_DEVICE_ADDED:
     case SDL_EVENT_CAMERA_DEVICE_REMOVED:
     case SDL_EVENT_CAMERA_DEVICE_APPROVED:
     case SDL_EVENT_CAMERA_DEVICE_DENIED:
-      this->handle(handle.cdevice);
+      this->camera.handle(handle.cdevice);
+      break;
+
+    case SDL_EVENT_FINGER_DOWN:
+    case SDL_EVENT_FINGER_UP:
+    case SDL_EVENT_FINGER_MOTION:
+    case SDL_EVENT_FINGER_CANCELED:
+      this->touchFinger.handle(handle.tfinger);
+      break;
+
+    case SDL_EVENT_SENSOR_UPDATE:
+      this->sensor.handle(handle.sensor);
       break;
 
     case SDL_EVENT_USER:
-      this->handle(handle.user);
+      this->user.handle(handle.user);
       break;
 
-      // case SDL_EVENT_LAST:
-      //   break;
+    case SDL_EVENT_LAST:
+      break;
 
     default:
       break;
     }
   }
 }
-
 } // namespace Terreate::SDL

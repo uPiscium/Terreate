@@ -55,7 +55,7 @@ shared<SDL::Window> Context::createWindow(u32 width, u32 height,
   mSDLObjectRegistry->registerWindow(mWindow->getId(), mWindow);
 
   if (autoCloseOnEvent) {
-    mEventHandler->onWindowCloseRequested.subscribe(
+    mEventHandler->window.onWindowCloseRequested.subscribe(
         [this](u64, shared<SDL::Window> window) {
           if (window && window->getId() == mWindow->getId()) {
             window->close();

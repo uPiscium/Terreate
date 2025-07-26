@@ -13,7 +13,7 @@ int main() {
   auto event = ctx.getEventHandler();
   auto &property = window->getProperty();
 
-  event->onWindowPixelSizeChange.subscribe(
+  event->window.onWindowPixelSizeChange.subscribe(
       [](u64 timestamp, shared<Window> window, i32 const &width,
          i32 const &height) {
         if (!window) {
@@ -32,12 +32,13 @@ int main() {
   //             << rel.y << ")" << std::endl;
   // });
 
-  event->onKey.subscribe([&window](u64 timestamp, Key const &key) {
-    if (key.pressed && key.key == Keyboard::K_ESCAPE) {
-      std::cout << "Escape key pressed, closing window." << std::endl;
-      window->close();
-    }
-  });
+  event->keyboard.onKeyInput.subscribe(
+      [&window](u64 timestamp, Key const &key) {
+        if (key.pressed && key.key == Keyboard::K_ESCAPE) {
+          std::cout << "Escape key pressed, closing window." << std::endl;
+          window->close();
+        }
+      });
 
   // event->onCameraAdd.subscribe([](u64 timestamp, shared<Camera> camera) {
   //   camera->open();
@@ -106,6 +107,8 @@ int main() {
   shader.addFragmentShaderSource(frag);
   shader.compile();
   shader.link();
+
+  property.setPosition(100, 100);
 
   while (ctx.valid()) {
     window->fill(0, 0, 0);
