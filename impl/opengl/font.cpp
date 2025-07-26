@@ -1,5 +1,5 @@
-#include "../../../include/module/opengl/exception.hpp"
-#include "../../../include/module/opengl/font.hpp"
+#include <opengl/exception.hpp>
+#include <opengl/font.hpp>
 
 namespace Terreate::OpenGL {
 namespace Decomposer {
