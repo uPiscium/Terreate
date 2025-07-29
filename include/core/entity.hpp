@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common/event.hpp"
+#include "../common/math.hpp"
 #include "../common/type.hpp"
 #include "../common/uuid.hpp"
 
@@ -21,8 +22,9 @@ private:
   shared<Component::ComponentRegistry> mComponentRegistry;
 
 public:
-  EntityComponentEvent onComponentAdded;
-  EntityComponentEvent onComponentRemoved;
+  EntityComponentEvent onComponentAdd;
+  EntityComponentEvent onComponentRemove;
+  Transform transform;
 
 public:
   Entity(shared<Component::ComponentRegistry> registry)

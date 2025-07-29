@@ -12,6 +12,7 @@ add_library(
   ${PROJECT_NAME} STATIC
   context.cpp
   entity.cpp
+  scene.cpp
 )
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC
