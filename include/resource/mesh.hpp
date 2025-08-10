@@ -276,7 +276,6 @@ private:
 
 public:
   MeshManager() = default;
-  MeshManager(shared<ResourceRegistry> registry) : mRegistry(registry) {}
   ~MeshManager() override = default;
 
   UUID const &getID() const override { return mID; }

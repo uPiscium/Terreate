@@ -18,4 +18,9 @@ class EntityError : public CoreModuleError {
 public:
   EntityError(str const &msg) : CoreModuleError(msg) {}
 };
+
+class RendererError : public CoreModuleError {
+public:
+  RendererError(str const &msg) : CoreModuleError(msg) {}
+};
 } // namespace Terreate::Exception

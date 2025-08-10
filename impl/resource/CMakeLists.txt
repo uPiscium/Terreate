@@ -11,6 +11,7 @@ endif()
 add_library(
   ${PROJECT_NAME} STATIC
   mesh.cpp
+  shader.cpp
 )
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC

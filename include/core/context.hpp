@@ -7,6 +7,7 @@
 #include "../sdl/window.hpp"
 
 #include "entity.hpp"
+#include "renderer.hpp"
 
 namespace Terreate::Core {
 class Context {
@@ -33,6 +34,7 @@ public:
   shared<SDL::Window> createWindow(u32 width, u32 height, str const &title,
                                    bool autoCloseOnEvent = true);
   shared<Entity> createEntity() { return mEntityManager->create(); }
+  shared<Renderer> createRenderer();
   template <Interface::Controller T> shared<T> createController();
 
   bool valid() const { return mWindow && !mWindow->isClosed(); }

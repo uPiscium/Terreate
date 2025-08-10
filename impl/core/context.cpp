@@ -73,6 +73,15 @@ shared<SDL::Window> Context::createWindow(u32 width, u32 height,
   return mWindow;
 }
 
+shared<Renderer> Context::createRenderer() {
+  if (!mWindow) {
+    throw Exception::ContextError("No window created. Create a window first.");
+  }
+
+  auto renderer = std::make_shared<Renderer>();
+  return renderer;
+}
+
 void Context::tick(double fps) {
   if (!this->valid())
     return;

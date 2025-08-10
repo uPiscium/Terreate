@@ -92,6 +92,13 @@ int main() {
       meshManager->createPrimitive<Resource::Circle>(0.5f);
   // mesh->setDrawMode(DrawMode::LINE_LOOP);
 
+  shared<Resource::ShaderManager> shaderManager =
+      resourceController->createManager<Resource::ShaderManager>();
+  shared<Resource::Shader> vertexShader = shaderManager->create(
+      "resources/shaders/rect.vert.glsl", Resource::ShaderType::VERTEX);
+  shared<Resource::Shader> fragmentShader = shaderManager->create(
+      "resources/shaders/rect.frag.glsl", Resource::ShaderType::FRAGMENT);
+
   shared<Core::Entity> entity = ctx.createEntity();
 
   shared<Component::MeshSystem> meshSystem =
@@ -100,13 +107,10 @@ int main() {
 
   entity->addComponent(meshComponent);
 
-  OpenGL::Shader shader;
-  str vert = shader.loadShaderSource("resources/shaders/rect.vert.glsl");
-  str frag = shader.loadShaderSource("resources/shaders/rect.frag.glsl");
-  shader.addVertexShaderSource(vert);
-  shader.addFragmentShaderSource(frag);
-  shader.compile();
-  shader.link();
+  shared<Core::Renderer> renderer = ctx.createRenderer();
+  renderer->attach(vertexShader);
+  renderer->attach(fragmentShader);
+  renderer->bundle();
 
   property.setPosition(100, 100);
 
@@ -114,9 +118,9 @@ int main() {
     window->fill(0, 0, 0);
     window->clear();
 
-    shader.bind();
+    renderer->bind();
     meshComponent->draw();
-    shader.unbind();
+    renderer->unbind();
 
     window->update();
     ctx.tick(120);
