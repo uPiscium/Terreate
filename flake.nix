@@ -35,8 +35,12 @@
           sndio
           wayland
           wayland-protocols
-          # vulkan-driver
-          # vulkan-headers
+          vulkan-headers
+          vulkan-loader
+          vulkan-validation-layers
+          vulkan-tools
+          shaderc
+          vulkan-tools-lunarg
         ];
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
           pkg-config
@@ -66,8 +70,12 @@
           sndio
           wayland
           wayland-protocols
-          # vulkan-driver
-          # vulkan-headers
+          vulkan-headers
+          vulkan-loader
+          vulkan-validation-layers
+          vulkan-tools
+          shaderc
+          vulkan-tools-lunarg
         ]);
       };
     };

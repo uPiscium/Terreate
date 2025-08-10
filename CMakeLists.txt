@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 project(Terreate)
-option(TERREATE_DEBUG_BUILD "Build with debug flags" ON)
-option(TERREATE_BUILD_TEST "Build test" ON)
+option(TERREATE_DEBUG_BUILD "Build with debug flags" OFF)
+option(TERREATE_BUILD_TEST "Build tests" ON)
 
-add_subdirectory(impl)
+add_subdirectory(src)
+
 if(TERREATE_BUILD_TEST)
-  add_subdirectory(test/impl)
+  add_subdirectory(example)
 endif()
 
 if(TERREATE_DEBUG_BUILD)

@@ -77,9 +77,4 @@ using glm::mix;
 using glm::normalize;
 using glm::slerp;
 
-struct Transform {
-  vec3 scale = vec3(1.0f);
-  vec3 position = vec3(0.0f);
-  vec3 front = vec3(0.0f, 0.0f, -1.0f);
-};
 } // namespace Terreate
