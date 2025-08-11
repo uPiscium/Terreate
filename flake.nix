@@ -8,74 +8,74 @@
     {
       devShells.x86_64-linux.default = pkgs.mkShell {
         buildInputs = with pkgs; [
-          pkg-config
-          cmake
           alsa-lib
+          cmake
+          dbus
           hidapi
           ibus
-          dbus
           jack2
           libdecor
+          libdrm
           libGL
           libpulseaudio
-          libusb1
           libsysprof-capture
-          libdrm
-          xorg.libX11
-          xorg.libXcursor
-          xorg.libXinerama
-          xorg.libXrandr
-          xorg.libXi
-          xorg.libXext
-          xorg.libXrender
-          xorg.libXtst
+          libusb1
           libxkbcommon
           mesa
           pipewire
+          pkg-config
+          shaderc
           sndio
           wayland
           wayland-protocols
+          xorg.libX11
+          xorg.libXcursor
+          xorg.libXext
+          xorg.libXi
+          xorg.libXinerama
+          xorg.libXrandr
+          xorg.libXrender
+          xorg.libXtst
           vulkan-headers
           vulkan-loader
-          vulkan-validation-layers
           vulkan-tools
-          shaderc
           vulkan-tools-lunarg
+          vulkan-validation-layers
         ];
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
-          pkg-config
-          cmake
           alsa-lib
+          cmake
+          dbus
           hidapi
           ibus
-          dbus
           jack2
           libdecor
+          libdrm
           libGL
           libpulseaudio
-          libusb1
           libsysprof-capture
-          libdrm
-          xorg.libX11
-          xorg.libXcursor
-          xorg.libXinerama
-          xorg.libXrandr
-          xorg.libXi
-          xorg.libXext
-          xorg.libXrender
-          xorg.libXtst
+          libusb1
           libxkbcommon
           mesa
           pipewire
+          pkg-config
+          shaderc
           sndio
           wayland
           wayland-protocols
+          xorg.libX11
+          xorg.libXcursor
+          xorg.libXext
+          xorg.libXi
+          xorg.libXinerama
+          xorg.libXrandr
+          xorg.libXrender
+          xorg.libXtst
           vulkan-headers
           vulkan-loader
-          vulkan-validation-layers
           vulkan-tools
-          shaderc
           vulkan-tools-lunarg
+          vulkan-validation-layers
         ]);
       };
     };

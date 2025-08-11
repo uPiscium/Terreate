@@ -12,10 +12,10 @@
 #include <unordered_set>
 #include <vector>
 
+#include <glad/gl.h>
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
-
-#include <vulkan/vulkan.h>
 
 #ifndef UNICODE_HALF_SPACE
 #define UNICODE_HALF_SPACE 32
