@@ -77,6 +77,8 @@
           vulkan-tools-lunarg
           vulkan-validation-layers
         ]);
+        VULKAN_SDK = "${pkgs.vulkan-headers}";
+        VK_LAYER_PATH = "${pkgs.vulkan-validation-layers}/share/vulkan/explicit_layer.d";
       };
     };
 }
