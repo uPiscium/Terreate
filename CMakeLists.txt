@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(Terreate)
 option(TERREATE_DEBUG_BUILD "Build with debug flags" OFF)
-option(TERREATE_BUILD_TEST "Build tests" ON)
+option(TERREATE_BUILD_EXAMPLE "Build examples" ON)
 
 include(FetchContent)
 
@@ -37,9 +37,7 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra")
 endif()
 
-# add_subdirectory(src)
-
-if(TERREATE_BUILD_TEST)
+if(TERREATE_BUILD_EXAMPLE)
   add_subdirectory(example)
 endif()
 
