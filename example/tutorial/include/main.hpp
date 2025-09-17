@@ -65,6 +65,10 @@ private:
   VkPipeline mGraphicsPipeline = VK_NULL_HANDLE;
   vec<VkFramebuffer> mSwapchainFramebuffers;
   VkCommandPool mCommandPool = VK_NULL_HANDLE;
+  VkCommandBuffer mCommandBuffer = VK_NULL_HANDLE;
+  VkSemaphore mImageAvailableSemaphore = VK_NULL_HANDLE;
+  VkSemaphore mRenderFinishedSemaphore = VK_NULL_HANDLE;
+  VkFence mInFlightFence = VK_NULL_HANDLE;
 
   SDL_Window *mWindow = nullptr;
 
@@ -101,8 +105,12 @@ private:
   void createGraphicsPipeline();
   void createFramebuffers();
   void createCommandPool();
+  void createCommandBuffer();
+  void recordCommandBuffer(VkCommandBuffer commandBuffer, u32 imageIndex);
+  void createSyncObjects();
   void initVulkan();
   bool pollEvents();
+  void drawFrame();
   void mainLoop();
   void cleanup();
 
