@@ -18,7 +18,7 @@ find_package(Vulkan REQUIRED)
 target_link_libraries(
   ${PROJECT_NAME} PRIVATE
   Vulkan::Vulkan
-  SDL3-static
+  SDL3::SDL3
   freetype
 )
 

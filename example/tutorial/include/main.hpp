@@ -2,6 +2,8 @@
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.hpp>
 
+#include <array>
+#include <chrono>
 #include <climits>
 #include <cstdlib>
 #include <fstream>
@@ -12,14 +14,26 @@
 #include <unordered_set>
 #include <vector>
 
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 typedef std::string str;
+typedef int8_t i8;
+typedef uint8_t u8;
+typedef int16_t i16;
+typedef uint16_t u16;
 typedef int32_t i32;
 typedef uint32_t u32;
+typedef int64_t i64;
+typedef uint64_t u64;
 
+template <typename T, size_t N> using array = std::array<T, N>;
 template <typename T> using vec = std::vector<T>;
 template <typename K, typename V> using umap = std::unordered_map<K, V>;
 template <typename T> using uset = std::unordered_set<T>;
 
+static constexpr u32 MAX_FRAMES_IN_FLIGHT = 2;
 static constexpr char const *ENGINE_NAME = "Terreate";
 static constexpr int WINDOW_WIDTH = 800;
 static constexpr int WINDOW_HEIGHT = 600;
@@ -29,6 +43,31 @@ static constexpr char const *VALIDATION_LAYERS[] = {
     "VK_LAYER_KHRONOS_validation"};
 static constexpr char const *DEVICE_EXTENSIONS[] = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
+struct Vertex {
+  glm::vec2 pos;
+  glm::vec3 color;
+
+  static VkVertexInputBindingDescription getBindingDescription();
+  static array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions();
+};
+
+struct UniformBufferObject {
+  alignas(16) glm::mat4 model;
+  alignas(16) glm::mat4 view;
+  alignas(16) glm::mat4 proj;
+};
+
+static vec<Vertex> const vertices = {
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}},
+};
+
+static vec<u16> const indices = {
+    0, 1, 2, 2, 3, 0,
+};
 
 struct QueueFamilyIndices {
   i32 graphicsFamily = -1;
@@ -61,14 +100,27 @@ private:
   VkExtent2D mSwapchainExtent;
   vec<VkImageView> mSwapchainImageViews;
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
+  VkDescriptorSetLayout mDescriptorSetLayout = VK_NULL_HANDLE;
   VkPipelineLayout mPipelineLayout = VK_NULL_HANDLE;
   VkPipeline mGraphicsPipeline = VK_NULL_HANDLE;
   vec<VkFramebuffer> mSwapchainFramebuffers;
   VkCommandPool mCommandPool = VK_NULL_HANDLE;
-  VkCommandBuffer mCommandBuffer = VK_NULL_HANDLE;
-  VkSemaphore mImageAvailableSemaphore = VK_NULL_HANDLE;
-  VkSemaphore mRenderFinishedSemaphore = VK_NULL_HANDLE;
-  VkFence mInFlightFence = VK_NULL_HANDLE;
+  VkBuffer mVertexBuffer = VK_NULL_HANDLE;
+  VkDeviceMemory mVertexBufferMemory = VK_NULL_HANDLE;
+  VkBuffer mIndexBuffer = VK_NULL_HANDLE;
+  VkDeviceMemory mIndexBufferMemory = VK_NULL_HANDLE;
+  vec<VkBuffer> mUniformBuffers;
+  vec<VkDeviceMemory> mUniformBuffersMemory;
+  vec<void *> mUniformBuffersMapped;
+  VkDescriptorPool mDescriptorPool = VK_NULL_HANDLE;
+  vec<VkDescriptorSet> mDescriptorSets;
+  vec<VkCommandBuffer> mCommandBuffers = {};
+  vec<VkSemaphore> mImageAvailableSemaphores = {};
+  vec<VkSemaphore> mRenderFinishedSemaphores = {};
+  vec<VkFence> mInFlightFences = {};
+
+  u32 mCurrentFrame = 0;
+  bool mFramebufferResized = false;
 
   SDL_Window *mWindow = nullptr;
 
@@ -102,14 +154,28 @@ private:
   void createImageViews();
   VkShaderModule createShaderModule(vec<char> const &code);
   void createRenderPass();
+  void createDescriptorSetLayout();
   void createGraphicsPipeline();
   void createFramebuffers();
   void createCommandPool();
-  void createCommandBuffer();
+  u32 findMemoryType(u32 typeFilter, VkMemoryPropertyFlags properties);
+  void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
+                    VkMemoryPropertyFlags properties, VkBuffer &buffer,
+                    VkDeviceMemory &bufferMemory);
+  void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+  void createVertexBuffer();
+  void createIndexBuffer();
+  void createUniformBuffers();
+  void createDescriptorPool();
+  void createDescriptorSets();
+  void createCommandBuffers();
   void recordCommandBuffer(VkCommandBuffer commandBuffer, u32 imageIndex);
   void createSyncObjects();
+  void cleanupSwapchain();
+  void recreateSwapchain();
   void initVulkan();
   bool pollEvents();
+  void updateUniformBuffer(u32 currentImage);
   void drawFrame();
   void mainLoop();
   void cleanup();
