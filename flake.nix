@@ -8,34 +8,35 @@
     {
       devShells.x86_64-linux.default = pkgs.mkShell {
         buildInputs = with pkgs; [
-          alsa-lib
+          sdl3
+          # alsa-lib
           cmake
-          dbus
-          hidapi
-          ibus
-          jack2
-          libdecor
-          libdrm
-          libGL
-          libpulseaudio
-          libsysprof-capture
-          libusb1
-          libxkbcommon
-          mesa
-          pipewire
-          pkg-config
-          shaderc
-          sndio
-          wayland
-          wayland-protocols
-          xorg.libX11
-          xorg.libXcursor
-          xorg.libXext
-          xorg.libXi
-          xorg.libXinerama
-          xorg.libXrandr
-          xorg.libXrender
-          xorg.libXtst
+          # dbus
+          # hidapi
+          # ibus
+          # jack2
+          # libdecor
+          # libdrm
+          # libGL
+          # libpulseaudio
+          # libsysprof-capture
+          # libusb1
+          # libxkbcommon
+          # mesa
+          # pipewire
+          # pkg-config
+          # shaderc
+          # sndio
+          # wayland
+          # wayland-protocols
+          # xorg.libX11
+          # xorg.libXcursor
+          # xorg.libXext
+          # xorg.libXi
+          # xorg.libXinerama
+          # xorg.libXrandr
+          # xorg.libXrender
+          # xorg.libXtst
           vulkan-headers
           vulkan-loader
           vulkan-tools
@@ -43,34 +44,35 @@
           vulkan-validation-layers
         ];
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
-          alsa-lib
-          cmake
-          dbus
-          hidapi
-          ibus
-          jack2
-          libdecor
-          libdrm
-          libGL
-          libpulseaudio
-          libsysprof-capture
-          libusb1
-          libxkbcommon
-          mesa
-          pipewire
-          pkg-config
-          shaderc
-          sndio
-          wayland
-          wayland-protocols
-          xorg.libX11
-          xorg.libXcursor
-          xorg.libXext
-          xorg.libXi
-          xorg.libXinerama
-          xorg.libXrandr
-          xorg.libXrender
-          xorg.libXtst
+          sdl3
+          # alsa-lib
+          # cmake
+          # dbus
+          # hidapi
+          # ibus
+          # jack2
+          # libdecor
+          # libdrm
+          # libGL
+          # libpulseaudio
+          # libsysprof-capture
+          # libusb1
+          # libxkbcommon
+          # mesa
+          # pipewire
+          # pkg-config
+          # shaderc
+          # sndio
+          # wayland
+          # wayland-protocols
+          # xorg.libX11
+          # xorg.libXcursor
+          # xorg.libXext
+          # xorg.libXi
+          # xorg.libXinerama
+          # xorg.libXrandr
+          # xorg.libXrender
+          # xorg.libXtst
           vulkan-headers
           vulkan-loader
           vulkan-tools
