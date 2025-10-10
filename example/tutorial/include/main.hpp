@@ -14,9 +14,19 @@
 #include <unordered_set>
 #include <vector>
 
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
+#include <stb/stb_image.h>
+
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/hash.hpp>
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tinyobjloader/tiny_obj_loader.h>
 
 typedef std::string str;
 typedef int8_t i8;
@@ -38,6 +48,10 @@ static constexpr char const *ENGINE_NAME = "Terreate";
 static constexpr int WINDOW_WIDTH = 800;
 static constexpr int WINDOW_HEIGHT = 600;
 static constexpr u32 ENGINE_VERSION = VK_MAKE_VERSION(0, 1, 0);
+static constexpr char const *MODEL_PATH =
+    "assets/models/viking_room/viking_room.obj";
+static constexpr char const *TEXTURE_PATH =
+    "assets/models/viking_room/viking_room.png";
 
 static constexpr char const *VALIDATION_LAYERS[] = {
     "VK_LAYER_KHRONOS_validation"};
@@ -45,28 +59,33 @@ static constexpr char const *DEVICE_EXTENSIONS[] = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 struct Vertex {
-  glm::vec2 pos;
+  glm::vec3 pos;
   glm::vec3 color;
+  glm::vec2 texCoord;
 
   static VkVertexInputBindingDescription getBindingDescription();
-  static array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions();
+  static array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
+
+  bool operator==(const Vertex &other) const {
+    return pos == other.pos && color == other.color &&
+           texCoord == other.texCoord;
+  }
 };
+
+namespace std {
+template <> struct hash<Vertex> {
+  size_t operator()(Vertex const &vertex) const {
+    return ((hash<glm::vec3>()(vertex.pos) ^
+             (hash<glm::vec3>()(vertex.color) << 1)) >>
+            (hash<glm::vec2>()(vertex.texCoord) << 1));
+  }
+};
+} // namespace std
 
 struct UniformBufferObject {
   alignas(16) glm::mat4 model;
   alignas(16) glm::mat4 view;
   alignas(16) glm::mat4 proj;
-};
-
-static vec<Vertex> const vertices = {
-    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}},
-};
-
-static vec<u16> const indices = {
-    0, 1, 2, 2, 3, 0,
 };
 
 struct QueueFamilyIndices {
@@ -89,32 +108,55 @@ private:
 
   VkInstance mInstance = VK_NULL_HANDLE;
   VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
+
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   VkDevice mDevice = VK_NULL_HANDLE;
+
   VkQueue mGraphicsQueue = VK_NULL_HANDLE;
   VkQueue mPresentQueue = VK_NULL_HANDLE;
+
   VkSurfaceKHR mSurface = VK_NULL_HANDLE;
+
   VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
   vec<VkImage> mSwapchainImages;
   VkFormat mSwapchainImageFormat;
   VkExtent2D mSwapchainExtent;
   vec<VkImageView> mSwapchainImageViews;
+
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
   VkDescriptorSetLayout mDescriptorSetLayout = VK_NULL_HANDLE;
   VkPipelineLayout mPipelineLayout = VK_NULL_HANDLE;
   VkPipeline mGraphicsPipeline = VK_NULL_HANDLE;
   vec<VkFramebuffer> mSwapchainFramebuffers;
+
   VkCommandPool mCommandPool = VK_NULL_HANDLE;
+
+  u32 mMipLevels = 1;
+  VkImage mTexture = VK_NULL_HANDLE;
+  VkDeviceMemory mTextureMemory = VK_NULL_HANDLE;
+  VkImageView mTextureImageView = VK_NULL_HANDLE;
+  VkSampler mTextureSampler = VK_NULL_HANDLE;
+
+  VkImage mDepthImage = VK_NULL_HANDLE;
+  VkDeviceMemory mDepthImageMemory = VK_NULL_HANDLE;
+  VkImageView mDepthImageView = VK_NULL_HANDLE;
+
+  vec<Vertex> mVertices;
+  vec<u32> mIndices;
   VkBuffer mVertexBuffer = VK_NULL_HANDLE;
   VkDeviceMemory mVertexBufferMemory = VK_NULL_HANDLE;
   VkBuffer mIndexBuffer = VK_NULL_HANDLE;
   VkDeviceMemory mIndexBufferMemory = VK_NULL_HANDLE;
+
   vec<VkBuffer> mUniformBuffers;
   vec<VkDeviceMemory> mUniformBuffersMemory;
   vec<void *> mUniformBuffersMapped;
+
   VkDescriptorPool mDescriptorPool = VK_NULL_HANDLE;
   vec<VkDescriptorSet> mDescriptorSets;
+
   vec<VkCommandBuffer> mCommandBuffers = {};
+
   vec<VkSemaphore> mImageAvailableSemaphores = {};
   vec<VkSemaphore> mRenderFinishedSemaphores = {};
   vec<VkFence> mInFlightFences = {};
@@ -151,18 +193,42 @@ private:
   chooseSwapPresentMode(vec<VkPresentModeKHR> const &availablePresentModes);
   VkExtent2D chooseSwapExtent(VkSurfaceCapabilitiesKHR const &capabilities);
   void createSwapchain();
+  VkImageView createImageView(VkImage image, VkFormat format,
+                              VkImageAspectFlags aspectFlags, u32 mipLevels);
   void createImageViews();
   VkShaderModule createShaderModule(vec<char> const &code);
+  void createCommandPool();
+  VkFormat findSupportedFormat(vec<VkFormat> const &candidates,
+                               VkImageTiling tiling,
+                               VkFormatFeatureFlags features);
+  VkFormat findDepthFormat();
   void createRenderPass();
   void createDescriptorSetLayout();
   void createGraphicsPipeline();
+  void createDepthResources();
   void createFramebuffers();
-  void createCommandPool();
   u32 findMemoryType(u32 typeFilter, VkMemoryPropertyFlags properties);
   void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                     VkMemoryPropertyFlags properties, VkBuffer &buffer,
                     VkDeviceMemory &bufferMemory);
+  VkCommandBuffer beginSingleTimeCommands();
+  void endSingleTimeCommands(VkCommandBuffer commandBuffer);
   void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+  void createImage(u32 width, u32 height, u32 mipLevels, VkFormat format,
+                   VkImageTiling tiling, VkImageUsageFlags usage,
+                   VkMemoryPropertyFlags properties, VkImage &image,
+                   VkDeviceMemory &imageMemory);
+  bool hasStencilComponent(VkFormat format);
+  void transitionImageLayout(VkImage image, VkFormat format,
+                             VkImageLayout oldLayout, VkImageLayout newLayout,
+                             u32 mipLevels);
+  void copyBufferToImage(VkBuffer buffer, VkImage image, u32 width, u32 height);
+  void generateMipmaps(VkImage image, VkFormat imageFormat, i32 texWidth,
+                       i32 texHeight, u32 mipLevels);
+  void createTexture();
+  void createTextureImageView();
+  void createTextureSampler();
+  void loadModel();
   void createVertexBuffer();
   void createIndexBuffer();
   void createUniformBuffers();

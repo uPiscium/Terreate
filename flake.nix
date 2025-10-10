@@ -8,71 +8,13 @@
     {
       devShells.x86_64-linux.default = pkgs.mkShell {
         buildInputs = with pkgs; [
-          sdl3
-          # alsa-lib
           cmake
-          # dbus
-          # hidapi
-          # ibus
-          # jack2
-          # libdecor
-          # libdrm
-          # libGL
-          # libpulseaudio
-          # libsysprof-capture
-          # libusb1
-          # libxkbcommon
-          # mesa
-          # pipewire
-          # pkg-config
-          # shaderc
-          # sndio
-          # wayland
-          # wayland-protocols
-          # xorg.libX11
-          # xorg.libXcursor
-          # xorg.libXext
-          # xorg.libXi
-          # xorg.libXinerama
-          # xorg.libXrandr
-          # xorg.libXrender
-          # xorg.libXtst
-          vulkan-headers
+          sdl3
+          shaderc
           vulkan-loader
-          vulkan-tools
-          vulkan-tools-lunarg
-          vulkan-validation-layers
         ];
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
           sdl3
-          # alsa-lib
-          # cmake
-          # dbus
-          # hidapi
-          # ibus
-          # jack2
-          # libdecor
-          # libdrm
-          # libGL
-          # libpulseaudio
-          # libsysprof-capture
-          # libusb1
-          # libxkbcommon
-          # mesa
-          # pipewire
-          # pkg-config
-          # shaderc
-          # sndio
-          # wayland
-          # wayland-protocols
-          # xorg.libX11
-          # xorg.libXcursor
-          # xorg.libXext
-          # xorg.libXi
-          # xorg.libXinerama
-          # xorg.libXrandr
-          # xorg.libXrender
-          # xorg.libXtst
           vulkan-headers
           vulkan-loader
           vulkan-tools

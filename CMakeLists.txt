@@ -6,7 +6,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(freetype)
 include(sdl3)
-include(sdl3_image)
 
 if(TERREATE_BUILD_EXAMPLE)
   add_subdirectory(example)
