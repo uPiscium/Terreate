@@ -15,22 +15,10 @@
         ];
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
           alsa-lib
-          # dbus
           hidapi
-          # ibus
           jack2
-          # libdecor
-          # libdrm
-          # libGL
-          # libpulseaudio
-          # libsysprof-capture
           libusb1
-          # libxkbcommon
-          # mesa
-          # pipewire
-          # pkg-config
           sdl3
-          # sndio
           vulkan-headers
           vulkan-loader
           vulkan-tools
@@ -40,12 +28,7 @@
           wayland-protocols
           xorg.libX11
           xorg.libXcursor
-          # xorg.libXext
           xorg.libXi
-          # xorg.libXinerama
-          # xorg.libXrandr
-          # xorg.libXrender
-          # xorg.libXtst
         ]);
         VULKAN_SDK = "${pkgs.vulkan-headers}";
         VK_LAYER_PATH = "${pkgs.vulkan-validation-layers}/share/vulkan/explicit_layer.d";
