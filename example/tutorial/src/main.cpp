@@ -41,6 +41,7 @@ void VulkanTutorial::initWindow() {
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK |
                 SDL_INIT_GAMEPAD | SDL_INIT_HAPTIC | SDL_INIT_CAMERA |
                 SDL_INIT_SENSOR | SDL_INIT_AUDIO)) {
+    std::cerr << "Failed to initialize SDL: " << SDL_GetError() << '\n';
     throw std::runtime_error("Failed to initialize SDL.");
     return;
   }
