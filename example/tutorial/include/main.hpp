@@ -66,7 +66,7 @@ struct Vertex {
   static VkVertexInputBindingDescription getBindingDescription();
   static array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
 
-  bool operator==(const Vertex &other) const {
+  bool operator==(Vertex const &other) const {
     return pos == other.pos && color == other.color &&
            texCoord == other.texCoord;
   }
@@ -109,6 +109,7 @@ private:
   VkInstance mInstance = VK_NULL_HANDLE;
   VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
 
+  VkSampleCountFlagBits mMSAASamples = VK_SAMPLE_COUNT_1_BIT;
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   VkDevice mDevice = VK_NULL_HANDLE;
 
@@ -131,6 +132,10 @@ private:
 
   VkCommandPool mCommandPool = VK_NULL_HANDLE;
 
+  VkImage mColorImage = VK_NULL_HANDLE;
+  VkDeviceMemory mColorImageMemory = VK_NULL_HANDLE;
+  VkImageView mColorImageView = VK_NULL_HANDLE;
+
   u32 mMipLevels = 1;
   VkImage mTexture = VK_NULL_HANDLE;
   VkDeviceMemory mTextureMemory = VK_NULL_HANDLE;
@@ -151,6 +156,10 @@ private:
   vec<VkBuffer> mUniformBuffers;
   vec<VkDeviceMemory> mUniformBuffersMemory;
   vec<void *> mUniformBuffersMapped;
+
+  vec<VkBuffer> mShaderStorageBuffers;
+  vec<VkDeviceMemory> mShaderStorageBuffersMemory;
+  vec<void *> mShaderStorageBuffersMapped;
 
   VkDescriptorPool mDescriptorPool = VK_NULL_HANDLE;
   vec<VkDescriptorSet> mDescriptorSets;
@@ -184,6 +193,7 @@ private:
   bool checkDeviceExtensionSupport(VkPhysicalDevice device);
   SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
   int rateDevice(VkPhysicalDevice device);
+  VkSampleCountFlagBits getMaxUsableSampleCount(VkPhysicalDevice device);
   void pickPhysicalDevice();
   void createLogicalDevice();
   void createQueue();
@@ -205,6 +215,7 @@ private:
   void createRenderPass();
   void createDescriptorSetLayout();
   void createGraphicsPipeline();
+  void createColorResources();
   void createDepthResources();
   void createFramebuffers();
   u32 findMemoryType(u32 typeFilter, VkMemoryPropertyFlags properties);
@@ -214,7 +225,8 @@ private:
   VkCommandBuffer beginSingleTimeCommands();
   void endSingleTimeCommands(VkCommandBuffer commandBuffer);
   void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-  void createImage(u32 width, u32 height, u32 mipLevels, VkFormat format,
+  void createImage(u32 width, u32 height, u32 mipLevels,
+                   VkSampleCountFlagBits samples, VkFormat format,
                    VkImageTiling tiling, VkImageUsageFlags usage,
                    VkMemoryPropertyFlags properties, VkImage &image,
                    VkDeviceMemory &imageMemory);
