@@ -1,6 +1,6 @@
 include(FetchContent)
 
-message(STATUS "[Freetype] Setting up...")
+message(STATUS "[Terreate] Setting up FreeType...")
 FetchContent_Declare(
   freetype
   GIT_REPOSITORY https://github.com/freetype/freetype.git
@@ -8,5 +8,5 @@ FetchContent_Declare(
   GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(freetype)
-message(STATUS "[Freetype] Ready.")
+message(STATUS "[Terreate] FreeType ready.")
 
