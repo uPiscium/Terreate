@@ -1,12 +1,6 @@
 project(TerreateCommonModule)
 message(STATUS "Configuring ${PROJECT_NAME}...")
 
-if(TERREATE_DEBUG_BUILD)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Wextra")
-else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra")
-endif()
-
 add_library(
   ${PROJECT_NAME} STATIC
   uuid.cpp

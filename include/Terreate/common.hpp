@@ -1,3 +1,4 @@
+#pragma once
 #include "common/bitflag.hpp"
 #include "common/event.hpp"
 #include "common/exception.hpp"

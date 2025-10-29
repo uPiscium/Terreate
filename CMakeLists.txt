@@ -5,7 +5,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(Terreate)
 option(TERREATE_DEBUG_BUILD "Build with debug flags" OFF)
-option(TERREATE_BUILD_EXAMPLE "Build examples" OFF)
+option(TERREATE_BUILD_EXAMPLE "Build examples" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -22,6 +22,7 @@ include(options)
 include(freetype)
 include(sdl3)
 
+prepare_sdl3()
 add_subdirectory(src)
 
 if(TERREATE_BUILD_EXAMPLE)

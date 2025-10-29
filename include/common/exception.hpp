@@ -2,7 +2,7 @@
 
 #include "type.hpp"
 
-namespace Terreate::Exception {
+namespace Terreate {
 class TerreateException : public std::exception {
 private:
   str mMessage;
@@ -20,4 +20,4 @@ class CommonModuleError : public TerreateException {
 public:
   CommonModuleError(str const &message) noexcept : TerreateException(message) {}
 };
-} // namespace Terreate::Exception
+} // namespace Terreate

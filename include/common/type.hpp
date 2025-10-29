@@ -42,7 +42,7 @@
 #ifndef PROHIBIT_COPY_AND_ASSIGN
 #define PROHIBIT_COPY_AND_ASSIGN(TypeName)                                     \
   TypeName(TypeName const &) = delete;                                         \
-  TypeName &operator=(TypeName const &) = delete;
+  TypeName &operator=(TypeName const &) = delete
 #endif // PROHIBIT_COPY_AND_ASSIGN
 
 namespace Terreate {
@@ -85,13 +85,21 @@ template <typename T> using function = std::function<T>;
 template <typename T> using guard = std::lock_guard<T>;
 template <typename T> using ulock = std::unique_lock<T>;
 
-template <typename Derived, typename Base>
-concept extends = std::derived_from<Derived, Base>;
 template <typename Enum>
 concept enumtype = std::is_enum_v<Enum>;
 
 static constexpr u32 SDL_FLAGS =
     SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD |
     SDL_INIT_HAPTIC | SDL_INIT_CAMERA | SDL_INIT_SENSOR | SDL_INIT_AUDIO;
+
+struct Version {
+  u32 major;
+  u32 minor;
+  u32 patch;
+};
+
+u32 constexpr makeVersion(Version const &version) {
+  return (version.major << 22) | (version.minor << 12) | (version.patch);
+}
 
 } // namespace Terreate
