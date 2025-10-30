@@ -18,54 +18,34 @@ private:
 private:
   void generateUUID();
   UUID(i8 const *uuid);
-  UUID(str const &uuid) {
-    std::memcpy(mUUID, uuid.c_str(), sizeof(i8) * sUUIDLength);
-  }
+  UUID(str const &uuid);
 
 public:
-  UUID() { this->generateUUID(); }
-  UUID(UUID const &other) {
-    std::memcpy(mUUID, other.mUUID, sizeof(i8) * sUUIDLength);
-  }
-  UUID(UUID &&other) {
-    std::memcpy(mUUID, other.mUUID, sizeof(i8) * sUUIDLength);
-  }
+  UUID();
+  UUID(UUID const &other);
+  UUID(UUID &&other);
 
-  i8 const *Raw() const { return mUUID; }
+  i8 const *raw() const;
 
   str toString() const;
-  size_t hash() const { return std::hash<str>{}(this->toString()); }
+  size_t hash() const;
 
-  bool operator==(UUID const &other) const {
-    return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) == 0;
-  }
-  bool operator!=(UUID const &other) const {
-    return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) != 0;
-  }
-  bool operator<(UUID const &other) const {
-    return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) < 0;
-  }
-  bool operator>(UUID const &other) const {
-    return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) > 0;
-  }
-  bool operator<=(UUID const &other) const {
-    return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) <= 0;
-  }
-  bool operator>=(UUID const &other) const {
-    return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) >= 0;
-  }
+  bool operator==(UUID const &other) const;
+  bool operator!=(UUID const &other) const;
+  bool operator<(UUID const &other) const;
+  bool operator>(UUID const &other) const;
+  bool operator<=(UUID const &other) const;
+  bool operator>=(UUID const &other) const;
   UUID &operator=(UUID const &other);
   UUID &operator=(UUID &&other);
-  operator size_t() const { return this->hash(); }
-  operator str() const { return this->toString(); }
+  operator size_t() const;
+  operator str() const;
 
 public:
-  static UUID fromi8(i8 const *uuid) { return UUID(uuid); }
-  static UUID fromString(str const &uuid) { return UUID(uuid); }
-  static UUID empty() { return UUID(nullptr); }
-  static UUID copy(UUID const &uuid) {
-    return UUID::fromString(uuid.toString());
-  }
+  static UUID fromi8(i8 const *uuid);
+  static UUID fromString(str const &uuid);
+  static UUID empty();
+  static UUID copy(UUID const &uuid);
 };
 
 template <typename T> inline str toStr(T const &val) {

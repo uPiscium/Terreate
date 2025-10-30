@@ -8,6 +8,9 @@ namespace Terreate::Vulkan {
 
 class Instance {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(Instance);
+
+private:
   constexpr static Version const ENGINE_VERSION = Version(0, 1, 0);
   constexpr static char const *ENGINE_NAME = "Terreate";
 
@@ -33,17 +36,13 @@ public:
 
   void attachDebugger(shared<IDebugger> debugger);
 
-  [[nodiscard]] operator VkInstance() const { return mHandle; }
+  [[nodiscard]] operator VkInstance() const;
 
 public:
   static shared<Instance>
   create(str const &appName, Version const &appVersion, bool debugMode = false,
          vec<str> const &extensions = {},
-         vec<str> const &layers = {"VK_LAYER_KHRONOS_validation"}) {
-    Instance *instance =
-        new Instance(appName, appVersion, debugMode, extensions, layers);
-    return shared<Instance>(instance);
-  }
+         vec<str> const &layers = {"VK_LAYER_KHRONOS_validation"});
 };
 
 } // namespace Terreate::Vulkan

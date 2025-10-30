@@ -1,5 +1,5 @@
-#include "common/uuid.hpp"
 #include "common/time.hpp"
+#include "common/uuid.hpp"
 
 namespace Terreate {
 std::mt19937 UUID::sRandomEngine = std::mt19937(std::random_device()());
@@ -27,6 +27,22 @@ UUID::UUID(i8 const *uuid) {
   std::memcpy(mUUID, uuid, sizeof(i8) * sUUIDLength);
 }
 
+UUID::UUID(str const &uuid) {
+  std::memcpy(mUUID, uuid.c_str(), sizeof(i8) * sUUIDLength);
+}
+
+UUID::UUID() { this->generateUUID(); }
+
+UUID::UUID(UUID const &other) {
+  std::memcpy(mUUID, other.mUUID, sizeof(i8) * sUUIDLength);
+}
+
+UUID::UUID(UUID &&other) {
+  std::memcpy(mUUID, other.mUUID, sizeof(i8) * sUUIDLength);
+}
+
+i8 const *UUID::raw() const { return mUUID; }
+
 str UUID::toString() const {
   stream ss;
   for (int i = 0; i < sUUIDLength / sizeof(u16); ++i) {
@@ -39,6 +55,32 @@ str UUID::toString() const {
   return ss.str();
 }
 
+size_t UUID::hash() const { return std::hash<str>{}(this->toString()); }
+
+bool UUID::operator==(UUID const &other) const {
+  return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) == 0;
+}
+
+bool UUID::operator!=(UUID const &other) const {
+  return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) != 0;
+}
+
+bool UUID::operator<(UUID const &other) const {
+  return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) < 0;
+}
+
+bool UUID::operator>(UUID const &other) const {
+  return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) > 0;
+}
+
+bool UUID::operator<=(UUID const &other) const {
+  return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) <= 0;
+}
+
+bool UUID::operator>=(UUID const &other) const {
+  return std::memcmp(mUUID, other.mUUID, sizeof(i8) * sUUIDLength) >= 0;
+}
+
 UUID &UUID::operator=(UUID const &other) {
   this->generateUUID();
   return *this;
@@ -48,6 +90,19 @@ UUID &UUID::operator=(UUID &&other) {
   std::memcpy(mUUID, other.mUUID, sizeof(i8) * sUUIDLength);
   return *this;
 }
+
+UUID::operator size_t() const { return this->hash(); }
+
+UUID::operator str() const { return this->toString(); }
+
+UUID UUID::fromi8(i8 const *uuid) { return UUID(uuid); }
+
+UUID UUID::fromString(str const &uuid) { return UUID(uuid); }
+
+UUID UUID::empty() { return UUID(nullptr); }
+
+UUID UUID::copy(UUID const &uuid) { return UUID::fromString(uuid.toString()); }
+
 } // namespace Terreate
 
 std::ostream &operator<<(std::ostream &stream, Terreate::UUID const &uuid) {

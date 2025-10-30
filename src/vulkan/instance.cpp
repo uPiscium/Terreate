@@ -1,5 +1,5 @@
-#include "vulkan/core.hpp"
 #include "vulkan/exception.hpp"
+#include "vulkan/instance.hpp"
 
 namespace Terreate::Vulkan {
 bool Instance::checkValidationLayerSupport(vec<str> const &layers) const {
@@ -32,7 +32,7 @@ vec<char const *> Instance::getRequiredExtensions(vec<str> const &exts) const {
   char const *const *extensions =
       SDL_Vulkan_GetInstanceExtensions(&extensionCount);
   if (!extensions) {
-    throw std::runtime_error("Failed to get required Vulkan extensions.");
+    throw InstanceException("Failed to get required Vulkan extensions.");
   }
   vec<char const *> requiredExtensions(extensions, extensions + extensionCount);
 
@@ -132,6 +132,16 @@ void Instance::attachDebugger(shared<IDebugger> debugger) {
   debugCreateInfo.pUserData = debugger.get();
   mDebugMessenger =
       createDebugUtilsMessengerEXT(mHandle, &debugCreateInfo, nullptr);
+}
+
+[[nodiscard]] Instance::operator VkInstance() const { return mHandle; }
+
+shared<Instance> Instance::create(str const &appName, Version const &appVersion,
+                                  bool debugMode, vec<str> const &extensions,
+                                  vec<str> const &layers) {
+  Instance *instance =
+      new Instance(appName, appVersion, debugMode, extensions, layers);
+  return shared<Instance>(instance);
 }
 
 } // namespace Terreate::Vulkan

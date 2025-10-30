@@ -22,21 +22,13 @@ public:
   virtual ~IDebugger() = default;
 
   virtual bool verbose(str const &message, MessageType const type,
-                       vec<DebugObject> const &object) {
-    return false;
-  }
+                       vec<DebugObject> const &object);
   virtual bool info(str const &message, MessageType const type,
-                    vec<DebugObject> const &object) {
-    return false;
-  }
+                    vec<DebugObject> const &object);
   virtual bool warning(str const &message, MessageType const type,
-                       vec<DebugObject> const &object) {
-    return false;
-  }
+                       vec<DebugObject> const &object);
   virtual bool error(str const &message, MessageType const type,
-                     vec<DebugObject> const &object) {
-    return false;
-  }
+                     vec<DebugObject> const &object);
 };
 
 VkDebugUtilsMessengerEXT createDebugUtilsMessengerEXT(

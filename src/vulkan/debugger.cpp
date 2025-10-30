@@ -11,6 +11,26 @@ DebugObject::DebugObject(VkDebugUtilsObjectNameInfoEXT const &info)
   }
 }
 
+bool IDebugger::verbose(str const &message, MessageType const type,
+                        vec<DebugObject> const &object) {
+  return false;
+}
+
+bool IDebugger::info(str const &message, MessageType const type,
+                     vec<DebugObject> const &object) {
+  return false;
+}
+
+bool IDebugger::warning(str const &message, MessageType const type,
+                        vec<DebugObject> const &object) {
+  return false;
+}
+
+bool IDebugger::error(str const &message, MessageType const type,
+                      vec<DebugObject> const &object) {
+  return false;
+}
+
 VkDebugUtilsMessengerEXT createDebugUtilsMessengerEXT(
     VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const *pCreateInfo,
     VkAllocationCallbacks const *pAllocator) {

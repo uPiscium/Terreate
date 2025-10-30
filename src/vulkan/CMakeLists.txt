@@ -3,8 +3,9 @@ message(STATUS "Configuring ${PROJECT_NAME}...")
 
 add_library(
   ${PROJECT_NAME} STATIC
-  core.cpp
   debugger.cpp
+  instance.cpp
+  window.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../../include)
