@@ -1,5 +1,7 @@
 #include "vulkan/debugger.hpp"
 
+#include <iostream>
+
 namespace Terreate::Vulkan {
 
 DebugObject::DebugObject(VkDebugUtilsObjectNameInfoEXT const &info)
@@ -28,6 +30,18 @@ bool IDebugger::warning(str const &message, MessageType const type,
 
 bool IDebugger::error(str const &message, MessageType const type,
                       vec<DebugObject> const &object) {
+  return false;
+}
+
+bool DefaultDebugger::warning(str const &message, MessageType const type,
+                              vec<DebugObject> const &object) {
+  std::cerr << "[VULKAN WARNING] " << message << std::endl;
+  return false;
+}
+
+bool DefaultDebugger::error(str const &message, MessageType const type,
+                            vec<DebugObject> const &object) {
+  std::cerr << "[VULKAN ERROR] " << message << std::endl;
   return false;
 }
 

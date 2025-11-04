@@ -5,7 +5,6 @@ add_library(
   ${PROJECT_NAME} STATIC
   debugger.cpp
   instance.cpp
-  window.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../../include)

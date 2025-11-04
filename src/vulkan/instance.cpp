@@ -1,6 +1,8 @@
 #include "vulkan/exception.hpp"
 #include "vulkan/instance.hpp"
 
+#include <iostream>
+
 namespace Terreate::Vulkan {
 bool Instance::checkValidationLayerSupport(vec<str> const &layers) const {
   u32 layerCount;
@@ -92,12 +94,12 @@ Instance::Instance(str const &appName, Version const &appVersion,
 
   VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo =
       this->getDebugMessengerCreateInfo();
+  vec<char const *> layerNames = {};
   if (mDebugMode) {
-    createInfo.enabledLayerCount = static_cast<u32>(layers.size());
-    vec<char const *> layerNames;
     for (auto const &layer : layers) {
       layerNames.push_back(layer.c_str());
     }
+    createInfo.enabledLayerCount = static_cast<u32>(layerNames.size());
     createInfo.ppEnabledLayerNames = layerNames.data();
     createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo;
   } else {
