@@ -38,17 +38,8 @@ void App::initWindow(int const &width, int const &height, str const &title) {
     mSDLRegistry->registerMouse(0, mouse);
   }
 
-  // mWindow = SDL_CreateWindow(title.c_str(), width, height,
-  //                            SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
   mWindow = SDL::Window::create(mInstance, width, height, title, mouse);
 }
-
-// void App::createSurface() {
-//   if (!SDL_Vulkan_CreateSurface(mWindow, *mInstance, nullptr,
-//   &mWindow->getSurface())) {
-//     throw std::runtime_error("Failed to create window surface.");
-//   }
-// }
 
 QueueFamilyIndices App::findQueueFamilies(VkPhysicalDevice device) {
   QueueFamilyIndices indices;
@@ -261,10 +252,6 @@ VkExtent2D App::chooseSwapExtent(VkSurfaceCapabilitiesKHR const &capabilities) {
     return capabilities.currentExtent;
   } else {
     pair<i32> size = mWindow->getSize();
-    // int width, height;
-    // SDL_GetWindowSizeInPixels(mWindow, &width, &height);
-    // VkExtent2D actualExtent = {static_cast<u32>(width),
-    //                            static_cast<u32>(height)};
     VkExtent2D actualExtent = {static_cast<u32>(size.first),
                                static_cast<u32>(size.second)};
     actualExtent.width =
@@ -692,12 +679,6 @@ void App::cleanupSwapchain() {
 }
 
 void App::recreateSwapchain() {
-  // int width = 0, height = 0;
-  // SDL_GetWindowSizeInPixels(mWindow, &width, &height);
-  // while (width == 0 || height == 0) {
-  //   SDL_GetWindowSizeInPixels(mWindow, &width, &height);
-  //   SDL_WaitEvent(nullptr);
-  // }
   pair<i32> size = mWindow->getSize();
   while (size.first == 0 || size.second == 0) {
     size = mWindow->getSize();
