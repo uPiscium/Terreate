@@ -31,6 +31,14 @@ public:
                      vec<DebugObject> const &object);
 };
 
+class DefaultDebugger : public IDebugger {
+public:
+  bool warning(str const &message, MessageType const type,
+               vec<DebugObject> const &object) override;
+  bool error(str const &message, MessageType const type,
+             vec<DebugObject> const &object) override;
+};
+
 VkDebugUtilsMessengerEXT createDebugUtilsMessengerEXT(
     VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const *pCreateInfo,
     VkAllocationCallbacks const *pAllocator);

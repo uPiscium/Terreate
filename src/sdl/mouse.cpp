@@ -28,6 +28,7 @@ SystemCursor::SystemCursor(CursorShape const &shape) {
 SystemCursor::~SystemCursor() { SDL_DestroyCursor(mCursor); }
 
 SystemCursor::operator SDL_Cursor *() const { return mCursor; }
+
 SystemCursor::operator bool() const { return mCursor != nullptr; }
 
 Mouse::Mouse(SDL_MouseID const &mouseID) : mMouseID(mouseID) {}

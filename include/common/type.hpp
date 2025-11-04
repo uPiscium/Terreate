@@ -6,7 +6,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include <fstream>
-#include <iomanip>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -59,6 +58,16 @@ typedef std::uint64_t u64;
 typedef i8 byte;
 typedef u8 ubyte;
 
+typedef SDL_AudioDeviceID AudioDeviceID;
+typedef SDL_CameraID CameraID;
+typedef SDL_JoystickID JoystickID;
+typedef SDL_MouseID MouseID;
+typedef SDL_WindowID WindowID;
+typedef SDL_DisplayID DisplayID;
+typedef SDL_KeyboardID KeyboardID;
+typedef SDL_SensorID SensorID;
+typedef SDL_PenID PenID;
+
 typedef std::string str;
 typedef std::wstring wstr;
 typedef std::stringstream stream;
@@ -84,6 +93,8 @@ template <typename T> using unique = std::unique_ptr<T>;
 template <typename T> using function = std::function<T>;
 template <typename T> using guard = std::lock_guard<T>;
 template <typename T> using ulock = std::unique_lock<T>;
+
+template <typename... Ts> using variant = std::variant<Ts...>;
 
 template <typename Enum>
 concept enumtype = std::is_enum_v<Enum>;

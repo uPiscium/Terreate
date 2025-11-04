@@ -4,8 +4,10 @@ message(STATUS "Configuring ${PROJECT_NAME}...")
 add_library(
   ${PROJECT_NAME} STATIC
   audio.cpp
+  camera.cpp
   event.cpp
   gamepad.cpp
+  icon.cpp
   joystick.cpp
   mouse.cpp
   registry.cpp

@@ -2,8 +2,8 @@
 
 #include "common/type.hpp"
 
-// #include "audio.hpp"
-// #include "camera.hpp"
+#include "audio.hpp"
+#include "camera.hpp"
 #include "gamepad.hpp"
 #include "joystick.hpp"
 #include "mouse.hpp"
@@ -11,50 +11,48 @@
 
 namespace Terreate::SDL {
 
-class SDLObjectRegistry {
+class Registry {
 private:
-  PROHIBIT_COPY_AND_ASSIGN(SDLObjectRegistry);
+  PROHIBIT_COPY_AND_ASSIGN(Registry);
 
 private:
-  // umap<SDL_AudioDeviceID, shared<AudioDevice>> mAudioDevices;
-  // umap<SDL_CameraID, shared<Camera>> mCameras;
-  umap<SDL_JoystickID, shared<Gamepad>> mGamepads;
-  umap<SDL_JoystickID, shared<Joystick>> mJoysticks;
-  umap<SDL_MouseID, shared<Mouse>> mMice;
-  umap<SDL_WindowID, shared<Window>> mWindows;
+  umap<AudioDeviceID, shared<AudioDevice>> mAudioDevices;
+  umap<CameraID, shared<Camera>> mCameras;
+  umap<JoystickID, shared<Gamepad>> mGamepads;
+  umap<JoystickID, shared<Joystick>> mJoysticks;
+  umap<MouseID, shared<Mouse>> mMice;
+  umap<WindowID, shared<Window>> mWindows;
 
 public:
-  SDLObjectRegistry() = default;
-  ~SDLObjectRegistry() = default;
+  Registry() = default;
+  ~Registry() = default;
 
-  // shared<AudioDevice> getAudioDevice(SDL_AudioDeviceID id) const;
-  // shared<Camera> getCamera(SDL_CameraID id) const;
-  shared<Gamepad> getGamepad(SDL_JoystickID id) const;
-  shared<Joystick> getJoystick(SDL_JoystickID id) const;
-  shared<Mouse> getMouse(SDL_MouseID id) const;
-  shared<Window> getWindow(SDL_WindowID id) const;
+  shared<AudioDevice> getAudioDevice(AudioDeviceID id) const;
+  shared<Camera> getCamera(CameraID id) const;
+  shared<Gamepad> getGamepad(JoystickID id) const;
+  shared<Joystick> getJoystick(JoystickID id) const;
+  shared<Mouse> getMouse(MouseID id) const;
+  shared<Window> getWindow(WindowID id) const;
 
-  // bool hasAudioDevice(SDL_AudioDeviceID id) const {
-  //   return mAudioDevices.contains(id);
-  // }
-  // bool hasCamera(SDL_CameraID id) const { return mCameras.contains(id); }
-  bool hasGamepad(SDL_JoystickID id) const;
-  bool hasJoystick(SDL_JoystickID id) const;
-  bool hasMouse(SDL_MouseID id) const;
-  bool hasWindow(SDL_WindowID id) const;
+  bool hasAudioDevice(AudioDeviceID id) const;
+  bool hasCamera(CameraID id) const;
+  bool hasGamepad(JoystickID id) const;
+  bool hasJoystick(JoystickID id) const;
+  bool hasMouse(MouseID id) const;
+  bool hasWindow(WindowID id) const;
 
-  // void registerAudioDevice(SDL_AudioDeviceID id, shared<AudioDevice> device);
-  // void unregisterAudioDevice(SDL_AudioDeviceID id);
-  // void registerCamera(SDL_CameraID id, shared<Camera> camera);
-  // void unregisterCamera(SDL_CameraID id);
-  void registerGamepad(SDL_JoystickID id, shared<Gamepad> gamepad);
-  void unregisterGamepad(SDL_JoystickID id);
-  void registerJoystick(SDL_JoystickID id, shared<Joystick> joystick);
-  void unregisterJoystick(SDL_JoystickID id);
-  void registerMouse(SDL_MouseID id, shared<Mouse> mouse);
-  void unregisterMouse(SDL_MouseID id);
-  void registerWindow(SDL_WindowID id, shared<Window> window);
-  void unregisterWindow(SDL_WindowID id);
+  void registerAudioDevice(AudioDeviceID id, shared<AudioDevice> device);
+  void unregisterAudioDevice(AudioDeviceID id);
+  void registerCamera(CameraID id, shared<Camera> camera);
+  void unregisterCamera(CameraID id);
+  void registerGamepad(JoystickID id, shared<Gamepad> gamepad);
+  void unregisterGamepad(JoystickID id);
+  void registerJoystick(JoystickID id, shared<Joystick> joystick);
+  void unregisterJoystick(JoystickID id);
+  void registerMouse(MouseID id, shared<Mouse> mouse);
+  void unregisterMouse(MouseID id);
+  void registerWindow(WindowID id, shared<Window> window);
+  void unregisterWindow(WindowID id);
 };
 
 } // namespace Terreate::SDL

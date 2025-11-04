@@ -3,48 +3,41 @@
 
 namespace Terreate::SDL {
 
-// bool SDLObjectRegistry::hasAudioDevice(SDL_AudioDeviceID id) const {
-//   return mAudioDevices.contains(id);
-// }
+bool Registry::hasAudioDevice(AudioDeviceID id) const {
+  return mAudioDevices.contains(id);
+}
 
-// bool SDLObjectRegistry::hasCamera(SDL_CameraID id) const {
-//   return mCameras.contains(id);
-// }
+bool Registry::hasCamera(CameraID id) const { return mCameras.contains(id); }
 
-bool SDLObjectRegistry::hasGamepad(SDL_JoystickID id) const {
+bool Registry::hasGamepad(JoystickID id) const {
   return mGamepads.contains(id);
 }
 
-bool SDLObjectRegistry::hasJoystick(SDL_JoystickID id) const {
+bool Registry::hasJoystick(JoystickID id) const {
   return mJoysticks.contains(id);
 }
 
-bool SDLObjectRegistry::hasMouse(SDL_MouseID id) const {
-  return mMice.contains(id);
+bool Registry::hasMouse(MouseID id) const { return mMice.contains(id); }
+
+bool Registry::hasWindow(WindowID id) const { return mWindows.contains(id); }
+
+shared<AudioDevice> Registry::getAudioDevice(AudioDeviceID id) const {
+  auto it = mAudioDevices.find(id);
+  if (it != mAudioDevices.end()) {
+    return it->second;
+  }
+  return nullptr;
 }
 
-bool SDLObjectRegistry::hasWindow(SDL_WindowID id) const {
-  return mWindows.contains(id);
+shared<Camera> Registry::getCamera(CameraID id) const {
+  auto it = mCameras.find(id);
+  if (it != mCameras.end()) {
+    return it->second;
+  }
+  return nullptr;
 }
 
-// shared<AudioDevice> ObjectRegistry::getAudioDevice(SDL_AudioDeviceID id)
-// const {
-//   auto it = mAudioDevices.find(id);
-//   if (it != mAudioDevices.end()) {
-//     return it->second;
-//   }
-//   return nullptr;
-// }
-
-// shared<Camera> ObjectRegistry::getCamera(SDL_CameraID id) const {
-//   auto it = mCameras.find(id);
-//   if (it != mCameras.end()) {
-//     return it->second;
-//   }
-//   return nullptr;
-// }
-
-shared<Gamepad> SDLObjectRegistry::getGamepad(SDL_JoystickID id) const {
+shared<Gamepad> Registry::getGamepad(JoystickID id) const {
   auto it = mGamepads.find(id);
   if (it != mGamepads.end()) {
     return it->second;
@@ -52,7 +45,7 @@ shared<Gamepad> SDLObjectRegistry::getGamepad(SDL_JoystickID id) const {
   return nullptr;
 }
 
-shared<Joystick> SDLObjectRegistry::getJoystick(SDL_JoystickID id) const {
+shared<Joystick> Registry::getJoystick(JoystickID id) const {
   auto it = mJoysticks.find(id);
   if (it != mJoysticks.end()) {
     return it->second;
@@ -60,7 +53,7 @@ shared<Joystick> SDLObjectRegistry::getJoystick(SDL_JoystickID id) const {
   return nullptr;
 }
 
-shared<Mouse> SDLObjectRegistry::getMouse(SDL_MouseID id) const {
+shared<Mouse> Registry::getMouse(MouseID id) const {
   auto it = mMice.find(id);
   if (it != mMice.end()) {
     return it->second;
@@ -68,7 +61,7 @@ shared<Mouse> SDLObjectRegistry::getMouse(SDL_MouseID id) const {
   return nullptr;
 }
 
-shared<Window> SDLObjectRegistry::getWindow(SDL_WindowID id) const {
+shared<Window> Registry::getWindow(WindowID id) const {
   auto it = mWindows.find(id);
   if (it != mWindows.end()) {
     return it->second;
@@ -76,47 +69,44 @@ shared<Window> SDLObjectRegistry::getWindow(SDL_WindowID id) const {
   return nullptr;
 }
 
-// void SDLObjectRegistry::registerAudioDevice(SDL_AudioDeviceID id,
-//                                             shared<AudioDevice> device) {
-//   if (this->hasAudioDevice(id)) {
-//     throw Exception::SDLModuleError(
-//         "Audio device with ID " + std::to_string(id) + " already
-//         registered.");
-//   }
-//   mAudioDevices[id] = device;
-// }
+void Registry::registerAudioDevice(AudioDeviceID id,
+                                   shared<AudioDevice> device) {
+  if (this->hasAudioDevice(id)) {
+    throw RegistryException("Audio device with ID " + std::to_string(id) +
+                            " already registered.");
+  }
+  mAudioDevices[id] = device;
+}
 
-// void SDLObjectRegistry::unregisterAudioDevice(SDL_AudioDeviceID id) {
-//   auto it = mAudioDevices.find(id);
-//   if (it != mAudioDevices.end()) {
-//     mAudioDevices.erase(it);
-//   } else {
-//     throw Exception::SDLModuleError("Audio device with ID " +
-//                                     std::to_string(id) + " not found.");
-//   }
-// }
+void Registry::unregisterAudioDevice(AudioDeviceID id) {
+  auto it = mAudioDevices.find(id);
+  if (it != mAudioDevices.end()) {
+    mAudioDevices.erase(it);
+  } else {
+    throw RegistryException("Audio device with ID " + std::to_string(id) +
+                            " not found.");
+  }
+}
 
-// void SDLObjectRegistry::registerCamera(SDL_CameraID id, shared<Camera>
-// camera) {
-//   if (this->hasCamera(id)) {
-//     throw Exception::SDLModuleError("Camera with ID " + std::to_string(id) +
-//                                     " already registered.");
-//   }
-//   mCameras[id] = camera;
-// }
+void Registry::registerCamera(CameraID id, shared<Camera> camera) {
+  if (this->hasCamera(id)) {
+    throw RegistryException("Camera with ID " + std::to_string(id) +
+                            " already registered.");
+  }
+  mCameras[id] = camera;
+}
 
-// void SDLObjectRegistry::unregisterCamera(SDL_CameraID id) {
-//   auto it = mCameras.find(id);
-//   if (it != mCameras.end()) {
-//     mCameras.erase(it);
-//   } else {
-//     throw Exception::SDLModuleError("Camera with ID " + std::to_string(id) +
-//                                     " not found.");
-//   }
-// }
+void Registry::unregisterCamera(CameraID id) {
+  auto it = mCameras.find(id);
+  if (it != mCameras.end()) {
+    mCameras.erase(it);
+  } else {
+    throw RegistryException("Camera with ID " + std::to_string(id) +
+                            " not found.");
+  }
+}
 
-void SDLObjectRegistry::registerGamepad(SDL_JoystickID id,
-                                        shared<Gamepad> gamepad) {
+void Registry::registerGamepad(JoystickID id, shared<Gamepad> gamepad) {
   if (this->hasGamepad(id)) {
     throw RegistryException("Gamepad with ID " + std::to_string(id) +
                             " already registered.");
@@ -124,7 +114,7 @@ void SDLObjectRegistry::registerGamepad(SDL_JoystickID id,
   mGamepads[id] = gamepad;
 }
 
-void SDLObjectRegistry::unregisterGamepad(SDL_JoystickID id) {
+void Registry::unregisterGamepad(JoystickID id) {
   auto it = mGamepads.find(id);
   if (it != mGamepads.end()) {
     mGamepads.erase(it);
@@ -134,8 +124,7 @@ void SDLObjectRegistry::unregisterGamepad(SDL_JoystickID id) {
   }
 }
 
-void SDLObjectRegistry::registerJoystick(SDL_JoystickID id,
-                                         shared<Joystick> joystick) {
+void Registry::registerJoystick(JoystickID id, shared<Joystick> joystick) {
   if (this->hasJoystick(id)) {
     throw RegistryException("Joystick with ID " + std::to_string(id) +
                             " already registered.");
@@ -143,7 +132,7 @@ void SDLObjectRegistry::registerJoystick(SDL_JoystickID id,
   mJoysticks[id] = joystick;
 }
 
-void SDLObjectRegistry::unregisterJoystick(SDL_JoystickID id) {
+void Registry::unregisterJoystick(JoystickID id) {
   auto it = mJoysticks.find(id);
   if (it != mJoysticks.end()) {
     mJoysticks.erase(it);
@@ -153,7 +142,7 @@ void SDLObjectRegistry::unregisterJoystick(SDL_JoystickID id) {
   }
 }
 
-void SDLObjectRegistry::registerMouse(SDL_MouseID id, shared<Mouse> mouse) {
+void Registry::registerMouse(MouseID id, shared<Mouse> mouse) {
   if (this->hasMouse(id)) {
     throw RegistryException("Mouse with ID " + std::to_string(id) +
                             " already registered.");
@@ -161,7 +150,7 @@ void SDLObjectRegistry::registerMouse(SDL_MouseID id, shared<Mouse> mouse) {
   mMice[id] = mouse;
 }
 
-void SDLObjectRegistry::unregisterMouse(SDL_MouseID id) {
+void Registry::unregisterMouse(MouseID id) {
   auto it = mMice.find(id);
   if (it != mMice.end()) {
     mMice.erase(it);
@@ -171,7 +160,7 @@ void SDLObjectRegistry::unregisterMouse(SDL_MouseID id) {
   }
 }
 
-void SDLObjectRegistry::registerWindow(SDL_WindowID id, shared<Window> window) {
+void Registry::registerWindow(WindowID id, shared<Window> window) {
   if (this->hasWindow(id)) {
     throw RegistryException("Window with ID " + std::to_string(id) +
                             " already registered.");
@@ -179,7 +168,7 @@ void SDLObjectRegistry::registerWindow(SDL_WindowID id, shared<Window> window) {
   mWindows[id] = window;
 }
 
-void SDLObjectRegistry::unregisterWindow(SDL_WindowID id) {
+void Registry::unregisterWindow(WindowID id) {
   auto it = mWindows.find(id);
   if (it != mWindows.end()) {
     mWindows.erase(it);

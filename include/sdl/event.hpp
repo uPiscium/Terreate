@@ -4,12 +4,12 @@
 #include "common/event.hpp"
 #include "common/type.hpp"
 
+#include "camera.hpp"
 #include "enum.hpp"
-// #include "camera.hpp"
 #include "gamepad.hpp"
 #include "joystick.hpp"
 #include "mouse.hpp"
-// #include "registry.hpp"
+#include "registry.hpp"
 #include "window.hpp"
 
 namespace Terreate::SDL {
@@ -60,131 +60,127 @@ public:
         pressed(event.down), repeat(event.repeat), mods(event.mod) {}
 };
 
-template <typename... Args> using SDLEvent = Event<u64, Args...>;
+typedef Event<> QuitEvent;
 
-typedef SDLEvent<> QuitEvent;
+typedef Event<> TerminateEvent;
+typedef Event<> LowMemoryEvent;
+typedef Event<> WillEnterBackgroundEvent;
+typedef Event<> DidEnterBackgroundEvent;
+typedef Event<> LocaleChangeEvent;
+typedef Event<> SystemThemeChangeEvent;
+typedef Event<> PrivateEvent;
+typedef Event<> PollStencilEvent;
+typedef Event<> RenderTargetResetEvent;
+typedef Event<> RenderDeviceResetEvent;
+typedef Event<> RenderDeviceLostEvent;
 
-typedef SDLEvent<> TerminateEvent;
-typedef SDLEvent<> LowMemoryEvent;
-typedef SDLEvent<> WillEnterBackgroundEvent;
-typedef SDLEvent<> DidEnterBackgroundEvent;
-typedef SDLEvent<> LocaleChangeEvent;
-typedef SDLEvent<> SystemThemeChangeEvent;
-typedef SDLEvent<> PrivateEvent;
-typedef SDLEvent<> PollStencilEvent;
-typedef SDLEvent<> RenderTargetResetEvent;
-typedef SDLEvent<> RenderDeviceResetEvent;
-typedef SDLEvent<> RenderDeviceLostEvent;
+typedef Event<DisplayID, u32> DisplayOrientationEvent;
+typedef Event<DisplayID> DisplayAddEvent;
+typedef Event<DisplayID> DisplayRemoveEvent;
+typedef Event<DisplayID, SDL_DisplayMode const *> DisplayModeChangeEvent;
+typedef Event<DisplayID, SDL_DisplayMode const *> DisplayCurrentModeChangeEvent;
+typedef Event<DisplayID, float> DisplayContentScaleChangeEvent;
 
-typedef SDLEvent<SDL_DisplayID, u32> DisplayOrientationEvent;
-typedef SDLEvent<SDL_DisplayID> DisplayAddEvent;
-typedef SDLEvent<SDL_DisplayID> DisplayRemoveEvent;
-typedef SDLEvent<SDL_DisplayID, SDL_DisplayMode const *> DisplayModeChangeEvent;
-typedef SDLEvent<SDL_DisplayID, SDL_DisplayMode const *>
-    DisplayCurrentModeChangeEvent;
-typedef SDLEvent<SDL_DisplayID, float> DisplayContentScaleChangeEvent;
+typedef Event<shared<Window>, bool> WindowVisibilityChangeEvent;
+typedef Event<shared<Window>, bool> WindowExposeEvent;
+typedef Event<shared<Window>, i32, i32> WindowMoveEvent;
+typedef Event<shared<Window>, i32, i32> WindowResizeEvent;
+typedef Event<shared<Window>, i32, i32> WindowPixelSizeChangeEvent;
+// typedef Event<shared<Window>> WindowMetalViewResizeEvent;
+typedef Event<shared<Window>> WindowMinimizeEvent;
+typedef Event<shared<Window>> WindowMaximizeEvent;
+typedef Event<shared<Window>> WindowRestoreEvent;
+typedef Event<shared<Window>> WindowMouseEnterEvent;
+typedef Event<shared<Window>> WindowMouseLeaveEvent;
+typedef Event<shared<Window>, bool> WindowKeyboardFocusChangeEvent;
+typedef Event<shared<Window>> WindowCloseRequestedEvent;
+typedef Event<shared<Window>, HitTestResult> WindowHitTestEvent;
+// typedef Event<shared<Window>> WindowICCProfileChangeEvent;
+typedef Event<shared<Window>, DisplayID> WindowDisplayChangeEvent;
+typedef Event<shared<Window>, float> WindowDisplayScaleChangeEvent;
+typedef Event<shared<Window>, u32, u32> WindowSafeAreaChangeEvent;
+typedef Event<shared<Window>> WindowOccludeEvent;
+typedef Event<shared<Window>, bool> WindowFullscreenChangeEvent;
+typedef Event<shared<Window>> WindowDestroyEvent;
+typedef Event<shared<Window>> WindowHDRStateChangeEvent;
 
-typedef SDLEvent<shared<Window>, bool> WindowVisibilityChangeEvent;
-typedef SDLEvent<shared<Window>, bool> WindowExposeEvent;
-typedef SDLEvent<shared<Window>, i32, i32> WindowMoveEvent;
-typedef SDLEvent<shared<Window>, i32, i32> WindowResizeEvent;
-typedef SDLEvent<shared<Window>, i32, i32> WindowPixelSizeChangeEvent;
-// typedef SDLEvent<shared<Window>> WindowMetalViewResizeEvent;
-typedef SDLEvent<shared<Window>> WindowMinimizeEvent;
-typedef SDLEvent<shared<Window>> WindowMaximizeEvent;
-typedef SDLEvent<shared<Window>> WindowRestoreEvent;
-typedef SDLEvent<shared<Window>> WindowMouseEnterEvent;
-typedef SDLEvent<shared<Window>> WindowMouseLeaveEvent;
-typedef SDLEvent<shared<Window>, bool> WindowKeyboardFocusChangeEvent;
-typedef SDLEvent<shared<Window>> WindowCloseRequestedEvent;
-typedef SDLEvent<shared<Window>, HitTestResult> WindowHitTestEvent;
-// typedef SDLEvent<shared<Window>> WindowICCProfileChangeEvent;
-typedef SDLEvent<shared<Window>, SDL_DisplayID> WindowDisplayChangeEvent;
-typedef SDLEvent<shared<Window>, float> WindowDisplayScaleChangeEvent;
-typedef SDLEvent<shared<Window>, u32, u32> WindowSafeAreaChangeEvent;
-typedef SDLEvent<shared<Window>> WindowOccludeEvent;
-typedef SDLEvent<shared<Window>, bool> WindowFullscreenChangeEvent;
-typedef SDLEvent<shared<Window>> WindowDestroyEvent;
-typedef SDLEvent<shared<Window>> WindowHDRStateChangeEvent;
+typedef Event<Key> KeyEvent;
 
-typedef SDLEvent<Key> KeyEvent;
+typedef Event<shared<Window>, str, i32> TextEditingEvent;
+typedef Event<shared<Window>, str> TextInputEvent;
 
-typedef SDLEvent<shared<Window>, str, i32> TextEditingEvent;
-typedef SDLEvent<shared<Window>, str> TextInputEvent;
+typedef Event<KeyboardID> KeyboardAddEvent;
+typedef Event<KeyboardID> KeyboardRemoveEvent;
 
-typedef SDLEvent<SDL_KeyboardID> KeyboardAddEvent;
-typedef SDLEvent<SDL_KeyboardID> KeyboardRemoveEvent;
-
-typedef SDLEvent<shared<Window>, vec<str>, u32, TextCandidateOrientation>
+typedef Event<shared<Window>, vec<str>, u32, TextCandidateOrientation>
     TextEditingCandidatesEvent;
 
-typedef SDLEvent<shared<Window>, shared<Mouse>, vec2, vec2> MouseMotionEvent;
-typedef SDLEvent<shared<Window>, shared<Mouse>, MouseButton, bool, u8, vec2>
+typedef Event<shared<Window>, shared<Mouse>, vec2, vec2> MouseMotionEvent;
+typedef Event<shared<Window>, shared<Mouse>, MouseButton, bool, u8, vec2>
     MouseButtonEvent;
-typedef SDLEvent<shared<Window>, shared<Mouse>, MouseWheelDirection, vec2, vec2,
-                 pair<u32>>
+typedef Event<shared<Window>, shared<Mouse>, MouseWheelDirection, vec2, vec2,
+              pair<u32>>
     MouseWheelEvent;
-typedef SDLEvent<shared<Mouse>> MouseAddEvent;
-typedef SDLEvent<shared<Mouse>> MouseRemoveEvent;
+typedef Event<shared<Mouse>> MouseAddEvent;
+typedef Event<shared<Mouse>> MouseRemoveEvent;
 
-typedef SDLEvent<shared<Joystick>, u8, i16> JoystickAxisEvent;
-typedef SDLEvent<shared<Joystick>, u8, pair<i16>> JoystickBallEvent;
-typedef SDLEvent<shared<Joystick>, u8, JoystickHatState> JoystickHatEvent;
-typedef SDLEvent<shared<Joystick>, u8, bool> JoystickButtonEvent;
-typedef SDLEvent<shared<Joystick>> JoystickAddEvent;
-typedef SDLEvent<shared<Joystick>> JoystickRemoveEvent;
-typedef SDLEvent<shared<Joystick>> JoystickUpdateCompleteEvent;
-typedef SDLEvent<shared<Joystick>, PowerState, i32> JoystickBatteryUpdateEvent;
+typedef Event<shared<Joystick>, u8, i16> JoystickAxisEvent;
+typedef Event<shared<Joystick>, u8, pair<i16>> JoystickBallEvent;
+typedef Event<shared<Joystick>, u8, JoystickHatState> JoystickHatEvent;
+typedef Event<shared<Joystick>, u8, bool> JoystickButtonEvent;
+typedef Event<shared<Joystick>> JoystickAddEvent;
+typedef Event<shared<Joystick>> JoystickRemoveEvent;
+typedef Event<shared<Joystick>> JoystickUpdateCompleteEvent;
+typedef Event<shared<Joystick>, PowerState, i32> JoystickBatteryUpdateEvent;
 
-typedef SDLEvent<shared<Gamepad>, GamepadAxis, i16> GamepadAxisEvent;
-typedef SDLEvent<shared<Gamepad>, GamepadButton, bool> GamepadButtonEvent;
-typedef SDLEvent<shared<Gamepad>> GamepadAddEvent;
-typedef SDLEvent<shared<Gamepad>> GamepadRemoveEvent;
-typedef SDLEvent<shared<Gamepad>> GamepadRemappedEvent;
-typedef SDLEvent<shared<Gamepad>> GamepadUpdateCompleteEvent;
-typedef SDLEvent<shared<Gamepad>> GamepadStreamHandleUpdateEvent;
-typedef SDLEvent<shared<Gamepad>, i32, i32, vec2, float> GamepadTouchpadEvent;
-typedef SDLEvent<shared<Gamepad>, SDLSensor, vec3, u64> GamepadSensorEvent;
+typedef Event<shared<Gamepad>, GamepadAxis, i16> GamepadAxisEvent;
+typedef Event<shared<Gamepad>, GamepadButton, bool> GamepadButtonEvent;
+typedef Event<shared<Gamepad>> GamepadAddEvent;
+typedef Event<shared<Gamepad>> GamepadRemoveEvent;
+typedef Event<shared<Gamepad>> GamepadRemappedEvent;
+typedef Event<shared<Gamepad>> GamepadUpdateCompleteEvent;
+typedef Event<shared<Gamepad>> GamepadStreamHandleUpdateEvent;
+typedef Event<shared<Gamepad>, i32, i32, vec2, float> GamepadTouchpadEvent;
+typedef Event<shared<Gamepad>, SDLSensor, vec3, u64> GamepadSensorEvent;
 
-typedef SDLEvent<shared<Window>, SDL_TouchID, SDL_FingerID, vec2, vec2, float>
+typedef Event<shared<Window>, SDL_TouchID, SDL_FingerID, vec2, vec2, float>
     TouchFingerEvent;
 
-typedef SDLEvent<bool, vec<str>> ClipboardEvent;
+typedef Event<bool, vec<str>> ClipboardEvent;
 
-typedef SDLEvent<shared<Window>, vec2, str, str> DropEvent;
+typedef Event<shared<Window>, vec2, str, str> DropEvent;
 
-// typedef SDLEvent<shared<AudioDevice>, bool> AudioDeviceAddEvent;
-// typedef SDLEvent<shared<AudioDevice>, bool> AudioDeviceRemoveEvent;
-// typedef SDLEvent<shared<AudioDevice>, bool, AudioFormat, i32, i32, i32>
-//     AudioDeviceFormatChangeEvent;
+typedef Event<shared<AudioDevice>, bool> AudioDeviceAddEvent;
+typedef Event<shared<AudioDevice>, bool> AudioDeviceRemoveEvent;
+typedef Event<shared<AudioDevice>, bool, AudioFormat, i32, i32, i32>
+    AudioDeviceFormatChangeEvent;
 
-typedef SDLEvent<SDL_SensorID, vec<float>> SensorEvent;
+typedef Event<SensorID, vec<float>> SensorEvent;
 
-typedef SDLEvent<shared<Window>, SDL_PenID> PenProximityEvent;
-typedef SDLEvent<shared<Window>, SDL_PenID, Bitflag<PenState>, vec2, bool, bool>
+typedef Event<shared<Window>, PenID> PenProximityEvent;
+typedef Event<shared<Window>, PenID, Bitflag<PenState>, vec2, bool, bool>
     PenTouchEvent;
-typedef SDLEvent<shared<Window>, SDL_PenID, Bitflag<PenState>, vec2, u8, bool>
+typedef Event<shared<Window>, PenID, Bitflag<PenState>, vec2, u8, bool>
     PenButtonEvent;
-typedef SDLEvent<shared<Window>, SDL_PenID, Bitflag<PenState>, vec2>
-    PenMotionEvent;
-typedef SDLEvent<shared<Window>, SDL_PenID, PenAxis, vec2, float> PenAxisEvent;
+typedef Event<shared<Window>, PenID, Bitflag<PenState>, vec2> PenMotionEvent;
+typedef Event<shared<Window>, PenID, PenAxis, vec2, float> PenAxisEvent;
 
-// typedef SDLEvent<shared<Camera>> CameraAddEvent;
-// typedef SDLEvent<shared<Camera>> CameraRemoveEvent;
-// typedef SDLEvent<shared<Camera>> CameraApprovedEvent;
-// typedef SDLEvent<shared<Camera>> CameraDeniedEvent;
+typedef Event<shared<Camera>> CameraAddEvent;
+typedef Event<shared<Camera>> CameraRemoveEvent;
+typedef Event<shared<Camera>> CameraApprovedEvent;
+typedef Event<shared<Camera>> CameraDeniedEvent;
 
-typedef SDLEvent<shared<Window>, u32, pair<void *>> UserEvent;
+typedef Event<shared<Window>, u32, pair<void *>> UserEvent;
 
 class IEventHandler {
 public:
   virtual ~IEventHandler() = default;
-  virtual void inject(shared<ObjectRegistry> const &registry) = 0;
+  virtual void inject(shared<Registry> const &registry) = 0;
 };
 
 class CommonEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   TerminateEvent onTerminate;
@@ -204,15 +200,13 @@ public:
 
 public:
   CommonEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_CommonEvent const &event);
 };
 
 class DisplayEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   DisplayOrientationEvent onOrientationChange;
@@ -224,15 +218,13 @@ public:
 
 public:
   DisplayEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_DisplayEvent const &event);
 };
 
 class WindowEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   WindowVisibilityChangeEvent onWindowVisibilityChange;
@@ -261,16 +253,14 @@ public:
 
 public:
   WindowEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_WindowEvent const &event);
   void handle(SDL_DropEvent const &event);
 };
 
 class KeyboardEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   KeyEvent onKeyInput;
@@ -279,16 +269,14 @@ public:
 
 public:
   KeyboardEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_KeyboardEvent const &event);
   void handle(SDL_KeyboardDeviceEvent const &event);
 };
 
 class TextEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   TextEditingEvent onTextEditing;
@@ -298,9 +286,7 @@ public:
 
 public:
   TextEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_TextEditingEvent const &event);
   void handle(SDL_TextInputEvent const &event);
   void handle(SDL_TextEditingCandidatesEvent const &event);
@@ -309,7 +295,7 @@ public:
 
 class MouseEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   MouseMotionEvent onMouseMotion;
@@ -320,9 +306,7 @@ public:
 
 public:
   MouseEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_MouseMotionEvent const &event);
   void handle(SDL_MouseButtonEvent const &event);
   void handle(SDL_MouseWheelEvent const &event);
@@ -331,7 +315,7 @@ public:
 
 class JoystickEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   JoystickAxisEvent onJoystickAxisMotion;
@@ -345,9 +329,7 @@ public:
 
 public:
   JoystickEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_JoyAxisEvent const &event);
   void handle(SDL_JoyBallEvent const &event);
   void handle(SDL_JoyHatEvent const &event);
@@ -358,7 +340,7 @@ public:
 
 class GamepadEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   GamepadAxisEvent onGamepadAxisMotion;
@@ -373,9 +355,7 @@ public:
 
 public:
   GamepadEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_GamepadAxisEvent const &event);
   void handle(SDL_GamepadButtonEvent const &event);
   void handle(SDL_GamepadDeviceEvent const &event);
@@ -385,7 +365,7 @@ public:
 
 class AudioDeviceEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   AudioDeviceAddEvent onAudioDeviceAdd;
@@ -394,15 +374,13 @@ public:
 
 public:
   AudioDeviceEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_AudioDeviceEvent const &event);
 };
 
 class PenEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   PenProximityEvent onPenProximity;
@@ -413,9 +391,7 @@ public:
 
 public:
   PenEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_PenProximityEvent const &event);
   void handle(SDL_PenTouchEvent const &event);
   void handle(SDL_PenButtonEvent const &event);
@@ -425,7 +401,7 @@ public:
 
 class CameraEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   CameraAddEvent onCameraAdd;
@@ -435,64 +411,52 @@ public:
 
 public:
   CameraEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_CameraDeviceEvent const &event);
 };
 
 class TouchFingerEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   TouchFingerEvent onFingerTouch;
 
 public:
   TouchFingerEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_TouchFingerEvent const &event);
 };
 
 class SensorEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   SensorEvent onSensorInput;
 
 public:
   SensorEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
-  void handle(SDL_SensorEvent const &event) {
-    this->onSensorInput.publish(event.timestamp, event.which,
-                                {event.data[0], event.data[1], event.data[2],
-                                 event.data[3], event.data[4], event.data[5]});
-  }
+  void inject(shared<Registry> const &registry) override;
+  void handle(SDL_SensorEvent const &event);
 };
 
 class UserEventHandler : public IEventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   UserEvent onUser;
 
 public:
   UserEventHandler() = default;
-  void inject(shared<ObjectRegistry> const &registry) override {
-    mRegistry = registry;
-  }
+  void inject(shared<Registry> const &registry) override;
   void handle(SDL_UserEvent const &event);
 };
 
 class EventHandler {
 private:
-  shared<ObjectRegistry> mRegistry = nullptr;
+  shared<Registry> mRegistry = nullptr;
 
 public:
   QuitEvent onQuit;
@@ -512,18 +476,16 @@ public:
   UserEventHandler user;
 
 private:
-  void handle(SDL_QuitEvent const &event) {
-    this->onQuit.publish(event.timestamp);
-  }
+  void handle(SDL_QuitEvent const &event);
 
 public:
-  EventHandler(shared<ObjectRegistry> const &registry);
+  EventHandler(shared<Registry> const &registry);
   ~EventHandler() = default;
 
   void poll();
 
 public:
-  static shared<EventHandler> create(shared<ObjectRegistry> const &registry) {
+  static shared<EventHandler> create(shared<Registry> const &registry) {
     return std::make_shared<EventHandler>(registry);
   }
 };

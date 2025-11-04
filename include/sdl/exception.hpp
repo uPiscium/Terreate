@@ -9,9 +9,19 @@ public:
   SDLException(str const &message) : TerreateException(message) {}
 };
 
-class JoystickException : public SDLException {
+class AudioException : public SDLException {
 public:
-  JoystickException(str const &message) : SDLException(message) {}
+  AudioException(str const &message) : SDLException(message) {}
+};
+
+class CameraException : public SDLException {
+public:
+  CameraException(str const &message) : SDLException(message) {}
+};
+
+class EventException : public SDLException {
+public:
+  EventException(str const &message) : SDLException(message) {}
 };
 
 class GamepadException : public SDLException {
@@ -19,14 +29,24 @@ public:
   GamepadException(str const &message) : SDLException(message) {}
 };
 
+class JoystickException : public SDLException {
+public:
+  JoystickException(str const &message) : SDLException(message) {}
+};
+
+class IconException : public SDLException {
+public:
+  IconException(str const &message) : SDLException(message) {}
+};
+
 class RegistryException : public SDLException {
 public:
   RegistryException(str const &message) : SDLException(message) {}
 };
 
-class AudioException : public SDLException {
+class WindowException : public SDLException {
 public:
-  AudioException(str const &message) : SDLException(message) {}
+  WindowException(str const &message) : SDLException(message) {}
 };
 
 } // namespace Terreate::SDL

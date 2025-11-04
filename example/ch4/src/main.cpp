@@ -13,35 +13,6 @@ static constexpr char const *DEVICE_EXTENSIONS[] = {
 
 #include <iostream>
 
-// VKAPI_ATTR VkBool32 VKAPI_CALL
-// debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-//               VkDebugUtilsMessageTypeFlagsEXT messageType,
-//               VkDebugUtilsMessengerCallbackDataEXT const *pCallbackData,
-//               void *pUserData) {
-//   switch (messageSeverity) {
-//   case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-//     return VK_FALSE;
-//     std::cerr << "VERBOSE: ";
-//     break;
-//   case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-//     return VK_FALSE;
-//     std::cerr << "INFO: ";
-//     break;
-//   case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-//     return VK_FALSE;
-//     std::cerr << "WARNING: ";
-//     break;
-//   case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-//     std::cerr << "ERROR: ";
-//     break;
-//   default:
-//     std::cerr << "UNKNOWN: ";
-//     break;
-//   }
-//   std::cerr << pCallbackData->pMessage << std::endl;
-//   return VK_FALSE;
-// }
-
 vec<char> readFile(str const &filename) {
   std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
@@ -59,166 +30,25 @@ vec<char> readFile(str const &filename) {
 }
 
 void App::initWindow(int const &width, int const &height, str const &title) {
-  if (!SDL_Init(SDL_FLAGS)) {
-    str msg = "Failed to initialize SDL: ";
-    msg += SDL_GetError();
-    throw std::runtime_error(msg);
-    return;
+  shared<SDL::Mouse> mouse;
+  if (mSDLRegistry->hasMouse(0)) {
+    mouse = mSDLRegistry->getMouse(0);
+  } else {
+    mouse = std::make_shared<SDL::Mouse>(0);
+    mSDLRegistry->registerMouse(0, mouse);
   }
 
-  mWindow = SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_VULKAN);
+  // mWindow = SDL_CreateWindow(title.c_str(), width, height,
+  //                            SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+  mWindow = SDL::Window::create(mInstance, width, height, title, mouse);
 }
 
-// bool App::checkValidationLayerSupport() {
-//   u32 layerCount;
-//   vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-//   std::vector<VkLayerProperties> availableLayers(layerCount);
-//   vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-//   for (auto const &layer : VALIDATION_LAYERS) {
-//     bool layerFound = false;
-
-//     for (const auto &availableLayer : availableLayers) {
-//       if (std::strcmp(layer, availableLayer.layerName) == 0) {
-//         layerFound = true;
-//         break;
-//       }
-//     }
-
-//     if (!layerFound) {
-//       return false;
-//     }
-//   }
-
-//   return true;
-// }
-
-// vec<char const *> App::getRequiredExtensions() {
-//   u32 extensionCount = 0;
-//   char const *const *extensions =
-//       SDL_Vulkan_GetInstanceExtensions(&extensionCount);
-//   if (!extensions) {
-//     throw std::runtime_error("Failed to get required Vulkan extensions.");
-//   }
-//   vec<char const *> requiredExtensions(extensions, extensions +
-//   extensionCount);
-
-//   if (mDebugMode) {
-//     requiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-//   }
-
-//   return requiredExtensions;
-// }
-
-// void App::populateDebugMessengerCreateInfo(
-//     VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
-//   createInfo = {};
-//   createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-//   createInfo.messageSeverity =
-//   VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-//                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-//                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-//                                |
-//                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-//   createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-//                            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-//                            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-//   createInfo.pfnUserCallback = debugCallback;
-//   createInfo.pUserData = nullptr; // Optional
-// }
-
-// void App::createInstance(str const &appName, u32 const &appVersion) {
-//   if (mDebugMode && !this->checkValidationLayerSupport()) {
-//     throw std::runtime_error("Validation layers requested, but not
-//     available.");
-//   }
-
-//   VkApplicationInfo appInfo{};
-//   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-//   appInfo.pApplicationName = appName.c_str();
-//   appInfo.applicationVersion = appVersion;
-//   appInfo.pEngineName = ENGINE_NAME;
-//   appInfo.engineVersion = ENGINE_VERSION;
-//   appInfo.apiVersion = VK_API_VERSION_1_4;
-
-//   vec<char const *> extensions = this->getRequiredExtensions();
-
-//   VkInstanceCreateInfo createInfo{};
-//   createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-//   createInfo.pApplicationInfo = &appInfo;
-//   createInfo.enabledExtensionCount = extensions.size();
-//   createInfo.ppEnabledExtensionNames = extensions.data();
-
-//   VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-//   if (mDebugMode) {
-//     createInfo.enabledLayerCount =
-//         sizeof(VALIDATION_LAYERS) / sizeof(VALIDATION_LAYERS[0]);
-//     createInfo.ppEnabledLayerNames = VALIDATION_LAYERS;
-
-//     this->populateDebugMessengerCreateInfo(debugCreateInfo);
-//     createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT
-//     *)&debugCreateInfo;
-//   } else {
-//     createInfo.enabledLayerCount = 0;
-//     createInfo.ppEnabledLayerNames = nullptr;
-//   }
-
-//   u32 extCount = 0;
-//   vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
-//   vec<VkExtensionProperties> availableExtensions(extCount);
-//   vkEnumerateInstanceExtensionProperties(nullptr, &extCount,
-//                                          availableExtensions.data());
-
-//   if (vkCreateInstance(&createInfo, nullptr, &mInstance) != VK_SUCCESS) {
-//     throw std::runtime_error("Failed to create Vulkan instance.");
+// void App::createSurface() {
+//   if (!SDL_Vulkan_CreateSurface(mWindow, *mInstance, nullptr,
+//   &mWindow->getSurface())) {
+//     throw std::runtime_error("Failed to create window surface.");
 //   }
 // }
-
-// VkResult App::createDebugUtilsMessengerEXT(
-//     VkDebugUtilsMessengerCreateInfoEXT const *pCreateInfo,
-//     VkAllocationCallbacks const *pAllocator) {
-//   auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-//       mInstance, "vkCreateDebugUtilsMessengerEXT");
-//   if (func != nullptr) {
-//     return func(mInstance, pCreateInfo, nullptr, &mDebugMessenger);
-//   } else {
-//     return VK_ERROR_EXTENSION_NOT_PRESENT;
-//   }
-// }
-
-// VkResult
-// App::destroyDebugUtilsMessengerEXT(VkAllocationCallbacks const *pAllocator) {
-//   auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-//       mInstance, "vkDestroyDebugUtilsMessengerEXT");
-//   if (func != nullptr && mDebugMessenger != VK_NULL_HANDLE) {
-//     func(mInstance, mDebugMessenger, nullptr);
-//     mDebugMessenger = VK_NULL_HANDLE;
-//     return VK_SUCCESS;
-//   } else {
-//     return VK_ERROR_EXTENSION_NOT_PRESENT;
-//   }
-// }
-
-// void App::setupDebugMessenger() {
-//   if (!mDebugMode) {
-//     return;
-//   }
-
-//   VkDebugUtilsMessengerCreateInfoEXT createInfo{};
-//   this->populateDebugMessengerCreateInfo(createInfo);
-
-//   if (this->createDebugUtilsMessengerEXT(&createInfo, nullptr) != VK_SUCCESS)
-//   {
-//     throw std::runtime_error("Failed to set up debug messenger.");
-//   }
-// }
-
-void App::createSurface() {
-  if (!SDL_Vulkan_CreateSurface(mWindow, *mInstance, nullptr, &mSurface)) {
-    throw std::runtime_error("Failed to create window surface.");
-  }
-}
 
 QueueFamilyIndices App::findQueueFamilies(VkPhysicalDevice device) {
   QueueFamilyIndices indices;
@@ -237,7 +67,8 @@ QueueFamilyIndices App::findQueueFamilies(VkPhysicalDevice device) {
     }
 
     VkBool32 presentSupport = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(device, 0, mSurface, &presentSupport);
+    vkGetPhysicalDeviceSurfaceSupportKHR(device, 0, mWindow->getSurface(),
+                                         &presentSupport);
     if (presentSupport) {
       indices.presentFamily = index;
     }
@@ -273,24 +104,26 @@ bool App::checkDeviceExtensionSupport(VkPhysicalDevice device) {
 
 SwapChainSupportDetails App::querySwapChainSupport(VkPhysicalDevice device) {
   SwapChainSupportDetails details;
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mSurface,
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mWindow->getSurface(),
                                             &details.capabilities);
 
   u32 formatCount;
-  vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, nullptr);
+  vkGetPhysicalDeviceSurfaceFormatsKHR(device, mWindow->getSurface(),
+                                       &formatCount, nullptr);
   if (formatCount != 0) {
     details.formats.resize(formatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount,
-                                         details.formats.data());
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, mWindow->getSurface(),
+                                         &formatCount, details.formats.data());
   }
 
   u32 presentModeCount;
-  vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount,
-                                            nullptr);
+  vkGetPhysicalDeviceSurfacePresentModesKHR(device, mWindow->getSurface(),
+                                            &presentModeCount, nullptr);
   if (presentModeCount != 0) {
     details.presentModes.resize(presentModeCount);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(
-        device, mSurface, &presentModeCount, details.presentModes.data());
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, mWindow->getSurface(),
+                                              &presentModeCount,
+                                              details.presentModes.data());
   }
 
   return details;
@@ -427,10 +260,13 @@ VkExtent2D App::chooseSwapExtent(VkSurfaceCapabilitiesKHR const &capabilities) {
   if (capabilities.currentExtent.width != UINT32_MAX) {
     return capabilities.currentExtent;
   } else {
-    int width, height;
-    SDL_GetWindowSizeInPixels(mWindow, &width, &height);
-    VkExtent2D actualExtent = {static_cast<u32>(width),
-                               static_cast<u32>(height)};
+    pair<i32> size = mWindow->getSize();
+    // int width, height;
+    // SDL_GetWindowSizeInPixels(mWindow, &width, &height);
+    // VkExtent2D actualExtent = {static_cast<u32>(width),
+    //                            static_cast<u32>(height)};
+    VkExtent2D actualExtent = {static_cast<u32>(size.first),
+                               static_cast<u32>(size.second)};
     actualExtent.width =
         std::clamp(actualExtent.width, capabilities.minImageExtent.width,
                    capabilities.maxImageExtent.width);
@@ -458,7 +294,7 @@ void App::createSwapchain() {
 
   VkSwapchainCreateInfoKHR createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-  createInfo.surface = mSurface;
+  createInfo.surface = mWindow->getSurface();
   createInfo.minImageCount = imageCount;
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -856,12 +692,18 @@ void App::cleanupSwapchain() {
 }
 
 void App::recreateSwapchain() {
-  int width = 0, height = 0;
-  SDL_GetWindowSizeInPixels(mWindow, &width, &height);
-  while (width == 0 || height == 0) {
-    SDL_GetWindowSizeInPixels(mWindow, &width, &height);
+  // int width = 0, height = 0;
+  // SDL_GetWindowSizeInPixels(mWindow, &width, &height);
+  // while (width == 0 || height == 0) {
+  //   SDL_GetWindowSizeInPixels(mWindow, &width, &height);
+  //   SDL_WaitEvent(nullptr);
+  // }
+  pair<i32> size = mWindow->getSize();
+  while (size.first == 0 || size.second == 0) {
+    size = mWindow->getSize();
     SDL_WaitEvent(nullptr);
   }
+
   vkDeviceWaitIdle(mDevice);
 
   this->cleanupSwapchain();
@@ -871,11 +713,7 @@ void App::recreateSwapchain() {
 }
 
 void App::initVulkan() {
-  mDebugger = std::make_shared<MyDebugger>();
-  mInstance = Vulkan::Instance::create("Vulkan App", {0, 0, 1});
-  mInstance->attachDebugger(mDebugger);
-
-  this->createSurface();
+  // this->createSurface();
   this->pickPhysicalDevice();
   this->createLogicalDevice();
   this->createQueue();
@@ -1029,21 +867,33 @@ void App::cleanup() {
 
   vkDestroyDevice(mDevice, nullptr);
 
-  if (mSurface != VK_NULL_HANDLE) {
-    vkDestroySurfaceKHR(*mInstance, mSurface, nullptr);
-    mSurface = VK_NULL_HANDLE;
-  }
+  // if (mWindow->getSurface() != VK_NULL_HANDLE) {
+  //   vkDestroySurfaceKHR(*mInstance, mWindow->getSurface(), nullptr);
+  //   mWindow->getSurface() = VK_NULL_HANDLE;
+  // }
 
-  if (mWindow) {
-    SDL_DestroyWindow(mWindow);
-    mWindow = nullptr;
-  }
+  // if (mWindow) {
+  //   SDL_DestroyWindow(mWindow);
+  //   mWindow = nullptr;
+  // }
 
   SDL_Quit();
 }
 
 App::App(int const &width, int const &height, str const &title, bool debugMode)
     : mDebugMode(debugMode) {
+  if (!SDL_Init(SDL_FLAGS)) {
+    str msg = "Failed to initialize SDL: ";
+    msg += SDL_GetError();
+    throw std::runtime_error(msg);
+    return;
+  }
+
+  mSDLRegistry = std::make_shared<SDL::Registry>();
+  mDebugger = std::make_shared<Vulkan::DefaultDebugger>();
+  mInstance = Vulkan::Instance::create("Vulkan App", {0, 0, 1}, mDebugMode);
+  mInstance->attachDebugger(mDebugger);
+
   this->initWindow(width, height, title);
   this->initVulkan();
 }

@@ -1,9 +1,8 @@
 #pragma once
 
 #include <Terreate/common.hpp>
+#include <Terreate/sdl.hpp>
 #include <Terreate/vulkan.hpp>
-
-#include <iostream>
 
 using namespace Terreate;
 
@@ -27,30 +26,17 @@ struct SwapChainSupportDetails {
   vec<VkPresentModeKHR> presentModes;
 };
 
-class MyDebugger : public Vulkan::IDebugger {
-public:
-  bool warning(str const &message, Vulkan::MessageType const type,
-               vec<Vulkan::DebugObject> const &object) override {
-    std::cerr << "[VULKAN WARNING] " << message << std::endl;
-    return false;
-  }
-  bool error(str const &message, Vulkan::MessageType const type,
-             vec<Vulkan::DebugObject> const &object) override {
-    std::cerr << "[VULKAN ERROR] " << message << std::endl;
-    return false;
-  }
-};
-
 class App {
 private:
   bool mDebugMode = true;
 
-  SDL_Window *mWindow;
-  // VkInstance mInstance = VK_NULL_HANDLE;
-  // VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
+  // SDL_Window *mWindow;
+  shared<SDL::Registry> mSDLRegistry = nullptr;
+  // shared<SDL::EventHandler> mSDLEventHandler = nullptr;
   shared<Vulkan::Instance> mInstance = nullptr;
-  shared<MyDebugger> mDebugger = nullptr;
-  VkSurfaceKHR mSurface = VK_NULL_HANDLE;
+  shared<Vulkan::DefaultDebugger> mDebugger = nullptr;
+  shared<SDL::Window> mWindow = nullptr;
+  // VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   VkDevice mDevice = VK_NULL_HANDLE;
@@ -82,21 +68,7 @@ private:
 
 private:
   void initWindow(int const &width, int const &height, str const &title);
-
-  // bool checkValidationLayerSupport();
-  // vec<char const *> getRequiredExtensions();
-  // void populateDebugMessengerCreateInfo(
-  //     VkDebugUtilsMessengerCreateInfoEXT &createInfo);
-  // void createInstance(str const &appName, u32 const &appVersion);
-
-  // VkResult createDebugUtilsMessengerEXT(
-  //     VkDebugUtilsMessengerCreateInfoEXT const *pCreateInfo,
-  //     VkAllocationCallbacks const *pAllocator);
-  // VkResult
-  // destroyDebugUtilsMessengerEXT(VkAllocationCallbacks const *pAllocator);
-  // void setupDebugMessenger();
-
-  void createSurface();
+  // void createSurface();
 
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
   bool checkDeviceExtensionSupport(VkPhysicalDevice device);

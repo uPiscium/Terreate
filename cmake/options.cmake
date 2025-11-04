@@ -1,5 +1,5 @@
 function(set_build_mode)
-  if(DEBUG_BUILD)
+  if(TERREATE_DEBUG_BUILD)
     message(STATUS "[Terreate] Building with debug flags.")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Wextra -fsanitize=address,undefined -fno-omit-frame-pointer")
     add_compile_definitions(TERREATE_DEBUG_BUILD)
@@ -22,8 +22,8 @@ function(setup_link target)
     Vulkan::Vulkan
     SDL3::SDL3
     TerreateCommonModule
+    TerreateSDLModule
     TerreateVulkanModule
- 
   )
 endfunction()
 
