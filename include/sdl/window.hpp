@@ -113,8 +113,7 @@ public:
   void close();
 
   operator bool() const;
-
-  VkSurfaceKHR const &getSurface() const { return mSurface; } // TODO: remove
+  operator VkSurfaceKHR const &() const;
 
 public:
   static shared<Window>

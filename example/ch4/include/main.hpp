@@ -30,16 +30,15 @@ class App {
 private:
   bool mDebugMode = true;
 
-  // SDL_Window *mWindow;
   shared<SDL::Registry> mSDLRegistry = nullptr;
   // shared<SDL::EventHandler> mSDLEventHandler = nullptr;
   shared<Vulkan::Instance> mInstance = nullptr;
   shared<Vulkan::DefaultDebugger> mDebugger = nullptr;
   shared<SDL::Window> mWindow = nullptr;
-  // VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 
-  VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
-  VkDevice mDevice = VK_NULL_HANDLE;
+  // VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
+  // VkDevice mDevice = VK_NULL_HANDLE;
+  shared<Vulkan::Device> mDevice = nullptr;
 
   VkQueue mGraphicsQueue = VK_NULL_HANDLE;
   VkQueue mPresentQueue = VK_NULL_HANDLE;
@@ -68,15 +67,14 @@ private:
 
 private:
   void initWindow(int const &width, int const &height, str const &title);
-  // void createSurface();
 
-  QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-  bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-  SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-  int rateDevice(VkPhysicalDevice device);
-  void pickPhysicalDevice();
+  // QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+  // bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+  // SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+  // int rateDevice(VkPhysicalDevice device);
+  // void pickPhysicalDevice();
 
-  void createLogicalDevice();
+  // void createLogicalDevice();
   void createQueue();
 
   VkSurfaceFormatKHR

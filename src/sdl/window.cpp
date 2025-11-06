@@ -460,6 +460,8 @@ void Window::close() {
 
 Window::operator bool() const { return !this->isClosed(); }
 
+Window::operator VkSurfaceKHR const &() const { return mSurface; }
+
 shared<Window> Window::create(shared<Vulkan::Instance> instance,
                               u32 const &width, u32 const &height,
                               str const &title, shared<Mouse> mouse,

@@ -4,6 +4,7 @@ message(STATUS "Configuring ${PROJECT_NAME}...")
 add_library(
   ${PROJECT_NAME} STATIC
   debugger.cpp
+  device.cpp
   instance.cpp
 )
 

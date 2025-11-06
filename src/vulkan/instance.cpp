@@ -1,8 +1,6 @@
 #include "vulkan/exception.hpp"
 #include "vulkan/instance.hpp"
 
-#include <iostream>
-
 namespace Terreate::Vulkan {
 bool Instance::checkValidationLayerSupport(vec<str> const &layers) const {
   u32 layerCount;
@@ -70,7 +68,8 @@ Instance::getDebugMessengerCreateInfo() const {
 Instance::Instance(str const &appName, Version const &appVersion,
                    bool debugMode, vec<str> const &extensions,
                    vec<str> const &layers)
-    : mDebugMode(debugMode) {
+    : mDebugMode(debugMode), mEnabledExtensions(extensions),
+      mEnabledLayers(layers) {
   if (mDebugMode && !this->checkValidationLayerSupport(layers)) {
     throw InstanceException("Validation layers requested, but not available.");
   }
@@ -123,6 +122,14 @@ Instance::~Instance() {
     mHandle = VK_NULL_HANDLE;
   }
 }
+
+vec<str> const &Instance::getEnabledExtensions() const {
+  return mEnabledExtensions;
+}
+
+vec<str> const &Instance::getEnabledLayers() const { return mEnabledLayers; }
+
+bool Instance::isDebugMode() const { return mDebugMode; }
 
 void Instance::attachDebugger(shared<IDebugger> debugger) {
   if (!debugger || !mDebugMode) {

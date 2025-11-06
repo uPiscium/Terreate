@@ -34,6 +34,11 @@ private:
 public:
   ~Instance();
 
+  vec<str> const &getEnabledExtensions() const;
+  vec<str> const &getEnabledLayers() const;
+
+  bool isDebugMode() const;
+
   void attachDebugger(shared<IDebugger> debugger);
 
   [[nodiscard]] operator VkInstance() const;
