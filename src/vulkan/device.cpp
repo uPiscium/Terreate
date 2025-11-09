@@ -1,7 +1,5 @@
 #include "vulkan/device.hpp"
 
-#include <iostream>
-
 namespace Terreate::Vulkan {
 
 PhysicalDevice::PhysicalDevice(VkPhysicalDevice physicalDevice,
@@ -20,27 +18,6 @@ PhysicalDevice::PhysicalDevice(VkPhysicalDevice physicalDevice,
   mSupportedExtensions.resize(extensionCount);
   vkEnumerateDeviceExtensionProperties(
       mPhysicalDevice, nullptr, &extensionCount, mSupportedExtensions.data());
-
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mPhysicalDevice, *window,
-                                            &mSurfaceCapabilities);
-
-  u32 formatCount = 0;
-  vkGetPhysicalDeviceSurfaceFormatsKHR(mPhysicalDevice, *window, &formatCount,
-                                       nullptr);
-  if (formatCount != 0) {
-    mSurfaceFormats.resize(formatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(mPhysicalDevice, *window, &formatCount,
-                                         mSurfaceFormats.data());
-  }
-
-  u32 presentModeCount = 0;
-  vkGetPhysicalDeviceSurfacePresentModesKHR(mPhysicalDevice, *window,
-                                            &presentModeCount, nullptr);
-  if (presentModeCount != 0) {
-    mPresentModes.resize(presentModeCount);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(
-        mPhysicalDevice, *window, &presentModeCount, mPresentModes.data());
-  }
 
   vkGetPhysicalDeviceProperties(mPhysicalDevice, &mProperties);
   vkGetPhysicalDeviceFeatures(mPhysicalDevice, &mSupportedFeatures);
@@ -71,24 +48,39 @@ PhysicalDevice::getSupportedExtensions() const {
   return mSupportedExtensions;
 }
 
-VkSurfaceCapabilitiesKHR const &PhysicalDevice::getSurfaceCapabilities() const {
-  return mSurfaceCapabilities;
-}
-
-vec<VkSurfaceFormatKHR> const &PhysicalDevice::getSurfaceFormats() const {
-  return mSurfaceFormats;
-}
-
-vec<VkPresentModeKHR> const &PhysicalDevice::getPresentModes() const {
-  return mPresentModes;
-}
-
 VkPhysicalDeviceProperties const &PhysicalDevice::getProperties() const {
   return mProperties;
 }
 
 VkPhysicalDeviceFeatures const &PhysicalDevice::getSupportedFeatures() const {
   return mSupportedFeatures;
+}
+
+VkSurfaceCapabilitiesKHR PhysicalDevice::getSurfaceCapabilities() const {
+  VkSurfaceCapabilitiesKHR capabilities;
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mPhysicalDevice, *mWindow,
+                                            &capabilities);
+  return capabilities;
+}
+
+vec<VkSurfaceFormatKHR> PhysicalDevice::getSurfaceFormats() const {
+  u32 formatCount = 0;
+  vkGetPhysicalDeviceSurfaceFormatsKHR(mPhysicalDevice, *mWindow, &formatCount,
+                                       nullptr);
+  vec<VkSurfaceFormatKHR> formats(formatCount);
+  vkGetPhysicalDeviceSurfaceFormatsKHR(mPhysicalDevice, *mWindow, &formatCount,
+                                       formats.data());
+  return formats;
+}
+
+vec<VkPresentModeKHR> PhysicalDevice::getPresentModes() const {
+  u32 presentModeCount = 0;
+  vkGetPhysicalDeviceSurfacePresentModesKHR(mPhysicalDevice, *mWindow,
+                                            &presentModeCount, nullptr);
+  vec<VkPresentModeKHR> presentModes(presentModeCount);
+  vkGetPhysicalDeviceSurfacePresentModesKHR(
+      mPhysicalDevice, *mWindow, &presentModeCount, presentModes.data());
+  return presentModes;
 }
 
 bool PhysicalDevice::hasQueueSupport(
@@ -127,7 +119,21 @@ bool PhysicalDevice::hasExtensionSupport(vec<str> const &extensionNames) const {
 }
 
 bool PhysicalDevice::hasSwapChainSupport() const {
-  return !mSurfaceFormats.empty() && !mPresentModes.empty();
+  u32 formatCount = 0;
+  vkGetPhysicalDeviceSurfaceFormatsKHR(mPhysicalDevice, *mWindow, &formatCount,
+                                       nullptr);
+  if (formatCount == 0) {
+    return false;
+  }
+
+  u32 presentModeCount = 0;
+  vkGetPhysicalDeviceSurfacePresentModesKHR(mPhysicalDevice, *mWindow,
+                                            &presentModeCount, nullptr);
+  if (presentModeCount == 0) {
+    return false;
+  }
+
+  return true;
 }
 
 PhysicalDevice::operator VkPhysicalDevice() const { return mPhysicalDevice; }
@@ -288,7 +294,7 @@ Device::~Device() {
   }
 }
 
-umap<QueueType, i32> const &Device::getQueueFamilyIndices() const {
+umap<QueueType, u32> const &Device::getQueueFamilyIndices() const {
   return mQueueFamilyIndices;
 }
 
@@ -300,24 +306,24 @@ vec<VkExtensionProperties> const &Device::getSupportedExtensions() const {
   return mPhysicalDevice->getSupportedExtensions();
 }
 
-VkSurfaceCapabilitiesKHR const &Device::getSurfaceCapabilities() const {
-  return mPhysicalDevice->getSurfaceCapabilities();
-}
-
-vec<VkSurfaceFormatKHR> const &Device::getSurfaceFormats() const {
-  return mPhysicalDevice->getSurfaceFormats();
-}
-
-vec<VkPresentModeKHR> const &Device::getPresentModes() const {
-  return mPhysicalDevice->getPresentModes();
-}
-
 VkPhysicalDeviceProperties const &Device::getProperties() const {
   return mPhysicalDevice->getProperties();
 }
 
 VkPhysicalDeviceFeatures const &Device::getSupportedFeatures() const {
   return mPhysicalDevice->getSupportedFeatures();
+}
+
+VkSurfaceCapabilitiesKHR Device::getSurfaceCapabilities() const {
+  return mPhysicalDevice->getSurfaceCapabilities();
+}
+
+vec<VkSurfaceFormatKHR> Device::getSurfaceFormats() const {
+  return mPhysicalDevice->getSurfaceFormats();
+}
+
+vec<VkPresentModeKHR> Device::getPresentModes() const {
+  return mPhysicalDevice->getPresentModes();
 }
 
 Device::operator VkDevice() const { return mDevice; }

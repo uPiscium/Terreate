@@ -14,13 +14,13 @@ typedef function<i32(shared<PhysicalDevice>)> DeviceRateFunction;
 
 class PhysicalDevice {
 private:
+  PROHIBIT_COPY_AND_ASSIGN(PhysicalDevice);
+
+private:
   shared<SDL::Window> mWindow = nullptr;
   VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
   vec<VkQueueFamilyProperties> mQueueFamilies;
   vec<VkExtensionProperties> mSupportedExtensions;
-  VkSurfaceCapabilitiesKHR mSurfaceCapabilities;
-  vec<VkSurfaceFormatKHR> mSurfaceFormats;
-  vec<VkPresentModeKHR> mPresentModes;
   VkPhysicalDeviceProperties mProperties;
   VkPhysicalDeviceFeatures mSupportedFeatures;
 
@@ -33,11 +33,11 @@ public:
   uset<u32> getQueue(VkQueueFlags const &flags) const;
   vec<VkQueueFamilyProperties> const &getQueueFamilies() const;
   vec<VkExtensionProperties> const &getSupportedExtensions() const;
-  VkSurfaceCapabilitiesKHR const &getSurfaceCapabilities() const;
-  vec<VkSurfaceFormatKHR> const &getSurfaceFormats() const;
-  vec<VkPresentModeKHR> const &getPresentModes() const;
   VkPhysicalDeviceProperties const &getProperties() const;
   VkPhysicalDeviceFeatures const &getSupportedFeatures() const;
+  VkSurfaceCapabilitiesKHR getSurfaceCapabilities() const;
+  vec<VkSurfaceFormatKHR> getSurfaceFormats() const;
+  vec<VkPresentModeKHR> getPresentModes() const;
 
   bool hasQueueSupport(uset<QueueType> const &requiredQueues) const;
   bool hasSurfaceSupport(u32 queueFamilyIndex) const;
@@ -63,7 +63,7 @@ private:
   shared<Instance> mInstance = nullptr;
   shared<PhysicalDevice> mPhysicalDevice = nullptr;
   VkDevice mDevice = VK_NULL_HANDLE;
-  umap<QueueType, i32> mQueueFamilyIndices;
+  umap<QueueType, u32> mQueueFamilyIndices;
 
 private:
   Device(shared<Instance> instance, shared<SDL::Window> window,
@@ -74,14 +74,14 @@ private:
 public:
   ~Device();
 
-  umap<QueueType, i32> const &getQueueFamilyIndices() const;
+  umap<QueueType, u32> const &getQueueFamilyIndices() const;
   vec<VkQueueFamilyProperties> const &getQueueFamilies() const;
   vec<VkExtensionProperties> const &getSupportedExtensions() const;
-  VkSurfaceCapabilitiesKHR const &getSurfaceCapabilities() const;
-  vec<VkSurfaceFormatKHR> const &getSurfaceFormats() const;
-  vec<VkPresentModeKHR> const &getPresentModes() const;
   VkPhysicalDeviceProperties const &getProperties() const;
   VkPhysicalDeviceFeatures const &getSupportedFeatures() const;
+  VkSurfaceCapabilitiesKHR getSurfaceCapabilities() const;
+  vec<VkSurfaceFormatKHR> getSurfaceFormats() const;
+  vec<VkPresentModeKHR> getPresentModes() const;
 
   operator VkDevice() const;
 
