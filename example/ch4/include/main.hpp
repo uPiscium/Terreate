@@ -6,26 +6,6 @@
 
 using namespace Terreate;
 
-struct QueueFamilyIndices {
-  i32 graphicsFamily = -1;
-  i32 presentFamily = -1;
-
-  bool isComplete() const { return graphicsFamily * presentFamily >= 0; }
-  operator uset<i32>() const {
-    if (this->isComplete()) {
-      return uset<i32>{graphicsFamily, presentFamily};
-    } else {
-      return uset<i32>{};
-    }
-  }
-};
-
-struct SwapChainSupportDetails {
-  VkSurfaceCapabilitiesKHR capabilities;
-  vec<VkSurfaceFormatKHR> formats;
-  vec<VkPresentModeKHR> presentModes;
-};
-
 class App {
 private:
   bool mDebugMode = true;
@@ -35,13 +15,8 @@ private:
   shared<Vulkan::Instance> mInstance = nullptr;
   shared<Vulkan::DefaultDebugger> mDebugger = nullptr;
   shared<SDL::Window> mWindow = nullptr;
-
-  // VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
-  // VkDevice mDevice = VK_NULL_HANDLE;
   shared<Vulkan::Device> mDevice = nullptr;
-
-  VkQueue mGraphicsQueue = VK_NULL_HANDLE;
-  VkQueue mPresentQueue = VK_NULL_HANDLE;
+  shared<Vulkan::Queue> mQueue = nullptr;
 
   VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
   vec<VkImage> mSwapchainImages;
@@ -67,15 +42,6 @@ private:
 
 private:
   void initWindow(int const &width, int const &height, str const &title);
-
-  // QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-  // bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-  // SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-  // int rateDevice(VkPhysicalDevice device);
-  // void pickPhysicalDevice();
-
-  // void createLogicalDevice();
-  void createQueue();
 
   VkSurfaceFormatKHR
   chooseSwapSurfaceFormat(vec<VkSurfaceFormatKHR> const &availableFormats);

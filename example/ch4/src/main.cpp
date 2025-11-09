@@ -41,190 +41,6 @@ void App::initWindow(int const &width, int const &height, str const &title) {
   mWindow = SDL::Window::create(mInstance, width, height, title, mouse);
 }
 
-// QueueFamilyIndices App::findQueueFamilies(VkPhysicalDevice device) {
-//   QueueFamilyIndices indices;
-
-//   u32 queueFamilyCount = 0;
-//   vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
-//   nullptr); vec<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-//   vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
-//                                            queueFamilies.data());
-
-//   u32 index = 0;
-//   for (auto const &queueFamily : queueFamilies) {
-//     if (queueFamily.queueCount > 0 &&
-//         queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-//       indices.graphicsFamily = index;
-//     }
-
-//     VkBool32 presentSupport = false;
-//     vkGetPhysicalDeviceSurfaceSupportKHR(device, 0, *mWindow,
-//     &presentSupport); if (presentSupport) {
-//       indices.presentFamily = index;
-//     }
-
-//     if (indices.isComplete()) {
-//       break;
-//     }
-
-//     ++index;
-//   }
-
-//   return indices;
-// }
-
-// bool App::checkDeviceExtensionSupport(VkPhysicalDevice device) {
-//   u32 extensionCount;
-//   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
-//                                        nullptr);
-
-//   vec<VkExtensionProperties> availableExtensions(extensionCount);
-//   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
-//                                        availableExtensions.data());
-
-//   u32 length = sizeof(DEVICE_EXTENSIONS) / sizeof(DEVICE_EXTENSIONS[0]);
-//   uset<str> requiredExtensions(DEVICE_EXTENSIONS, DEVICE_EXTENSIONS +
-//   length);
-
-//   for (auto const &extension : availableExtensions) {
-//     requiredExtensions.erase(extension.extensionName);
-//   }
-
-//   return requiredExtensions.empty();
-// }
-
-// SwapChainSupportDetails App::querySwapChainSupport(VkPhysicalDevice device) {
-//   SwapChainSupportDetails details;
-//   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, *mWindow,
-//                                             &details.capabilities);
-
-//   u32 formatCount;
-//   vkGetPhysicalDeviceSurfaceFormatsKHR(device, *mWindow, &formatCount,
-//   nullptr); if (formatCount != 0) {
-//     details.formats.resize(formatCount);
-//     vkGetPhysicalDeviceSurfaceFormatsKHR(device, *mWindow, &formatCount,
-//                                          details.formats.data());
-//   }
-
-//   u32 presentModeCount;
-//   vkGetPhysicalDeviceSurfacePresentModesKHR(device, *mWindow,
-//   &presentModeCount,
-//                                             nullptr);
-//   if (presentModeCount != 0) {
-//     details.presentModes.resize(presentModeCount);
-//     vkGetPhysicalDeviceSurfacePresentModesKHR(
-//         device, *mWindow, &presentModeCount, details.presentModes.data());
-//   }
-
-//   return details;
-// }
-
-// int App::rateDevice(VkPhysicalDevice device) {
-//   if (!this->findQueueFamilies(device).isComplete()) {
-//     return -1;
-//   }
-
-//   if (!this->checkDeviceExtensionSupport(device)) {
-//     return -1;
-//   }
-
-//   SwapChainSupportDetails swapChainSupport =
-//       this->querySwapChainSupport(device);
-//   if (swapChainSupport.formats.empty() ||
-//       swapChainSupport.presentModes.empty()) {
-//     return -1;
-//   }
-
-//   int score = 0;
-//   VkPhysicalDeviceProperties deviceProperties;
-//   VkPhysicalDeviceFeatures deviceFeatures;
-//   vkGetPhysicalDeviceProperties(device, &deviceProperties);
-//   vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-
-//   // Discrete GPUs have a significant performance advantage
-//   if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
-//     score += 1000;
-//   }
-
-//   return score;
-// }
-
-// void App::pickPhysicalDevice() {
-//   u32 deviceCount = 0;
-//   vkEnumeratePhysicalDevices(*mInstance, &deviceCount, nullptr);
-
-//   if (deviceCount == 0) {
-//     throw std::runtime_error("Failed to find GPUs with Vulkan support.");
-//   }
-
-//   vec<VkPhysicalDevice> devices(deviceCount);
-//   vkEnumeratePhysicalDevices(*mInstance, &deviceCount, devices.data());
-
-//   VkPhysicalDevice best = VK_NULL_HANDLE;
-//   int bestScore = -1;
-//   for (auto const &device : devices) {
-//     int score = this->rateDevice(device);
-//     if (score > bestScore) {
-//       best = device;
-//       bestScore = score;
-//     }
-//   }
-
-//   if (bestScore == -1 || best == VK_NULL_HANDLE) {
-//     throw std::runtime_error("Failed to find a suitable GPU.");
-//   }
-//   mPhysicalDevice = best;
-// }
-
-// void App::createLogicalDevice() {
-//   QueueFamilyIndices indices = this->findQueueFamilies(mPhysicalDevice);
-
-//   uset<i32> uniqueQueueFamilies = indices;
-
-//   vec<VkDeviceQueueCreateInfo> queueCreateInfos;
-//   float queuePriority = 1.0f;
-//   for (i32 queueFamily : uniqueQueueFamilies) {
-//     VkDeviceQueueCreateInfo queueCreateInfo{};
-//     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-//     queueCreateInfo.queueFamilyIndex = queueFamily;
-//     queueCreateInfo.queueCount = 1;
-//     queueCreateInfo.pQueuePriorities = &queuePriority;
-//     queueCreateInfos.push_back(queueCreateInfo);
-//   }
-
-//   VkPhysicalDeviceFeatures deviceFeatures{};
-//   VkDeviceCreateInfo createInfo{};
-//   createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-//   createInfo.pQueueCreateInfos = queueCreateInfos.data();
-//   createInfo.queueCreateInfoCount = queueCreateInfos.size();
-//   createInfo.pEnabledFeatures = &deviceFeatures;
-
-//   createInfo.enabledExtensionCount =
-//       sizeof(DEVICE_EXTENSIONS) / sizeof(DEVICE_EXTENSIONS[0]);
-//   createInfo.ppEnabledExtensionNames = DEVICE_EXTENSIONS;
-
-//   if (mDebugMode) {
-//     createInfo.enabledLayerCount =
-//         sizeof(VALIDATION_LAYERS) / sizeof(VALIDATION_LAYERS[0]);
-//     createInfo.ppEnabledLayerNames = VALIDATION_LAYERS;
-//   } else {
-//     createInfo.enabledLayerCount = 0;
-//   }
-
-//   if (vkCreateDevice(mPhysicalDevice, &createInfo, nullptr, &mDevice) !=
-//       VK_SUCCESS) {
-//     throw std::runtime_error("Failed to create logical device.");
-//   }
-// }
-
-void App::createQueue() {
-  umap<Vulkan::QueueType, i32> indices = mDevice->getQueueFamilyIndices();
-  vkGetDeviceQueue(*mDevice, (u32)indices[Vulkan::QueueType::GRAPHICS], 0,
-                   &mGraphicsQueue);
-  vkGetDeviceQueue(*mDevice, (u32)indices[Vulkan::QueueType::GRAPHICS], 0,
-                   &mPresentQueue);
-}
-
 VkSurfaceFormatKHR
 App::chooseSwapSurfaceFormat(vec<VkSurfaceFormatKHR> const &availableFormats) {
   for (auto const &availableFormat : availableFormats) {
@@ -549,15 +365,12 @@ void App::createFramebuffers() {
 }
 
 void App::createCommandPool() {
-  // QueueFamilyIndices queueFamilyIndices =
-  //     this->findQueueFamilies(mPhysicalDevice);
-  umap<Vulkan::QueueType, i32> queueFamilyIndices =
+  umap<Vulkan::QueueType, u32> queueFamilyIndices =
       mDevice->getQueueFamilyIndices();
 
   VkCommandPoolCreateInfo poolInfo{};
   poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
   poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-  // poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
   poolInfo.queueFamilyIndex =
       (u32)queueFamilyIndices[Vulkan::QueueType::GRAPHICS];
 
@@ -686,10 +499,9 @@ void App::recreateSwapchain() {
 }
 
 void App::initVulkan() {
-  // this->pickPhysicalDevice();
-  // this->createLogicalDevice();
   mDevice = Vulkan::Device::create(mInstance, mWindow);
-  this->createQueue();
+  mQueue = Vulkan::Queue::create(mDevice);
+  // this->createQueue();
   this->createSwapchain();
   this->createImageViews();
   this->createCommandPool();
@@ -744,45 +556,19 @@ void App::drawFrame() {
   vkResetCommandBuffer(mCommandBuffers[mCurrentFrame], 0);
   this->recordCommandBuffer(mCommandBuffers[mCurrentFrame], imageIndex);
 
-  VkSubmitInfo submitInfo{};
-  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-  VkSemaphore waitSemaphores[] = {mImageAvailableSemaphores[mCurrentFrame]};
-  VkPipelineStageFlags waitStages[] = {
-      VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-  submitInfo.waitSemaphoreCount = 1;
-  submitInfo.pWaitSemaphores = waitSemaphores;
-  submitInfo.pWaitDstStageMask = waitStages;
-  submitInfo.commandBufferCount = 1;
-  submitInfo.pCommandBuffers = &mCommandBuffers[mCurrentFrame];
+  mQueue->submit({mImageAvailableSemaphores[mCurrentFrame]},
+                 {mRenderFinishedSemaphores[imageIndex]},
+                 {mCommandBuffers[mCurrentFrame]},
+                 mInFlightFences[mCurrentFrame]);
 
-  VkSemaphore signalSemaphores[] = {mRenderFinishedSemaphores[imageIndex]};
-  submitInfo.signalSemaphoreCount = 1;
-  submitInfo.pSignalSemaphores = signalSemaphores;
-
-  if (vkQueueSubmit(mGraphicsQueue, 1, &submitInfo,
-                    mInFlightFences[mCurrentFrame]) != VK_SUCCESS) {
-    throw std::runtime_error("Failed to submit draw command buffer.");
+  if (!mQueue->present(mSwapchain, imageIndex,
+                       {mRenderFinishedSemaphores[imageIndex]})) {
+    this->recreateSwapchain();
   }
 
-  VkPresentInfoKHR presentInfo{};
-  presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-  presentInfo.waitSemaphoreCount = 1;
-  presentInfo.pWaitSemaphores = signalSemaphores;
-
-  VkSwapchainKHR swapChains[] = {mSwapchain};
-  presentInfo.swapchainCount = 1;
-  presentInfo.pSwapchains = swapChains;
-  presentInfo.pImageIndices = &imageIndex;
-  presentInfo.pResults = nullptr;
-
-  result = vkQueuePresentKHR(mPresentQueue, &presentInfo);
-
-  if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-      mFramebufferResized) {
-    mFramebufferResized = false;
+  if (mFramebufferResized) {
     this->recreateSwapchain();
-  } else if (result != VK_SUCCESS) {
-    throw std::runtime_error("Failed to present swap chain image.");
+    mFramebufferResized = false;
   }
 
   mCurrentFrame = (mCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
@@ -837,8 +623,6 @@ void App::cleanup() {
     vkDestroyCommandPool(*mDevice, mCommandPool, nullptr);
     mCommandPool = VK_NULL_HANDLE;
   }
-
-  // vkDestroyDevice(*mDevice, nullptr);
 
   SDL_Quit();
 }

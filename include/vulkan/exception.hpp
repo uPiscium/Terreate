@@ -25,4 +25,9 @@ public:
   InstanceException(str const &message) : VulkanException(message) {}
 };
 
+class QueueException : public VulkanException {
+public:
+  QueueException(str const &message) : VulkanException(message) {}
+};
+
 } // namespace Terreate::Vulkan

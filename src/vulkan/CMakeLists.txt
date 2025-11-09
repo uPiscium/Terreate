@@ -6,6 +6,7 @@ add_library(
   debugger.cpp
   device.cpp
   instance.cpp
+  queue.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../../include)

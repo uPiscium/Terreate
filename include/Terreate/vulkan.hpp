@@ -4,3 +4,4 @@
 #include "vulkan/enum.hpp"
 #include "vulkan/exception.hpp"
 #include "vulkan/instance.hpp"
+#include "vulkan/queue.hpp"
