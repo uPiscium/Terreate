@@ -31,17 +31,21 @@ void Queue::submit(vec<VkSemaphore> const &wait, vec<VkSemaphore> const &signal,
   }
 }
 
-vec<bool> Queue::present(vec<VkSwapchainKHR> swapchains, u32 imageIndex,
+vec<bool> Queue::present(vec<shared<Swapchain>> swapchains, u32 imageIndex,
                          vec<VkSemaphore> const &wait) const {
   vec<VkResult> results(swapchains.size());
+  vec<VkSwapchainKHR> vkSwapchains;
+  for (auto const &swapchain : swapchains) {
+    vkSwapchains.push_back(*swapchain);
+  }
   VkPresentInfoKHR presentInfo{};
   presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
   presentInfo.waitSemaphoreCount = static_cast<u32>(wait.size());
   presentInfo.pWaitSemaphores = wait.data();
 
-  presentInfo.swapchainCount = static_cast<u32>(swapchains.size());
-  presentInfo.pSwapchains = swapchains.data();
+  presentInfo.swapchainCount = static_cast<u32>(vkSwapchains.size());
+  presentInfo.pSwapchains = vkSwapchains.data();
   presentInfo.pImageIndices = &imageIndex;
   presentInfo.pResults = results.data();
 
@@ -61,9 +65,9 @@ vec<bool> Queue::present(vec<VkSwapchainKHR> swapchains, u32 imageIndex,
   return status;
 }
 
-bool Queue::present(VkSwapchainKHR swapchain, u32 imageIndex,
+bool Queue::present(shared<Swapchain> swapchain, u32 imageIndex,
                     vec<VkSemaphore> const &wait) const {
-  vec<VkSwapchainKHR> swapchains = {swapchain};
+  vec<shared<Swapchain>> swapchains = {swapchain};
   vec<bool> status = this->present(swapchains, imageIndex, wait);
   return status[0];
 }

@@ -3,6 +3,7 @@
 #include "common/type.hpp"
 
 #include "device.hpp"
+#include "swapchain.hpp"
 
 namespace Terreate::Vulkan {
 
@@ -24,9 +25,9 @@ public:
               vec<VkCommandBuffer> const &commandBuffer,
               VkFence fence = VK_NULL_HANDLE) const;
   // returns false if swapchain is suboptimal or out of date
-  vec<bool> present(vec<VkSwapchainKHR> swapchains, u32 imageIndex,
+  vec<bool> present(vec<shared<Swapchain>> swapchains, u32 imageIndex,
                     vec<VkSemaphore> const &wait) const;
-  bool present(VkSwapchainKHR swapchain, u32 imageIndex,
+  bool present(shared<Swapchain> swapchain, u32 imageIndex,
                vec<VkSemaphore> const &wait) const;
   void wait() const;
 
