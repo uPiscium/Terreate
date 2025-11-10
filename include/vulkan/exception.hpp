@@ -30,4 +30,9 @@ public:
   QueueException(str const &message) : VulkanException(message) {}
 };
 
+class SwapchainException : public VulkanException {
+public:
+  SwapchainException(str const &message) : VulkanException(message) {}
+};
+
 } // namespace Terreate::Vulkan
