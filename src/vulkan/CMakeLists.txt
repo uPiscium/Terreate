@@ -7,6 +7,7 @@ add_library(
   device.cpp
   instance.cpp
   queue.cpp
+  swapchain.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../../include)

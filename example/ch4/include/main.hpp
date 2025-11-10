@@ -18,10 +18,7 @@ private:
   shared<Vulkan::Device> mDevice = nullptr;
   shared<Vulkan::Queue> mQueue = nullptr;
 
-  VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
-  vec<VkImage> mSwapchainImages;
-  VkFormat mSwapchainImageFormat;
-  VkExtent2D mSwapchainExtent;
+  shared<Vulkan::Swapchain> mSwapchain = nullptr;
   vec<VkImageView> mSwapchainImageViews;
 
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
@@ -43,12 +40,6 @@ private:
 private:
   void initWindow(int const &width, int const &height, str const &title);
 
-  VkSurfaceFormatKHR
-  chooseSwapSurfaceFormat(vec<VkSurfaceFormatKHR> const &availableFormats);
-  VkPresentModeKHR
-  chooseSwapPresentMode(vec<VkPresentModeKHR> const &availablePresentModes);
-  VkExtent2D chooseSwapExtent(VkSurfaceCapabilitiesKHR const &capabilities);
-  void createSwapchain();
   void createImageViews();
 
   VkShaderModule createShaderModule(vec<char> const &code);

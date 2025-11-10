@@ -5,3 +5,4 @@
 #include "vulkan/exception.hpp"
 #include "vulkan/instance.hpp"
 #include "vulkan/queue.hpp"
+#include "vulkan/swapchain.hpp"
