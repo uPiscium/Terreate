@@ -475,7 +475,7 @@ void App::drawFrame() {
                  {mCommandBuffers[mCurrentFrame]},
                  mInFlightFences[mCurrentFrame]);
 
-  if (!mQueue->present(*mSwapchain, imageIndex,
+  if (!mQueue->present(mSwapchain, imageIndex,
                        {mRenderFinishedSemaphores[imageIndex]})) {
     this->recreateSwapchain();
   }
