@@ -1,4 +1,4 @@
-#include "sdl/mouse.hpp"
+#include "core/sdl/mouse.hpp"
 
 namespace Terreate::SDL {
 

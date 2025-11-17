@@ -1,5 +1,5 @@
-#include "sdl/exception.hpp"
-#include "sdl/icon.hpp"
+#include "core/sdl/exception.hpp"
+#include "core/sdl/icon.hpp"
 
 namespace Terreate::SDL {
 

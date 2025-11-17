@@ -1,5 +1,5 @@
-#include "sdl/exception.hpp"
-#include "sdl/gamepad.hpp"
+#include "core/sdl/exception.hpp"
+#include "core/sdl/gamepad.hpp"
 
 namespace Terreate::SDL {
 

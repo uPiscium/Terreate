@@ -2,7 +2,7 @@
 
 #include "common/type.hpp"
 
-#include "sdl/enum.hpp"
+#include "enum.hpp"
 
 namespace Terreate::SDL {
 

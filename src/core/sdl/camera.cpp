@@ -1,5 +1,5 @@
-#include "sdl/camera.hpp"
-#include "sdl/exception.hpp"
+#include "core/sdl/camera.hpp"
+#include "core/sdl/exception.hpp"
 
 namespace Terreate::SDL {
 

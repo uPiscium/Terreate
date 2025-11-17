@@ -1,5 +1,5 @@
-#include "sdl/exception.hpp"
-#include "sdl/window.hpp"
+#include "core/sdl/exception.hpp"
+#include "core/sdl/window.hpp"
 
 namespace Terreate::SDL {
 

@@ -1,5 +1,5 @@
-#include "sdl/audio.hpp"
-#include "sdl/exception.hpp"
+#include "core/sdl/audio.hpp"
+#include "core/sdl/exception.hpp"
 
 namespace Terreate::SDL {
 

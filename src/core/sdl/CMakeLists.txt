@@ -1,6 +1,6 @@
-project(TerreateSDLModule)
-message(STATUS "Configuring ${PROJECT_NAME}...")
+project(TerreateCoreSDL)
 
+message(STATUS "Configuring ${PROJECT_NAME}...")
 add_library(
   ${PROJECT_NAME} STATIC
   audio.cpp
@@ -14,10 +14,10 @@ add_library(
   window.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../../include)
-target_include_directories(${PROJECT_NAME} PUBLIC ../../deps)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../../include)
+target_include_directories(${PROJECT_NAME} PUBLIC ../../../deps)
 set_target_properties(
   ${PROJECT_NAME} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-message(STATUS "${PROJECT_NAME} configured.")
+message(STATUS "Configured ${PROJECT_NAME}.")

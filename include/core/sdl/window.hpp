@@ -2,10 +2,10 @@
 
 #include "common/type.hpp"
 
-#include "vulkan/instance.hpp"
+#include "core/vulkan/instance.hpp"
 
-#include "sdl/icon.hpp"
-#include "sdl/mouse.hpp"
+#include "icon.hpp"
+#include "mouse.hpp"
 
 namespace Terreate::SDL {
 

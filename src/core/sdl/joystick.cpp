@@ -1,5 +1,5 @@
-#include "sdl/exception.hpp"
-#include "sdl/joystick.hpp"
+#include "core/sdl/exception.hpp"
+#include "core/sdl/joystick.hpp"
 
 #include <limits>
 
