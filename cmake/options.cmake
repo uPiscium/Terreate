@@ -9,24 +9,6 @@ function(set_build_mode)
   endif()
 endfunction()
 
-function(setup_include target)
-  target_include_directories(${target} PUBLIC ./include)
-  target_include_directories(${target} PUBLIC ../../include)
-  target_include_directories(${target} PUBLIC ../../deps)
-endfunction()
-
-function(setup_link target)
-  find_package(Vulkan REQUIRED)
-  target_link_libraries(
-    ${target} PRIVATE
-    Vulkan::Vulkan
-    SDL3::SDL3
-    TerreateCommonModule
-    TerreateSDLModule
-    TerreateVulkanModule
-  )
-endfunction()
-
 function(setup_binary_dir target)
   set_target_properties(${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                                    ${CMAKE_BINARY_DIR}/bin)

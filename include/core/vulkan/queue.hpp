@@ -24,6 +24,8 @@ public:
   void submit(vec<VkSemaphore> const &wait, vec<VkSemaphore> const &signal,
               vec<VkCommandBuffer> const &commandBuffer,
               VkFence fence = VK_NULL_HANDLE) const;
+  void submit(vec<VkCommandBuffer> const &commandBuffer,
+              VkFence fence = VK_NULL_HANDLE) const;
   // returns false if swapchain is suboptimal or out of date
   vec<bool> present(vec<shared<Swapchain>> swapchains, u32 imageIndex,
                     vec<VkSemaphore> const &wait) const;

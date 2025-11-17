@@ -1,5 +1,5 @@
-#include "vulkan/exception.hpp"
-#include "vulkan/swapchain.hpp"
+#include "core/vulkan/exception.hpp"
+#include "core/vulkan/swapchain.hpp"
 
 namespace Terreate::Vulkan {
 

@@ -2,9 +2,10 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
-#include <memory>
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 
+#include <algorithm>
+#include <cstring>
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -13,6 +14,7 @@
 #include <typeindex>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 #ifndef STB_IMAGE_IMPLEMENTATION // Avoid multiple definition error

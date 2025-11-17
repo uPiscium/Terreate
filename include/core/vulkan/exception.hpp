@@ -10,6 +10,11 @@ public:
   VulkanException(str const &message) : TerreateException(message) {}
 };
 
+class AllocatorException : public VulkanException {
+public:
+  AllocatorException(str const &message) : VulkanException(message) {}
+};
+
 class DebuggerException : public VulkanException {
 public:
   DebuggerException(str const &message) : VulkanException(message) {}
@@ -18,6 +23,11 @@ public:
 class DeviceException : public VulkanException {
 public:
   DeviceException(str const &message) : VulkanException(message) {}
+};
+
+class ImageException : public VulkanException {
+public:
+  ImageException(str const &message) : VulkanException(message) {}
 };
 
 class InstanceException : public VulkanException {

@@ -1,8 +1,9 @@
-project(TerreateCommonModule)
+project(TerreateCommon)
 message(STATUS "Configuring ${PROJECT_NAME}...")
 
 add_library(
   ${PROJECT_NAME} STATIC
+  tiny_object_loader.cc
   uuid.cpp
 )
 

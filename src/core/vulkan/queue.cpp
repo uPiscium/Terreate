@@ -1,4 +1,4 @@
-#include "vulkan/queue.hpp"
+#include "core/vulkan/queue.hpp"
 
 namespace Terreate::Vulkan {
 
@@ -29,6 +29,11 @@ void Queue::submit(vec<VkSemaphore> const &wait, vec<VkSemaphore> const &signal,
   if (vkQueueSubmit(mHandle, 1, &submitInfo, fence) != VK_SUCCESS) {
     throw QueueException("Failed to submit draw command buffer to queue.");
   }
+}
+
+void Queue::submit(vec<VkCommandBuffer> const &commandBuffer,
+                   VkFence fence) const {
+  this->submit({}, {}, commandBuffer, fence);
 }
 
 vec<bool> Queue::present(vec<shared<Swapchain>> swapchains, u32 imageIndex,

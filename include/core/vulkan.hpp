@@ -1,8 +1,10 @@
 #pragma once
+#include "vulkan/allocator.hpp"
 #include "vulkan/debugger.hpp"
 #include "vulkan/device.hpp"
 #include "vulkan/enum.hpp"
 #include "vulkan/exception.hpp"
+#include "vulkan/image.hpp"
 #include "vulkan/instance.hpp"
 #include "vulkan/queue.hpp"
 #include "vulkan/swapchain.hpp"

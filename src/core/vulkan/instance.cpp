@@ -1,5 +1,5 @@
-#include "vulkan/exception.hpp"
-#include "vulkan/instance.hpp"
+#include "core/vulkan/exception.hpp"
+#include "core/vulkan/instance.hpp"
 
 namespace Terreate::Vulkan {
 bool Instance::checkValidationLayerSupport(vec<str> const &layers) const {

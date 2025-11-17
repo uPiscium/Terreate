@@ -2,7 +2,7 @@
 
 #include "common/type.hpp"
 
-#include "sdl/window.hpp"
+#include "core/sdl/window.hpp"
 
 #include "device.hpp"
 
