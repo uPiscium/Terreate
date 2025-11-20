@@ -5,6 +5,7 @@
 #include "core/sdl/window.hpp"
 
 #include "device.hpp"
+#include "image.hpp"
 
 namespace Terreate::Vulkan {
 
@@ -17,6 +18,7 @@ private:
   shared<SDL::Window> mWindow = nullptr;
   VkSwapchainKHR mHandle = VK_NULL_HANDLE;
   vec<VkImage> mImages;
+  vec<shared<ImageView>> mImageViews;
   VkFormat mImageFormat;
   VkExtent2D mExtent;
 
@@ -36,7 +38,8 @@ public:
 
   u32 getImageCount() const;
   i32 getNextImageIndex(VkSemaphore const &semaphore) const;
-  vec<VkImage> const &getImages() const;
+  // vec<VkImage> const &getImages() const;
+  vec<shared<ImageView>> const &getImageViews() const;
   VkFormat getImageFormat() const;
   VkExtent2D getExtent() const;
 

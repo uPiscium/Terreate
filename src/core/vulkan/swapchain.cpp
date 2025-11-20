@@ -83,11 +83,21 @@ void Swapchain::createSwapchain() {
   mImages.resize(imageCount);
   vkGetSwapchainImagesKHR(*mDevice, mHandle, &imageCount, mImages.data());
 
+  for (auto const &image : mImages) {
+    mImageViews.push_back(ImageView::create(
+        mDevice, image, surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, 1));
+  }
+
   mImageFormat = surfaceFormat.format;
   mExtent = extent;
 }
 
 void Swapchain::cleanup() {
+  for (auto &imageView : mImageViews) {
+    imageView.reset();
+  }
+  mImageViews.clear();
+
   if (mHandle != VK_NULL_HANDLE) {
     vkDestroySwapchainKHR(*mDevice, mHandle, nullptr);
     mHandle = VK_NULL_HANDLE;
@@ -119,7 +129,11 @@ i32 Swapchain::getNextImageIndex(VkSemaphore const &semaphore) const {
   return imageIndex;
 }
 
-vec<VkImage> const &Swapchain::getImages() const { return mImages; }
+// vec<VkImage> const &Swapchain::getImages() const { return mImages; }
+
+vec<shared<ImageView>> const &Swapchain::getImageViews() const {
+  return mImageViews;
+}
 
 VkFormat Swapchain::getImageFormat() const { return mImageFormat; }
 
