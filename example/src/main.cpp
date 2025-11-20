@@ -95,17 +95,6 @@ VkImageView App::createImageView(VkImage image, VkFormat format,
   return imageView;
 }
 
-void App::createImageViews() {
-  mSwapchainImageViews.resize(mSwapchain->getImageCount());
-
-  vec<VkImage> const &swapchainImages = mSwapchain->getImages();
-  for (u32 i = 0; i < swapchainImages.size(); ++i) {
-    mSwapchainImageViews[i] =
-        this->createImageView(swapchainImages[i], mSwapchain->getImageFormat(),
-                              VK_IMAGE_ASPECT_COLOR_BIT, 1);
-  }
-}
-
 VkShaderModule App::createShaderModule(vec<char> const &code) {
   VkShaderModuleCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -439,14 +428,16 @@ void App::createDepthResources() {
 }
 
 void App::createFramebuffers() {
-  mSwapchainFramebuffers.resize(mSwapchainImageViews.size());
+  mSwapchainFramebuffers.resize(mSwapchain->getImageCount());
   VkExtent2D extent = mSwapchain->getExtent();
 
-  for (u32 i = 0; i < mSwapchainImageViews.size(); ++i) {
+  vec<shared<Vulkan::ImageView>> const &swapchainImageViews =
+      mSwapchain->getImageViews();
+  for (u32 i = 0; i < mSwapchain->getImageCount(); ++i) {
     vec<VkImageView> attachments = {
         mColorImageView,
         mDepthImageView,
-        mSwapchainImageViews[i],
+        *swapchainImageViews[i],
     };
     VkFramebufferCreateInfo framebufferInfo{};
     framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -1109,7 +1100,7 @@ void App::recordCommandBuffer(VkCommandBuffer commandBuffer, u32 imageIndex) {
 
 void App::createSyncObjects() {
   mImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-  mRenderFinishedSemaphores.resize(mSwapchainImageViews.size());
+  mRenderFinishedSemaphores.resize(mSwapchain->getImageCount());
   mInFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
   VkSemaphoreCreateInfo semaphoreInfo{};
@@ -1128,7 +1119,7 @@ void App::createSyncObjects() {
     }
   }
 
-  for (u32 i = 0; i < mSwapchainImageViews.size(); ++i) {
+  for (u32 i = 0; i < mSwapchain->getImageCount(); ++i) {
     if (vkCreateSemaphore(*mDevice, &semaphoreInfo, nullptr,
                           &mRenderFinishedSemaphores[i]) != VK_SUCCESS) {
       throw std::runtime_error("Failed to create synchronization objects.");
@@ -1149,9 +1140,9 @@ void App::cleanupSwapchain() {
     vkDestroyFramebuffer(*mDevice, mSwapchainFramebuffers[i], nullptr);
   }
 
-  for (u32 i = 0; i < mSwapchainImageViews.size(); ++i) {
-    vkDestroyImageView(*mDevice, mSwapchainImageViews[i], nullptr);
-  }
+  // for (u32 i = 0; i < mSwapchainImageViews.size(); ++i) {
+  //   vkDestroyImageView(*mDevice, mSwapchainImageViews[i], nullptr);
+  // }
 }
 
 void App::recreateSwapchain() {
@@ -1165,7 +1156,7 @@ void App::recreateSwapchain() {
 
   mSwapchain->update();
   this->cleanupSwapchain();
-  this->createImageViews();
+  // this->createImageViews();
   this->createColorResources();
   this->createDepthResources();
   this->createFramebuffers();
@@ -1175,7 +1166,7 @@ void App::initVulkan() {
   mDevice = Vulkan::Device::create(mInstance, mWindow);
   mQueue = Vulkan::Queue::create(mDevice);
   mSwapchain = Vulkan::Swapchain::create(mDevice, mWindow);
-  this->createImageViews();
+  // this->createImageViews();
 
   this->createCommandPool();
 
@@ -1336,7 +1327,7 @@ void App::cleanup() {
     mRenderPass = VK_NULL_HANDLE;
   }
 
-  for (u32 i = 0; i < mSwapchainImageViews.size(); ++i) {
+  for (u32 i = 0; i < mSwapchain->getImageCount(); ++i) {
     if (mRenderFinishedSemaphores[i] != VK_NULL_HANDLE) {
       vkDestroySemaphore(*mDevice, mRenderFinishedSemaphores[i], nullptr);
       mRenderFinishedSemaphores[i] = VK_NULL_HANDLE;

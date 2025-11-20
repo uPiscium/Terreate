@@ -53,7 +53,6 @@ private:
   shared<Vulkan::Queue> mQueue = nullptr;
 
   shared<Vulkan::Swapchain> mSwapchain = nullptr;
-  vec<VkImageView> mSwapchainImageViews;
 
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
   VkDescriptorSetLayout mDescriptorSetLayout = VK_NULL_HANDLE;
@@ -104,7 +103,6 @@ private:
 
   VkImageView createImageView(VkImage image, VkFormat format,
                               VkImageAspectFlags aspectFlags, u32 mipLevels);
-  void createImageViews();
 
   VkShaderModule createShaderModule(vec<char> const &code);
 
