@@ -28,7 +28,8 @@ private:
 
 private:
   VkSampleCountFlagBits getMaxUsableSampleCount() const;
-  PhysicalDevice(VkPhysicalDevice physicalDevice, shared<SDL::Window> window);
+  PhysicalDevice(VkPhysicalDevice physicalDevice,
+                 shared<SDL::Window> const &window);
 
 public:
   ~PhysicalDevice() = default;
@@ -56,10 +57,10 @@ public:
 
 public:
   static shared<PhysicalDevice> create(VkPhysicalDevice physicalDevice,
-                                       shared<SDL::Window> window);
-  static i32 rateDevice(shared<PhysicalDevice> physicalDevice);
+                                       shared<SDL::Window> const &window);
+  static i32 rateDevice(shared<PhysicalDevice> const &physicalDevice);
   static shared<PhysicalDevice>
-  pick(shared<Instance> instance, shared<SDL::Window> window,
+  pick(shared<Instance> const &instance, shared<SDL::Window> const &window,
        uset<QueueType> const &requiredQueues,
        vec<str> const &requiredExtensions = {},
        DeviceRateFunction func = PhysicalDevice::rateDevice);
@@ -73,8 +74,8 @@ private:
   umap<QueueType, u32> mQueueFamilyIndices;
 
 private:
-  Device(shared<Instance> instance, shared<SDL::Window> window,
-         shared<PhysicalDevice> physicalDevice,
+  Device(shared<Instance> const &instance, shared<SDL::Window> const &window,
+         shared<PhysicalDevice> const &physicalDevice,
          vec<DeviceFeatures> const &requiredFeatures,
          uset<QueueType> const &requiredQueues,
          vec<str> const &requiredExtensions);
@@ -102,7 +103,7 @@ public:
 
 public:
   static shared<Device> create(
-      shared<Instance> instance, shared<SDL::Window> window,
+      shared<Instance> const &instance, shared<SDL::Window> const &window,
       vec<DeviceFeatures> const &requiredFeatures =
           {Vulkan::DeviceFeatures::SAMPLER_ANISOTROPY,
            Vulkan::DeviceFeatures::SAMPLE_RATE_SHADING},
@@ -110,8 +111,8 @@ public:
                                                QueueType::COMPUTE},
       vec<str> const &requiredExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME});
   static shared<Device> create(
-      shared<Instance> instance, shared<SDL::Window> window,
-      shared<PhysicalDevice> physicalDevice,
+      shared<Instance> const &instance, shared<SDL::Window> const &window,
+      shared<PhysicalDevice> const &physicalDevice,
       vec<DeviceFeatures> const &requiredFeatures =
           {Vulkan::DeviceFeatures::SAMPLER_ANISOTROPY,
            Vulkan::DeviceFeatures::SAMPLE_RATE_SHADING},

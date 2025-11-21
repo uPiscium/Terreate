@@ -6,7 +6,8 @@
 
 namespace Terreate::Vulkan {
 
-Allocator::Allocator(shared<Instance> instance, shared<Device> device)
+Allocator::Allocator(shared<Instance> const &instance,
+                     shared<Device> const &device)
     : mInstance(instance), mDevice(device) {
   VmaAllocatorCreateInfo allocatorInfo{};
   allocatorInfo.device = *mDevice;
@@ -82,6 +83,12 @@ void Allocator::destroy(ImageAllocation &allocation) {
   vmaDestroyImage(mHandle, allocation.image, allocation.allocation);
   allocation.image = VK_NULL_HANDLE;
   allocation.allocation = VK_NULL_HANDLE;
+}
+
+shared<Allocator> Allocator::create(shared<Instance> const &instance,
+                                    shared<Device> const &device) {
+  Allocator *allocator = new Allocator(instance, device);
+  return shared<Allocator>(allocator);
 }
 
 } // namespace Terreate::Vulkan

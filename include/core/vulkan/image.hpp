@@ -18,9 +18,9 @@ private:
   void *mMappedMemory = nullptr;
 
 private:
-  Image(shared<Device> device, shared<Allocator> allocator, pair<u32> size,
-        u32 mipLevels, VkSampleCountFlagBits samples, VkFormat format,
-        VkImageTiling tiling, VkImageUsageFlags usage,
+  Image(shared<Device> const &device, shared<Allocator> const &allocator,
+        pair<u32> size, u32 mipLevels, VkSampleCountFlagBits samples,
+        VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
         VkMemoryPropertyFlags properties);
 
 public:
@@ -29,11 +29,11 @@ public:
   operator VkImage() const;
 
 public:
-  static shared<Image> create(shared<Device> device,
-                              shared<Allocator> allocator, pair<u32> size,
-                              u32 mipLevels, VkSampleCountFlagBits samples,
-                              VkFormat format, VkImageTiling tiling,
-                              VkImageUsageFlags usage,
+  static shared<Image> create(shared<Device> const &device,
+                              shared<Allocator> const &allocator,
+                              pair<u32> size, u32 mipLevels,
+                              VkSampleCountFlagBits samples, VkFormat format,
+                              VkImageTiling tiling, VkImageUsageFlags usage,
                               VkMemoryPropertyFlags properties);
 };
 
@@ -46,7 +46,7 @@ private:
   VkImageView mImageView = VK_NULL_HANDLE;
 
 private:
-  ImageView(shared<Device> device, VkImage image, VkFormat format,
+  ImageView(shared<Device> const &device, VkImage image, VkFormat format,
             VkImageAspectFlags aspectFlags, u32 mipLevels);
 
 public:
@@ -55,12 +55,12 @@ public:
   operator VkImageView() const;
 
 public:
-  static shared<ImageView> create(shared<Device> device, VkImage image,
+  static shared<ImageView> create(shared<Device> const &device, VkImage image,
                                   VkFormat format,
                                   VkImageAspectFlags aspectFlags,
                                   u32 mipLevels);
-  static shared<ImageView> create(shared<Device> device, shared<Image> image,
-                                  VkFormat format,
+  static shared<ImageView> create(shared<Device> const &device,
+                                  shared<Image> const &image, VkFormat format,
                                   VkImageAspectFlags aspectFlags,
                                   u32 mipLevels);
 };

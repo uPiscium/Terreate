@@ -104,7 +104,8 @@ void Swapchain::cleanup() {
   }
 }
 
-Swapchain::Swapchain(shared<Device> device, shared<SDL::Window> window)
+Swapchain::Swapchain(shared<Device> const &device,
+                     shared<SDL::Window> const &window)
     : mDevice(device), mWindow(window) {
   this->createSwapchain();
 }
@@ -146,8 +147,8 @@ void Swapchain::update() {
 
 Swapchain::operator VkSwapchainKHR() const { return mHandle; }
 
-shared<Swapchain> Swapchain::create(shared<Device> device,
-                                    shared<SDL::Window> window) {
+shared<Swapchain> Swapchain::create(shared<Device> const &device,
+                                    shared<SDL::Window> const &window) {
   Swapchain *swapchain = new Swapchain(device, window);
   return shared<Swapchain>(swapchain);
 }

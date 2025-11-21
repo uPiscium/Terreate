@@ -2,17 +2,22 @@
 
 namespace Terreate::Vulkan {
 
-Queue::Queue(shared<Device> device) : mDevice(device) {
+Queue::Queue(shared<Device> const &device) : mDevice(device) {
   umap<QueueType, u32> queueFamilyIndices = mDevice->getQueueFamilyIndices();
   vkGetDeviceQueue(*mDevice, queueFamilyIndices[QueueType::GRAPHICS], 0,
                    &mHandle);
 }
 
 void Queue::submit(vec<VkSemaphore> const &wait, vec<VkSemaphore> const &signal,
-                   vec<VkCommandBuffer> const &commandBuffer,
+                   vec<shared<CommandBuffer>> const &commandBuffer,
                    VkFence fence) const {
   VkSubmitInfo submitInfo{};
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+  vec<VkCommandBuffer> vkCommandBuffers;
+  for (auto const &cmdBuf : commandBuffer) {
+    vkCommandBuffers.push_back(*cmdBuf);
+  }
 
   VkPipelineStageFlags waitStages[] = {
       VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
@@ -21,7 +26,7 @@ void Queue::submit(vec<VkSemaphore> const &wait, vec<VkSemaphore> const &signal,
   submitInfo.pWaitDstStageMask = waitStages;
 
   submitInfo.commandBufferCount = static_cast<u32>(commandBuffer.size());
-  submitInfo.pCommandBuffers = commandBuffer.data();
+  submitInfo.pCommandBuffers = vkCommandBuffers.data();
 
   submitInfo.signalSemaphoreCount = static_cast<u32>(signal.size());
   submitInfo.pSignalSemaphores = signal.data();
@@ -31,7 +36,7 @@ void Queue::submit(vec<VkSemaphore> const &wait, vec<VkSemaphore> const &signal,
   }
 }
 
-void Queue::submit(vec<VkCommandBuffer> const &commandBuffer,
+void Queue::submit(vec<shared<CommandBuffer>> const &commandBuffer,
                    VkFence fence) const {
   this->submit({}, {}, commandBuffer, fence);
 }
@@ -70,7 +75,7 @@ vec<bool> Queue::present(vec<shared<Swapchain>> swapchains, u32 imageIndex,
   return status;
 }
 
-bool Queue::present(shared<Swapchain> swapchain, u32 imageIndex,
+bool Queue::present(shared<Swapchain> const &swapchain, u32 imageIndex,
                     vec<VkSemaphore> const &wait) const {
   vec<shared<Swapchain>> swapchains = {swapchain};
   vec<bool> status = this->present(swapchains, imageIndex, wait);
@@ -81,7 +86,7 @@ void Queue::wait() const { vkQueueWaitIdle(mHandle); }
 
 Queue::operator VkQueue() const { return mHandle; }
 
-shared<Queue> Queue::create(shared<Device> device) {
+shared<Queue> Queue::create(shared<Device> const &device) {
   Queue *queue = new Queue(device);
   return shared<Queue>(queue);
 }

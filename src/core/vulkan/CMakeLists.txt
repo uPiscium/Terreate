@@ -4,6 +4,7 @@ message(STATUS "Configuring ${PROJECT_NAME}...")
 add_library(
   ${PROJECT_NAME} STATIC
   allocator.cpp
+  command.cpp
   debugger.cpp
   device.cpp
   image.cpp

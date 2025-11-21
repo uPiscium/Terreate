@@ -31,7 +31,7 @@ private:
   void createSwapchain();
   void cleanup();
 
-  Swapchain(shared<Device> device, shared<SDL::Window> window);
+  Swapchain(shared<Device> const &device, shared<SDL::Window> const &window);
 
 public:
   ~Swapchain();
@@ -48,8 +48,8 @@ public:
   operator VkSwapchainKHR() const;
 
 public:
-  static shared<Swapchain> create(shared<Device> device,
-                                  shared<SDL::Window> window);
+  static shared<Swapchain> create(shared<Device> const &device,
+                                  shared<SDL::Window> const &window);
 };
 
 } // namespace Terreate::Vulkan

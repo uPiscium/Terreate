@@ -1,5 +1,6 @@
 #pragma once
 #include "vulkan/allocator.hpp"
+#include "vulkan/command.hpp"
 #include "vulkan/debugger.hpp"
 #include "vulkan/device.hpp"
 #include "vulkan/enum.hpp"

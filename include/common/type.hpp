@@ -84,6 +84,10 @@ typedef std::type_index typeindex;
 typedef SDL_GUID GUID;
 typedef SDL_AudioSpec AudioSpec;
 
+// Vulkan types
+typedef VkRect2D Rect2D;
+typedef VkViewport Viewport;
+
 template <typename S, typename T, typename Hash = std::hash<S>>
 using umap = std::unordered_map<S, T, Hash>;
 template <typename S, typename T = S> using pair = std::pair<S, T>;

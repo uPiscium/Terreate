@@ -29,7 +29,7 @@ private:
   VmaAllocator mHandle = VK_NULL_HANDLE;
 
 private:
-  Allocator(shared<Instance> instance, shared<Device> device);
+  Allocator(shared<Instance> const &instance, shared<Device> const &device);
 
 public:
   ~Allocator();
@@ -44,6 +44,10 @@ public:
   void destroy(ImageAllocation &allocation);
 
   VmaAllocator operator*() const;
+
+public:
+  static shared<Allocator> create(shared<Instance> const &instance,
+                                  shared<Device> const &device);
 };
 
 } // namespace Terreate::Vulkan

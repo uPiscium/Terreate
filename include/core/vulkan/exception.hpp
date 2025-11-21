@@ -15,6 +15,11 @@ public:
   AllocatorException(str const &message) : VulkanException(message) {}
 };
 
+class CommandException : public VulkanException {
+public:
+  CommandException(str const &message) : VulkanException(message) {}
+};
+
 class DebuggerException : public VulkanException {
 public:
   DebuggerException(str const &message) : VulkanException(message) {}

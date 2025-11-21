@@ -26,7 +26,7 @@ VkSampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const {
 }
 
 PhysicalDevice::PhysicalDevice(VkPhysicalDevice physicalDevice,
-                               shared<SDL::Window> window)
+                               shared<SDL::Window> const &window)
     : mWindow(window), mHandle(physicalDevice) {
   u32 queueFamilyCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(mHandle, &queueFamilyCount, nullptr);
@@ -191,13 +191,14 @@ bool PhysicalDevice::hasSwapChainSupport() const {
 
 PhysicalDevice::operator VkPhysicalDevice() const { return mHandle; }
 
-shared<PhysicalDevice> PhysicalDevice::create(VkPhysicalDevice physicalDevice,
-                                              shared<SDL::Window> window) {
+shared<PhysicalDevice>
+PhysicalDevice::create(VkPhysicalDevice physicalDevice,
+                       shared<SDL::Window> const &window) {
   PhysicalDevice *device = new PhysicalDevice(physicalDevice, window);
   return shared<PhysicalDevice>(device);
 }
 
-i32 PhysicalDevice::rateDevice(shared<PhysicalDevice> physicalDevice) {
+i32 PhysicalDevice::rateDevice(shared<PhysicalDevice> const &physicalDevice) {
   int score = 0;
   VkPhysicalDeviceProperties properties = physicalDevice->getProperties();
 
@@ -216,11 +217,10 @@ i32 PhysicalDevice::rateDevice(shared<PhysicalDevice> physicalDevice) {
   return score;
 }
 
-shared<PhysicalDevice>
-PhysicalDevice::pick(shared<Instance> instance, shared<SDL::Window> window,
-                     uset<QueueType> const &requiredQueues,
-                     vec<str> const &requiredExtensions,
-                     DeviceRateFunction func) {
+shared<PhysicalDevice> PhysicalDevice::pick(
+    shared<Instance> const &instance, shared<SDL::Window> const &window,
+    uset<QueueType> const &requiredQueues, vec<str> const &requiredExtensions,
+    DeviceRateFunction func) {
   u32 deviceCount = 0;
   vkEnumeratePhysicalDevices(*instance, &deviceCount, nullptr);
   if (deviceCount == 0) {
@@ -277,8 +277,9 @@ PhysicalDevice::pick(shared<Instance> instance, shared<SDL::Window> window,
   return bestDevice;
 }
 
-Device::Device(shared<Instance> instance, shared<SDL::Window> window,
-               shared<PhysicalDevice> physicalDevice,
+Device::Device(shared<Instance> const &instance,
+               shared<SDL::Window> const &window,
+               shared<PhysicalDevice> const &physicalDevice,
                vec<DeviceFeatures> const &requiredFeatures,
                uset<QueueType> const &requiredQueues,
                vec<str> const &requiredExtensions)
@@ -569,8 +570,8 @@ void Device::waitIdle() const { vkDeviceWaitIdle(mHandle); }
 
 Device::operator VkDevice() const { return mHandle; }
 
-shared<Device> Device::create(shared<Instance> instance,
-                              shared<SDL::Window> window,
+shared<Device> Device::create(shared<Instance> const &instance,
+                              shared<SDL::Window> const &window,
                               vec<DeviceFeatures> const &requiredFeatures,
                               uset<QueueType> const &requiredQueues,
                               vec<str> const &requiredExtensions) {
@@ -582,9 +583,9 @@ shared<Device> Device::create(shared<Instance> instance,
   return shared<Device>(device);
 }
 
-shared<Device> Device::create(shared<Instance> instance,
-                              shared<SDL::Window> window,
-                              shared<PhysicalDevice> physicalDevice,
+shared<Device> Device::create(shared<Instance> const &instance,
+                              shared<SDL::Window> const &window,
+                              shared<PhysicalDevice> const &physicalDevice,
                               vec<DeviceFeatures> const &requiredFeatures,
                               uset<QueueType> const &requiredQueues,
                               vec<str> const &requiredExtensions) {

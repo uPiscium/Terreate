@@ -3,9 +3,9 @@
 
 namespace Terreate::Vulkan {
 
-Image::Image(shared<Device> device, shared<Allocator> allocator, pair<u32> size,
-             u32 mipLevels, VkSampleCountFlagBits samples, VkFormat format,
-             VkImageTiling tiling, VkImageUsageFlags usage,
+Image::Image(shared<Device> const &device, shared<Allocator> const &allocator,
+             pair<u32> size, u32 mipLevels, VkSampleCountFlagBits samples,
+             VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
              VkMemoryPropertyFlags properties)
     : mDevice(device), mAllocator(allocator) {
   mAllocation = allocator->create(size, mipLevels, samples, format, tiling,
@@ -16,18 +16,20 @@ Image::~Image() { mAllocator->destroy(mAllocation); }
 
 Image::operator VkImage() const { return mAllocation.image; }
 
-shared<Image> Image::create(shared<Device> device, shared<Allocator> allocator,
-                            pair<u32> size, u32 mipLevels,
-                            VkSampleCountFlagBits samples, VkFormat format,
-                            VkImageTiling tiling, VkImageUsageFlags usage,
+shared<Image> Image::create(shared<Device> const &device,
+                            shared<Allocator> const &allocator, pair<u32> size,
+                            u32 mipLevels, VkSampleCountFlagBits samples,
+                            VkFormat format, VkImageTiling tiling,
+                            VkImageUsageFlags usage,
                             VkMemoryPropertyFlags properties) {
   Image *image = new Image(device, allocator, size, mipLevels, samples, format,
                            tiling, usage, properties);
   return shared<Image>(image);
 }
 
-ImageView::ImageView(shared<Device> device, VkImage image, VkFormat format,
-                     VkImageAspectFlags aspectFlags, u32 mipLevels)
+ImageView::ImageView(shared<Device> const &device, VkImage image,
+                     VkFormat format, VkImageAspectFlags aspectFlags,
+                     u32 mipLevels)
     : mDevice(device) {
   VkImageViewCreateInfo viewInfo{};
   viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -59,7 +61,7 @@ ImageView::~ImageView() {
 
 ImageView::operator VkImageView() const { return mImageView; }
 
-shared<ImageView> ImageView::create(shared<Device> device, VkImage image,
+shared<ImageView> ImageView::create(shared<Device> const &device, VkImage image,
                                     VkFormat format,
                                     VkImageAspectFlags aspectFlags,
                                     u32 mipLevels) {
@@ -68,8 +70,8 @@ shared<ImageView> ImageView::create(shared<Device> device, VkImage image,
   return shared<ImageView>(imageView);
 }
 
-shared<ImageView> ImageView::create(shared<Device> device, shared<Image> image,
-                                    VkFormat format,
+shared<ImageView> ImageView::create(shared<Device> const &device,
+                                    shared<Image> const &image, VkFormat format,
                                     VkImageAspectFlags aspectFlags,
                                     u32 mipLevels) {
   return ImageView::create(device, *image, format, aspectFlags, mipLevels);
