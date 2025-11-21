@@ -54,28 +54,27 @@ private:
 
   shared<Vulkan::Swapchain> mSwapchain = nullptr;
 
+  shared<Vulkan::CommandPool> mCommandPool = nullptr;
+  vec<shared<Vulkan::CommandBuffer>> mCommandBuffers = {};
+
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
   VkDescriptorSetLayout mDescriptorSetLayout = VK_NULL_HANDLE;
   VkPipelineLayout mPipelineLayout = VK_NULL_HANDLE;
   VkPipeline mGraphicsPipeline = VK_NULL_HANDLE;
   vec<VkFramebuffer> mSwapchainFramebuffers;
 
-  VkCommandPool mCommandPool = VK_NULL_HANDLE;
-  vec<VkCommandBuffer> mCommandBuffers = {};
-
   u32 mMipLevels = 1;
-  VkImage mTexture = VK_NULL_HANDLE;
-  VkDeviceMemory mTextureMemory = VK_NULL_HANDLE;
-  VkImageView mTextureImageView = VK_NULL_HANDLE;
+  shared<Vulkan::Image> mTextureImage = nullptr;
+  shared<Vulkan::ImageView> mTextureImageView = nullptr;
   VkSampler mTextureSampler = VK_NULL_HANDLE;
 
-  VkImage mColorImage = VK_NULL_HANDLE;
-  VkDeviceMemory mColorImageMemory = VK_NULL_HANDLE;
-  VkImageView mColorImageView = VK_NULL_HANDLE;
+  shared<Vulkan::Allocator> mAllocator = nullptr;
 
-  VkImage mDepthImage = VK_NULL_HANDLE;
-  VkDeviceMemory mDepthImageMemory = VK_NULL_HANDLE;
-  VkImageView mDepthImageView = VK_NULL_HANDLE;
+  shared<Vulkan::Image> mColorImage = nullptr;
+  shared<Vulkan::ImageView> mColorImageView = nullptr;
+
+  shared<Vulkan::Image> mDepthImage = nullptr;
+  shared<Vulkan::ImageView> mDepthImageView = nullptr;
 
   vec<Vertex> mVertices;
   vec<u32> mIndices;
@@ -101,12 +100,10 @@ private:
 private:
   void initWindow(int const &width, int const &height, str const &title);
 
-  VkImageView createImageView(VkImage image, VkFormat format,
-                              VkImageAspectFlags aspectFlags, u32 mipLevels);
-
   VkShaderModule createShaderModule(vec<char> const &code);
 
-  void createCommandPool();
+  // void createCommandPool();
+  void createCommandBuffers();
 
   VkFormat findSupportedFormat(vec<VkFormat> const &candidates,
                                VkImageTiling tiling,
@@ -125,15 +122,11 @@ private:
   void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                     VkMemoryPropertyFlags properties, VkBuffer &buffer,
                     VkDeviceMemory &bufferMemory);
-  VkCommandBuffer beginSingleTimeCommands();
-  void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+  shared<Vulkan::CommandBuffer> beginSingleTimeCommands();
+  void
+  endSingleTimeCommands(shared<Vulkan::CommandBuffer> const &commandBuffer);
   void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
-  void createImage(u32 width, u32 height, u32 mipLevels,
-                   VkSampleCountFlagBits samples, VkFormat format,
-                   VkImageTiling tiling, VkImageUsageFlags usage,
-                   VkMemoryPropertyFlags properties, VkImage &image,
-                   VkDeviceMemory &imageMemory);
   void transitionImageLayout(VkImage image, VkFormat format,
                              VkImageLayout oldLayout, VkImageLayout newLayout,
                              u32 mipLevels);
@@ -154,8 +147,8 @@ private:
   void createDescriptorPool();
   void createDescriptorSets();
 
-  void createCommandBuffers();
-  void recordCommandBuffer(VkCommandBuffer commandBuffer, u32 imageIndex);
+  void recordCommandBuffer(shared<Vulkan::CommandBuffer> const &commandBuffer,
+                           u32 imageIndex);
 
   void createSyncObjects();
 
