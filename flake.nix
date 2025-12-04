@@ -7,7 +7,9 @@
     in
     {
       devShells.x86_64-linux.default = pkgs.mkShell {
+        inputFrom = with pkgs; [ stdenv.cc.cc.lib ];
         buildInputs = with pkgs; [
+          bear
           cmake
           sdl3
           shaderc
