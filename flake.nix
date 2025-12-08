@@ -4,12 +4,15 @@
   outputs = { self, nixpkgs }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      gccVersion = pkgs.gcc.cc.version;
+      gccTarget = pkgs.stdenv.hostPlatform.config;
     in
     {
-      devShells.x86_64-linux.default = pkgs.mkShell {
-        inputFrom = with pkgs; [ stdenv.cc.cc.lib ];
+      # devShells.x86_64-linux.default = pkgs.mkShell {
+      devShells.x86_64-linux.default = pkgs.mkShell.override {
+        stdenv = pkgs.clangStdenv;
+      } {
         buildInputs = with pkgs; [
-          bear
           cmake
           sdl3
           shaderc
@@ -17,6 +20,7 @@
         ];
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
           alsa-lib
+          glibc
           hidapi
           jack2
           libusb1
@@ -34,6 +38,10 @@
         ]);
         VULKAN_SDK = "${pkgs.vulkan-headers}";
         VK_LAYER_PATH = "${pkgs.vulkan-validation-layers}/share/vulkan/explicit_layer.d";
+        shellHook = ''
+          export CPLUS_INCLUDE_PATH="${pkgs.gcc.cc}/include/c++/${gccVersion}/${gccTarget}:${pkgs.gcc.cc}/include/c++/${gccVersion}:${pkgs.glibc.dev}/include:$CPLUS_INCLUDE_PATH"
+          export C_INCLUDE_PATH="${pkgs.glibc.dev}/include:$C_INCLUDE_PATH"
+        '';
       };
     };
 }
