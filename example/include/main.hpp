@@ -55,7 +55,7 @@ private:
   shared<Vulkan::Swapchain> mSwapchain = nullptr;
 
   shared<Vulkan::CommandPool> mCommandPool = nullptr;
-  vec<shared<Vulkan::CommandBuffer>> mCommandBuffers = {};
+  vec<shared<Vulkan::CommandBufferEncoder>> mCommandBufferEncoders;
 
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
   VkDescriptorSetLayout mDescriptorSetLayout = VK_NULL_HANDLE;
@@ -90,9 +90,9 @@ private:
   VkDescriptorPool mDescriptorPool = VK_NULL_HANDLE;
   vec<VkDescriptorSet> mDescriptorSets;
 
-  vec<VkSemaphore> mImageAvailableSemaphores = {};
-  vec<VkSemaphore> mRenderFinishedSemaphores = {};
-  vec<VkFence> mInFlightFences = {};
+  vec<VkSemaphore> mImageAvailableSemaphores;
+  vec<VkSemaphore> mRenderFinishedSemaphores;
+  vec<VkFence> mInFlightFences;
 
   u32 mCurrentFrame = 0;
   bool mFramebufferResized = false;
@@ -102,7 +102,6 @@ private:
 
   VkShaderModule createShaderModule(vec<char> const &code);
 
-  // void createCommandPool();
   void createCommandBuffers();
 
   VkFormat findSupportedFormat(vec<VkFormat> const &candidates,
@@ -122,17 +121,17 @@ private:
   void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                     VkMemoryPropertyFlags properties, VkBuffer &buffer,
                     VkDeviceMemory &bufferMemory);
-  shared<Vulkan::CommandBuffer> beginSingleTimeCommands();
+  shared<Vulkan::CommandBufferEncoder> beginSingleTimeCommands();
   void
-  endSingleTimeCommands(shared<Vulkan::CommandBuffer> const &commandBuffer);
+  endSingleTimeCommands(shared<Vulkan::CommandBufferEncoder> const &encoder);
   void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
   void transitionImageLayout(VkImage image, VkFormat format,
                              VkImageLayout oldLayout, VkImageLayout newLayout,
                              u32 mipLevels);
   void copyBufferToImage(VkBuffer buffer, VkImage image, u32 width, u32 height);
-  void generateMipmaps(VkImage image, VkFormat imageFormat, i32 texWidth,
-                       i32 texHeight, u32 mipLevels);
+  void generateMipmaps(shared<Vulkan::Image> const &image, VkFormat imageFormat,
+                       i32 texWidth, i32 texHeight, u32 mipLevels);
 
   void createTexture();
   void createTextureImageView();
@@ -147,7 +146,7 @@ private:
   void createDescriptorPool();
   void createDescriptorSets();
 
-  void recordCommandBuffer(shared<Vulkan::CommandBuffer> const &commandBuffer,
+  void recordCommandBuffer(shared<Vulkan::CommandBufferEncoder> const &encoder,
                            u32 imageIndex);
 
   void createSyncObjects();

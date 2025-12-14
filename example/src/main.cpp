@@ -16,7 +16,7 @@ vec<char> readFile(str const &filename) {
   size_t fsize = (size_t)file.tellg();
   vec<char> buffer(fsize);
   file.seekg(0);
-  file.read(buffer.data(), fsize);
+  file.read(buffer.data(), (std::streamsize)fsize);
   file.close();
 
   return buffer;
@@ -241,7 +241,7 @@ void App::createGraphicsPipeline() {
   fragInfo.module = fragShaderModule;
   fragInfo.pName = "main";
 
-  VkPipelineShaderStageCreateInfo stages[] = {vertInfo, fragInfo};
+  vec<VkPipelineShaderStageCreateInfo> stages = {vertInfo, fragInfo};
 
   vec<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT,
                                        VK_DYNAMIC_STATE_SCISSOR};
@@ -348,8 +348,8 @@ void App::createGraphicsPipeline() {
 
   VkGraphicsPipelineCreateInfo pipelineInfo{};
   pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-  pipelineInfo.stageCount = 2;
-  pipelineInfo.pStages = stages;
+  pipelineInfo.stageCount = static_cast<u32>(stages.size());
+  pipelineInfo.pStages = stages.data();
   pipelineInfo.pVertexInputState = &vertexInputInfo;
   pipelineInfo.pInputAssemblyState = &inputAssembly;
   pipelineInfo.pViewportState = &viewportState;
@@ -434,8 +434,9 @@ u32 App::findMemoryType(u32 typeFilter, VkMemoryPropertyFlags properties) {
       mDevice->getMemoryProperties();
 
   for (u32 i = 0; i < memProperties.memoryTypeCount; ++i) {
-    if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags &
-                                    properties) == properties) {
+    if ((bool)(typeFilter & (1 << i)) &&
+        (memProperties.memoryTypes[i].propertyFlags & properties) ==
+            properties) {
       return i;
     }
   }
@@ -474,39 +475,45 @@ void App::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
   vkBindBufferMemory(*mDevice, buffer, bufferMemory, 0);
 }
 
-shared<Vulkan::CommandBuffer> App::beginSingleTimeCommands() {
+shared<Vulkan::CommandBufferEncoder> App::beginSingleTimeCommands() {
   shared<Vulkan::CommandBuffer> commandBuffer = Vulkan::CommandBuffer::create(
       mDevice, mCommandPool, Vulkan::CommandBufferLevel::PRIMARY);
-  commandBuffer->begin(Vulkan::CommandBufferUsage::ONE_TIME_SUBMIT);
+  shared<Vulkan::CommandBufferEncoder> encoder =
+      Vulkan::CommandBufferEncoder::create(commandBuffer);
+  encoder->begin(Vulkan::CommandBufferUsage::ONE_TIME_SUBMIT);
 
-  return commandBuffer;
+  return encoder;
 }
 
 void App::endSingleTimeCommands(
-    shared<Vulkan::CommandBuffer> const &commandBuffer) {
+    shared<Vulkan::CommandBufferEncoder> const &commandBuffer) {
   commandBuffer->end();
 
-  mQueue->submit({commandBuffer}); // TODO: change to use fences
+  mQueue->submit(
+      {commandBuffer->getCommandBuffer()}); // TODO: change to use fences
   mQueue->wait();
 }
 
 void App::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer,
                      VkDeviceSize size) {
-  shared<Vulkan::CommandBuffer> commandBuffer = this->beginSingleTimeCommands();
+  shared<Vulkan::CommandBufferEncoder> encoder =
+      this->beginSingleTimeCommands();
 
   VkBufferCopy copyRegion{};
   copyRegion.srcOffset = 0;
   copyRegion.dstOffset = 0;
   copyRegion.size = size;
-  vkCmdCopyBuffer(*commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+  vkCmdCopyBuffer(*encoder->getCommandBuffer(), srcBuffer, dstBuffer, 1,
+                  &copyRegion);
 
-  this->endSingleTimeCommands(commandBuffer);
+  this->endSingleTimeCommands(encoder);
 }
 
 void App::transitionImageLayout(VkImage image, VkFormat format,
                                 VkImageLayout oldLayout,
                                 VkImageLayout newLayout, u32 mipLevels) {
-  shared<Vulkan::CommandBuffer> commandBuffer = this->beginSingleTimeCommands();
+  shared<Vulkan::CommandBufferEncoder> encoder =
+      this->beginSingleTimeCommands();
 
   VkImageMemoryBarrier barrier{};
   barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -560,15 +567,15 @@ void App::transitionImageLayout(VkImage image, VkFormat format,
     throw std::invalid_argument("Unsupported layout transition.");
   }
 
-  vkCmdPipelineBarrier(*commandBuffer, sourceStage, destinationStage, 0, 0,
-                       nullptr, 0, nullptr, 1, &barrier);
+  encoder->pipelineBarrier(sourceStage, destinationStage, 0, {}, {}, {barrier});
 
-  this->endSingleTimeCommands(commandBuffer);
+  this->endSingleTimeCommands(encoder);
 }
 
 void App::copyBufferToImage(VkBuffer buffer, VkImage image, u32 width,
                             u32 height) {
-  shared<Vulkan::CommandBuffer> commandBuffer = this->beginSingleTimeCommands();
+  shared<Vulkan::CommandBufferEncoder> encoder =
+      this->beginSingleTimeCommands();
 
   VkBufferImageCopy region{};
   region.bufferOffset = 0;
@@ -581,27 +588,29 @@ void App::copyBufferToImage(VkBuffer buffer, VkImage image, u32 width,
   region.imageOffset = {0, 0, 0};
   region.imageExtent = {width, height, 1};
 
-  vkCmdCopyBufferToImage(*commandBuffer, buffer, image,
+  vkCmdCopyBufferToImage(*encoder->getCommandBuffer(), buffer, image,
                          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
-  this->endSingleTimeCommands(commandBuffer);
+  this->endSingleTimeCommands(encoder);
 }
 
-void App::generateMipmaps(VkImage image, VkFormat imageFormat, i32 texWidth,
-                          i32 texHeight, u32 mipLevels) {
+void App::generateMipmaps(shared<Vulkan::Image> const &image,
+                          VkFormat imageFormat, i32 texWidth, i32 texHeight,
+                          u32 mipLevels) {
   VkFormatProperties formatProperties =
       mDevice->getFormatProperties(imageFormat);
-  if (!(formatProperties.optimalTilingFeatures &
-        VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
+  if (!(bool)(formatProperties.optimalTilingFeatures &
+              VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
     throw std::runtime_error(
         "Texture image format does not support linear blitting.");
   }
 
-  shared<Vulkan::CommandBuffer> commandBuffer = this->beginSingleTimeCommands();
+  shared<Vulkan::CommandBufferEncoder> encoder =
+      this->beginSingleTimeCommands();
 
   VkImageMemoryBarrier barrier{};
   barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-  barrier.image = image;
+  barrier.image = *image;
   barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
   barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
   barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -619,9 +628,9 @@ void App::generateMipmaps(VkImage image, VkFormat imageFormat, i32 texWidth,
     barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 
-    vkCmdPipelineBarrier(*commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT,
-                         VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
-                         nullptr, 1, &barrier);
+    encoder->pipelineBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT,
+                             VK_PIPELINE_STAGE_TRANSFER_BIT, 0, {}, {},
+                             {barrier});
 
     VkImageBlit blit{};
     blit.srcOffsets[0] = {0, 0, 0};
@@ -638,18 +647,18 @@ void App::generateMipmaps(VkImage image, VkFormat imageFormat, i32 texWidth,
     blit.dstSubresource.baseArrayLayer = 0;
     blit.dstSubresource.layerCount = 1;
 
-    vkCmdBlitImage(*commandBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                   image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit,
-                   VK_FILTER_LINEAR);
+    encoder->blitImage(image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image,
+                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, {blit},
+                       VK_FILTER_LINEAR);
 
     barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
     barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
     barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-    vkCmdPipelineBarrier(*commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT,
-                         VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr,
-                         0, nullptr, 1, &barrier);
+    encoder->pipelineBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT,
+                             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, {}, {},
+                             {barrier});
 
     if (mipWidth > 1)
       mipWidth /= 2;
@@ -663,11 +672,12 @@ void App::generateMipmaps(VkImage image, VkFormat imageFormat, i32 texWidth,
   barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
   barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-  vkCmdPipelineBarrier(*commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT,
+  vkCmdPipelineBarrier(*encoder->getCommandBuffer(),
+                       VK_PIPELINE_STAGE_TRANSFER_BIT,
                        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0,
                        nullptr, 1, &barrier);
 
-  this->endSingleTimeCommands(commandBuffer);
+  this->endSingleTimeCommands(encoder);
 }
 
 void App::createTexture() {
@@ -707,7 +717,7 @@ void App::createTexture() {
                               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mMipLevels);
   this->copyBufferToImage(stagingBuffer, *mTextureImage,
                           static_cast<u32>(width), static_cast<u32>(height));
-  this->generateMipmaps(*mTextureImage, VK_FORMAT_R8G8B8A8_SRGB, width, height,
+  this->generateMipmaps(mTextureImage, VK_FORMAT_R8G8B8A8_SRGB, width, height,
                         mMipLevels);
 
   vkDestroyBuffer(*mDevice, stagingBuffer, nullptr);
@@ -852,10 +862,12 @@ void App::createUniformBuffers() {
 }
 
 void App::createCommandBuffers() {
-  mCommandBuffers.clear();
+  mCommandBufferEncoders.clear();
   for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-    mCommandBuffers.push_back(Vulkan::CommandBuffer::create(
-        mDevice, mCommandPool, Vulkan::CommandBufferLevel::PRIMARY));
+    shared<Vulkan::CommandBuffer> commandBuffer = Vulkan::CommandBuffer::create(
+        mDevice, mCommandPool, Vulkan::CommandBufferLevel::PRIMARY);
+    mCommandBufferEncoders.push_back(
+        Vulkan::CommandBufferEncoder::create(commandBuffer));
   }
 }
 
@@ -936,16 +948,8 @@ void App::createDescriptorSets() {
 }
 
 void App::recordCommandBuffer(
-    shared<Vulkan::CommandBuffer> const &commandBuffer, u32 imageIndex) {
-  // VkCommandBufferBeginInfo beginInfo{};
-  // beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-  // beginInfo.flags = 0;                  // Optional
-  // beginInfo.pInheritanceInfo = nullptr; // Optional
-
-  // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-  //   throw std::runtime_error("Failed to begin recording.");
-  // }
-  commandBuffer->begin(Vulkan::CommandBufferUsage::NONE);
+    shared<Vulkan::CommandBufferEncoder> const &encoder, u32 imageIndex) {
+  encoder->begin(Vulkan::CommandBufferUsage::NONE);
 
   VkExtent2D extent = mSwapchain->getExtent();
   VkRenderPassBeginInfo renderPassInfo{};
@@ -963,10 +967,9 @@ void App::recordCommandBuffer(
   renderPassInfo.clearValueCount = static_cast<u32>(clearValues.size());
   renderPassInfo.pClearValues = clearValues.data();
 
-  vkCmdBeginRenderPass(*commandBuffer, &renderPassInfo,
-                       VK_SUBPASS_CONTENTS_INLINE);
-  vkCmdBindPipeline(*commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    mGraphicsPipeline);
+  encoder->beginRenderPass(renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+  vkCmdBindPipeline(*encoder->getCommandBuffer(),
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, mGraphicsPipeline);
 
   VkViewport viewport{};
   viewport.x = 0.0f;
@@ -975,29 +978,27 @@ void App::recordCommandBuffer(
   viewport.height = (float)extent.height;
   viewport.minDepth = 0.0f;
   viewport.maxDepth = 1.0f;
-  vkCmdSetViewport(*commandBuffer, 0, 1, &viewport);
+  encoder->setViewport(viewport);
 
   VkRect2D scissor{};
   scissor.offset = {0, 0};
   scissor.extent = extent;
-  vkCmdSetScissor(*commandBuffer, 0, 1, &scissor);
+  encoder->setScissor(scissor);
 
-  VkBuffer vertexBuffers[] = {mVertexBuffer};
-  VkDeviceSize offsets[] = {0};
-  vkCmdBindVertexBuffers(*commandBuffer, 0, 1, vertexBuffers, offsets);
-  vkCmdBindIndexBuffer(*commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT32);
+  array<VkBuffer, 1> vertexBuffers = {mVertexBuffer};
+  array<VkDeviceSize, 1> offsets = {0};
+  vkCmdBindVertexBuffers(*encoder->getCommandBuffer(), 0, 1,
+                         vertexBuffers.data(), offsets.data());
+  vkCmdBindIndexBuffer(*encoder->getCommandBuffer(), mIndexBuffer, 0,
+                       VK_INDEX_TYPE_UINT32);
 
-  vkCmdBindDescriptorSets(*commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                          mPipelineLayout, 0, 1,
-                          &mDescriptorSets[mCurrentFrame], 0, nullptr);
-  vkCmdDrawIndexed(*commandBuffer, static_cast<u32>(mIndices.size()), 1, 0, 0,
-                   0);
+  vkCmdBindDescriptorSets(*encoder->getCommandBuffer(),
+                          VK_PIPELINE_BIND_POINT_GRAPHICS, mPipelineLayout, 0,
+                          1, &mDescriptorSets[mCurrentFrame], 0, nullptr);
+  encoder->drawIndexed(static_cast<u32>(mIndices.size()), 1, 0, 0, 0);
 
-  vkCmdEndRenderPass(*commandBuffer);
-  commandBuffer->end();
-  // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-  //   throw std::runtime_error("Failed to record command buffer.");
-  // }
+  encoder->endRenderPass();
+  encoder->end();
 }
 
 void App::createSyncObjects() {
@@ -1089,8 +1090,6 @@ bool App::pollEvents() {
   while (SDL_PollEvent(&handle)) {
     switch (handle.type) {
     case SDL_EVENT_QUIT:
-      return false;
-
     case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
     case SDL_EVENT_WINDOW_DESTROYED:
       return false;
@@ -1120,15 +1119,16 @@ void App::updateUniformBuffer(u32 currentImage) {
   UniformBufferObject ubo{};
   float scale = (std::sin(time) + 1.0f) / 4.0f + 0.5f;
   float angle = time * glm::radians(90.0f);
-  glm::mat4 model = glm::mat4(1.0f);
+  auto model = glm::mat4(1.0f);
   model = glm::scale(model, glm::vec3(scale, scale, scale));
   model = glm::rotate(model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
   ubo.model = model;
   ubo.view =
       glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f),
                   glm::vec3(0.0f, 0.0f, 1.0f));
-  ubo.proj = glm::perspective(glm::radians(45.0f),
-                              extent.width / (float)extent.height, 0.1f, 10.0f);
+  ubo.proj =
+      glm::perspective(glm::radians(45.0f),
+                       (float)extent.width / (float)extent.height, 0.1f, 10.0f);
   ubo.proj[1][1] *= -1;
   std::memcpy(mUniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
@@ -1147,14 +1147,14 @@ void App::drawFrame() {
 
   vkResetFences(*mDevice, 1, &mInFlightFences[mCurrentFrame]);
 
-  mCommandBuffers[mCurrentFrame]->reset();
-  this->recordCommandBuffer(mCommandBuffers[mCurrentFrame], imageIndex);
+  mCommandBufferEncoders[mCurrentFrame]->reset();
+  this->recordCommandBuffer(mCommandBufferEncoders[mCurrentFrame], imageIndex);
 
   this->updateUniformBuffer(mCurrentFrame);
 
   mQueue->submit({mImageAvailableSemaphores[mCurrentFrame]},
                  {mRenderFinishedSemaphores[imageIndex]},
-                 {mCommandBuffers[mCurrentFrame]},
+                 {mCommandBufferEncoders[mCurrentFrame]->getCommandBuffer()},
                  mInFlightFences[mCurrentFrame]);
 
   if (!mQueue->present(mSwapchain, imageIndex,
@@ -1231,8 +1231,6 @@ void App::cleanup() {
       mImageAvailableSemaphores[i] = VK_NULL_HANDLE;
     }
   }
-
-  SDL_Quit();
 }
 
 App::App(int const &width, int const &height, str const &title, bool debugMode)
@@ -1258,16 +1256,14 @@ App::~App() { this->cleanup(); }
 void App::run() { this->mainLoop(); }
 
 int main() {
-  std::cout << "Vulkan Application Starting..." << std::endl;
-  App app;
-  std::cout << "Starting Vulkan Application" << std::endl;
-
   try {
+    App app;
     app.run();
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;
   }
 
+  SDL_Quit();
   return EXIT_SUCCESS;
 }

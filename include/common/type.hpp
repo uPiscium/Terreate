@@ -32,13 +32,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/hash.hpp>
 
-#ifndef UNICODE_HALF_SPACE
-#define UNICODE_HALF_SPACE 32
-#endif // UNICODE_HALF_SPACE
+// #ifndef UNICODE_HALF_SPACE
+// #define UNICODE_HALF_SPACE 32
+// #endif // UNICODE_HALF_SPACE
 
-#ifndef UNICODE_FULL_SPACE
-#define UNICODE_FULL_SPACE 32306
-#endif // UNICODE_FULL_SPACE
+// #ifndef UNICODE_FULL_SPACE
+// #define UNICODE_FULL_SPACE 32306
+// #endif // UNICODE_FULL_SPACE
 
 #ifndef PROHIBIT_COPY_AND_ASSIGN
 #define PROHIBIT_COPY_AND_ASSIGN(TypeName)                                     \
@@ -47,46 +47,46 @@
 #endif // PROHIBIT_COPY_AND_ASSIGN
 
 namespace Terreate {
-typedef std::int8_t i8;
-typedef std::int16_t i16;
-typedef std::int32_t i32;
-typedef std::int64_t i64;
+using i8 = std::int8_t;
+using i16 = std::int16_t;
+using i32 = std::int32_t;
+using i64 = std::int64_t;
 
-typedef std::uint8_t u8;
-typedef std::uint16_t u16;
-typedef std::uint32_t u32;
-typedef std::uint64_t u64;
+using u8 = std::uint8_t;
+using u16 = std::uint16_t;
+using u32 = std::uint32_t;
+using u64 = std::uint64_t;
 
-typedef i8 byte;
-typedef u8 ubyte;
+using byte = i8;
+using ubyte = u8;
 
-typedef SDL_AudioDeviceID AudioDeviceID;
-typedef SDL_CameraID CameraID;
-typedef SDL_JoystickID JoystickID;
-typedef SDL_MouseID MouseID;
-typedef SDL_WindowID WindowID;
-typedef SDL_DisplayID DisplayID;
-typedef SDL_KeyboardID KeyboardID;
-typedef SDL_SensorID SensorID;
-typedef SDL_PenID PenID;
+using AudioDeviceID = SDL_AudioDeviceID;
+using CameraID = SDL_CameraID;
+using JoystickID = SDL_JoystickID;
+using MouseID = SDL_MouseID;
+using WindowID = SDL_WindowID;
+using DisplayID = SDL_DisplayID;
+using KeyboardID = SDL_KeyboardID;
+using SensorID = SDL_SensorID;
+using PenID = SDL_PenID;
 
-typedef std::string str;
-typedef std::wstring wstr;
-typedef std::stringstream stream;
-typedef std::ifstream ifstream;
-typedef std::ofstream ofstream;
-typedef std::mutex mutex;
+using str = std::string;
+using wstr = std::wstring;
+using stream = std::stringstream;
+using ifstream = std::ifstream;
+using ofstream = std::ofstream;
+using mutex = std::mutex;
 
-typedef std::type_info typeinfo;
-typedef std::type_index typeindex;
+using typeinfo = std::type_info;
+using typeindex = std::type_index;
 
 // SDL types
-typedef SDL_GUID GUID;
-typedef SDL_AudioSpec AudioSpec;
+using GUID = SDL_GUID;
+using AudioSpec = SDL_AudioSpec;
 
 // Vulkan types
-typedef VkRect2D Rect2D;
-typedef VkViewport Viewport;
+using Rect2D = VkRect2D;
+using Viewport = VkViewport;
 
 template <typename S, typename T, typename Hash = std::hash<S>>
 using umap = std::unordered_map<S, T, Hash>;
