@@ -4,7 +4,7 @@
 
 #include "enum.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 typedef void *RawBuffer;
 typedef variant<vec<i8>, vec<u8>, vec<i16>, vec<i32>, vec<float>> AudioData;
@@ -121,4 +121,4 @@ public:
                              float gain);
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

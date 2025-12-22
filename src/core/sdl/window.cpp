@@ -1,7 +1,7 @@
 #include "core/sdl/exception.hpp"
 #include "core/sdl/window.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 u64 WindowSettings::toFlags() const {
   u64 flags = 0;
@@ -48,7 +48,7 @@ u64 WindowSettings::toFlags() const {
   return flags;
 }
 
-Window::Window(shared<Vulkan::Instance> instance, u32 const &width,
+Window::Window(shared<Core::Vulkan::Instance> instance, u32 const &width,
                u32 const &height, str const &title, shared<Mouse> mouse,
                u64 const &flags)
     : mInstance(instance) {
@@ -56,7 +56,7 @@ Window::Window(shared<Vulkan::Instance> instance, u32 const &width,
   mWindow =
       SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_VULKAN | flags);
   SDL_Vulkan_CreateSurface(mWindow, *instance, nullptr, &mSurface);
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Failed to create SDL window or context: " +
                           str(SDL_GetError()));
   }
@@ -68,14 +68,14 @@ Window::~Window() {
 }
 
 WindowID Window::getID() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowID(mWindow);
 }
 
 pair<i32> Window::getPosition() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   i32 x, y;
@@ -84,7 +84,7 @@ pair<i32> Window::getPosition() const {
 }
 
 pair<i32> Window::getSize() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   i32 width, height;
@@ -93,7 +93,7 @@ pair<i32> Window::getSize() const {
 }
 
 str Window::getClipboard() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   char const *text = SDL_GetClipboardText();
@@ -104,21 +104,21 @@ str Window::getClipboard() const {
 }
 
 str Window::getTitle() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return str(SDL_GetWindowTitle(mWindow));
 }
 
 float Window::getOpacity() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowOpacity(mWindow);
 }
 
 pair<u32> Window::getFramebufferSize() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   i32 width, height;
@@ -127,7 +127,7 @@ pair<u32> Window::getFramebufferSize() const {
 }
 
 pair<vec2> Window::getMouseRect() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   SDL_Rect const *rect = SDL_GetWindowMouseRect(mWindow);
@@ -141,49 +141,49 @@ pair<vec2> Window::getMouseRect() const {
 }
 
 void Window::setPosition(pair<i32> const &position) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   SDL_SetWindowPosition(mWindow, position.first, position.second);
 }
 
 void Window::setSize(pair<i32> const &size) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   SDL_SetWindowSize(mWindow, size.first, size.second);
 }
 
 void Window::setClipboard(str const &text) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   SDL_SetClipboardText(text.c_str());
 }
 
 void Window::setTitle(str const &title) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   SDL_SetWindowTitle(mWindow, title.c_str());
 }
 
 void Window::setOpacity(float const &opacity) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   SDL_SetWindowOpacity(mWindow, opacity);
 }
 
 void Window::setIcon(Icon const &icon) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   SDL_SetWindowIcon(mWindow, (SDL_Surface *)icon);
 }
 
 void Window::setMouseRect(pair<vec2> const &rect) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   SDL_Rect sdlRect = {
@@ -195,147 +195,147 @@ void Window::setMouseRect(pair<vec2> const &rect) {
 bool Window::isClosed() const { return mWindow == nullptr; }
 
 bool Window::isFullscreen() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_FULLSCREEN;
 }
 
 bool Window::isOccluded() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_OCCLUDED;
 }
 
 bool Window::isHidden() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_HIDDEN;
 }
 
 bool Window::isBorderless() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_BORDERLESS;
 }
 
 bool Window::isResizable() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_RESIZABLE;
 }
 
 bool Window::isMinimized() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_MINIMIZED;
 }
 
 bool Window::isMaximized() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_MAXIMIZED;
 }
 
 bool Window::isMouseGrabbed() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_MOUSE_GRABBED;
 }
 
 bool Window::isInputFocused() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_INPUT_FOCUS;
 }
 
 bool Window::isMouseFocused() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_MOUSE_FOCUS;
 }
 
 bool Window::isHighDPI() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_HIGH_PIXEL_DENSITY;
 }
 
 bool Window::isMouseCaptured() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_MOUSE_CAPTURE;
 }
 
 bool Window::isRelativeMouseMode() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowRelativeMouseMode(mWindow);
 }
 
 bool Window::isAlwaysOnTop() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_ALWAYS_ON_TOP;
 }
 
 bool Window::isUtility() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_UTILITY;
 }
 
 bool Window::isToolTip() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_TOOLTIP;
 }
 
 bool Window::isPopupMenu() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_POPUP_MENU;
 }
 
 bool Window::isKeyboardGrabbed() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_KEYBOARD_GRABBED;
 }
 
 bool Window::isTransparent() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_TRANSPARENT;
 }
 
 bool Window::isNotFocusable() const {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_NOT_FOCUSABLE;
 }
 
 void Window::fullscreen(bool const &fullscreen) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -343,7 +343,7 @@ void Window::fullscreen(bool const &fullscreen) {
 }
 
 void Window::visible(bool const &visible) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -355,7 +355,7 @@ void Window::visible(bool const &visible) {
 }
 
 void Window::borderless(bool const &borderless) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -363,7 +363,7 @@ void Window::borderless(bool const &borderless) {
 }
 
 void Window::resizable(bool const &resizeable) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -371,7 +371,7 @@ void Window::resizable(bool const &resizeable) {
 }
 
 void Window::mouseGrabbed(bool const &grabbed) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -379,7 +379,7 @@ void Window::mouseGrabbed(bool const &grabbed) {
 }
 
 void Window::mouseCapture(bool const &mouseCapture) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -387,7 +387,7 @@ void Window::mouseCapture(bool const &mouseCapture) {
 }
 
 void Window::relativeMouseMode(bool const &relative) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -395,7 +395,7 @@ void Window::relativeMouseMode(bool const &relative) {
 }
 
 void Window::alwaysOnTop(bool const &alwaysOnTop) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -403,7 +403,7 @@ void Window::alwaysOnTop(bool const &alwaysOnTop) {
 }
 
 void Window::keyboardGrabbed(bool const &grabbed) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -411,7 +411,7 @@ void Window::keyboardGrabbed(bool const &grabbed) {
 }
 
 void Window::minimize() {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -419,7 +419,7 @@ void Window::minimize() {
 }
 
 void Window::maximize() {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -427,7 +427,7 @@ void Window::maximize() {
 }
 
 void Window::requestInputFocus() {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -435,7 +435,7 @@ void Window::requestInputFocus() {
 }
 
 void Window::vsync(bool const &vsync) {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
 
@@ -452,7 +452,7 @@ void Window::destroy() {
 }
 
 void Window::close() {
-  if (!mWindow) {
+  if (mWindow == nullptr) {
     throw WindowException("Window is not available.");
   }
   this->destroy();
@@ -462,13 +462,13 @@ Window::operator bool() const { return !this->isClosed(); }
 
 Window::operator VkSurfaceKHR const &() const { return mSurface; }
 
-shared<Window> Window::create(shared<Vulkan::Instance> instance,
+shared<Window> Window::create(shared<Core::Vulkan::Instance> const &instance,
                               u32 const &width, u32 const &height,
-                              str const &title, shared<Mouse> mouse,
+                              str const &title, shared<Mouse> const &mouse,
                               WindowSettings const &settings) {
   u64 flags = settings.toFlags();
-  Window *window = new Window(instance, width, height, title, mouse, flags);
+  auto *window = new Window(instance, width, height, title, mouse, flags);
   return shared<Window>(window);
 }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

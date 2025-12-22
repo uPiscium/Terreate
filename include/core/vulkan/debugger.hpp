@@ -5,7 +5,7 @@
 #include "enum.hpp"
 #include "exception.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 struct DebugObject {
 public:
@@ -50,4 +50,4 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugCallbackWrapper(
     VkDebugUtilsMessageTypeFlagsEXT messageType,
     VkDebugUtilsMessengerCallbackDataEXT const *pCallbackData, void *pUserData);
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

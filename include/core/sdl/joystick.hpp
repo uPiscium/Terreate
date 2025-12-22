@@ -3,7 +3,7 @@
 #include "common/math.hpp"
 #include "common/type.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 class Joystick {
 private:
@@ -39,4 +39,4 @@ public:
   static void loadMapping(str const &mapping);
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

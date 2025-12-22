@@ -3,7 +3,7 @@
 
 #include <limits>
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 Joystick::Joystick(u32 const &index) {
   mJoystickID = index;
@@ -81,4 +81,4 @@ void Joystick::loadMapping(str const &mapping) {
   }
 }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

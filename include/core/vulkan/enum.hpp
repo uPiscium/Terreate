@@ -2,7 +2,7 @@
 
 #include "common/type.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 enum class CommandBufferLevel {
   PRIMARY = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
@@ -111,4 +111,4 @@ enum class QueueType {
   OPTICAL_FLOW = VK_QUEUE_OPTICAL_FLOW_BIT_NV,
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

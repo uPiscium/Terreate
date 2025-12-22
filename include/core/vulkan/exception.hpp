@@ -3,7 +3,7 @@
 #include "common/exception.hpp"
 #include "common/type.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 class VulkanException : public TerreateException {
 public:
@@ -50,4 +50,4 @@ public:
   SwapchainException(str const &message) : VulkanException(message) {}
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

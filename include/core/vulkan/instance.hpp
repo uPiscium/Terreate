@@ -4,7 +4,7 @@
 
 #include "debugger.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 class Instance {
 private:
@@ -50,4 +50,4 @@ public:
          vec<str> const &layers = {"VK_LAYER_KHRONOS_validation"});
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

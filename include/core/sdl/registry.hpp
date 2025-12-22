@@ -9,7 +9,7 @@
 #include "mouse.hpp"
 #include "window.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 class Registry {
 private:
@@ -55,4 +55,4 @@ public:
   void unregisterWindow(WindowID id);
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

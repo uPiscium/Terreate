@@ -1,7 +1,7 @@
 #include "core/vulkan/exception.hpp"
 #include "core/vulkan/image.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 Image::Image(shared<Device> const &device, shared<Allocator> const &allocator,
              pair<u32> size, u32 mipLevels, VkSampleCountFlagBits samples,
@@ -77,4 +77,4 @@ shared<ImageView> ImageView::create(shared<Device> const &device,
   return ImageView::create(device, *image, format, aspectFlags, mipLevels);
 }
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

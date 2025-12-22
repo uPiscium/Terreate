@@ -5,7 +5,7 @@
 
 #include "enum.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 class Cursor {
 private:
@@ -78,4 +78,4 @@ public:
   static bool hasMouse();
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

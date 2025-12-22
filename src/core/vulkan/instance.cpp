@@ -1,7 +1,7 @@
 #include "core/vulkan/exception.hpp"
 #include "core/vulkan/instance.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 bool Instance::checkValidationLayerSupport(vec<str> const &layers) const {
   u32 layerCount;
   vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -153,4 +153,4 @@ shared<Instance> Instance::create(str const &appName, Version const &appVersion,
   return shared<Instance>(instance);
 }
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

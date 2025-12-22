@@ -1,7 +1,7 @@
 #include "core/sdl/audio.hpp"
 #include "core/sdl/exception.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 AudioBuffer::AudioBuffer(AudioFormat format) : mFormat(format) {
   switch (mFormat) {
@@ -393,4 +393,4 @@ vec<ubyte> AudioDevice::mixAudio(vec<ubyte> const &src,
   return dst;
 }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

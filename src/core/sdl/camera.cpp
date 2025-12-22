@@ -1,7 +1,7 @@
 #include "core/sdl/camera.hpp"
 #include "core/sdl/exception.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 Camera::Camera(CameraID id) : mID(id), mCamera(nullptr), mOpened(false) {}
 
@@ -127,4 +127,4 @@ vec<SDL_CameraID> Camera::getCameras() {
   return cameras;
 }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

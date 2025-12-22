@@ -6,7 +6,7 @@
 #include "enum.hpp"
 #include "image.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 class CommandPool {
 private:
@@ -176,4 +176,4 @@ public:
   create(shared<CommandBuffer> const &commandBuffer);
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

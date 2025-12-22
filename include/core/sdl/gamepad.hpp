@@ -6,7 +6,8 @@
 #include "enum.hpp"
 #include "joystick.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
+
 struct Finger {
   bool down;
   vec2 position;
@@ -57,4 +58,4 @@ public:
   static void loadMapping(str const &mapping);
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

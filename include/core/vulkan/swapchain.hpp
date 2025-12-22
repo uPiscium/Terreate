@@ -7,7 +7,7 @@
 #include "device.hpp"
 #include "image.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 class Swapchain {
 private:
@@ -52,4 +52,4 @@ public:
                                   shared<SDL::Window> const &window);
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

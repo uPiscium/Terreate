@@ -1,7 +1,7 @@
 #include "core/vulkan/exception.hpp"
 #include "core/vulkan/swapchain.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 VkSurfaceFormatKHR
 Swapchain::chooseFormat(vec<VkSurfaceFormatKHR> const &availableFormats) {
@@ -153,4 +153,4 @@ shared<Swapchain> Swapchain::create(shared<Device> const &device,
   return shared<Swapchain>(swapchain);
 }
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

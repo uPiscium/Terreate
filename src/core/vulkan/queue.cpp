@@ -1,6 +1,6 @@
 #include "core/vulkan/queue.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 Queue::Queue(shared<Device> const &device) : mDevice(device) {
   umap<QueueType, u32> queueFamilyIndices = mDevice->getQueueFamilyIndices();
@@ -91,4 +91,4 @@ shared<Queue> Queue::create(shared<Device> const &device) {
   return shared<Queue>(queue);
 }
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

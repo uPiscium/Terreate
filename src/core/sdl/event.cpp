@@ -1,7 +1,7 @@
 #include "core/sdl/event.hpp"
 #include "core/sdl/exception.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 void CommonEventHandler::inject(shared<Registry> const &registry) {
   this->mRegistry = registry;
@@ -765,4 +765,4 @@ void EventHandler::poll() {
   }
 }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

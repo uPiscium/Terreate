@@ -1,6 +1,6 @@
 #include "core/sdl/mouse.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 Cursor::Cursor(i32 const &xHot, i32 const &yHot) : mXHot(xHot), mYHot(yHot) {}
 
@@ -103,4 +103,4 @@ bool Mouse::isCursorVisible() { return SDL_CursorVisible(); }
 
 bool Mouse::hasMouse() { return SDL_HasMouse(); }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

@@ -7,7 +7,7 @@
 #include "enum.hpp"
 #include "instance.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 class PhysicalDevice;
 typedef function<i32(shared<PhysicalDevice>)> DeviceRateFunction;
@@ -121,4 +121,4 @@ public:
       vec<str> const &requiredExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME});
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

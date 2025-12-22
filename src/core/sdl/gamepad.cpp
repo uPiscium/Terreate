@@ -1,7 +1,7 @@
 #include "core/sdl/exception.hpp"
 #include "core/sdl/gamepad.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 Gamepad::Gamepad(u32 const &index) {
   mGamepadID = index;
@@ -127,4 +127,4 @@ void Gamepad::loadMapping(str const &mapping) {
   Joystick::loadMapping(mapping);
 }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

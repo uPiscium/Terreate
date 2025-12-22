@@ -44,18 +44,18 @@ class App {
 private:
   bool mDebugMode = true;
 
-  shared<SDL::Registry> mSDLRegistry = nullptr;
-  // shared<SDL::EventHandler> mSDLEventHandler = nullptr;
-  shared<Vulkan::Instance> mInstance = nullptr;
-  shared<Vulkan::DefaultDebugger> mDebugger = nullptr;
-  shared<SDL::Window> mWindow = nullptr;
-  shared<Vulkan::Device> mDevice = nullptr;
-  shared<Vulkan::Queue> mQueue = nullptr;
+  shared<Core::SDL::Registry> mSDLRegistry = nullptr;
+  // shared<Core::SDL::EventHandler> mSDLEventHandler = nullptr;
+  shared<Core::Vulkan::Instance> mInstance = nullptr;
+  shared<Core::Vulkan::DefaultDebugger> mDebugger = nullptr;
+  shared<Core::SDL::Window> mWindow = nullptr;
+  shared<Core::Vulkan::Device> mDevice = nullptr;
+  shared<Core::Vulkan::Queue> mQueue = nullptr;
 
-  shared<Vulkan::Swapchain> mSwapchain = nullptr;
+  shared<Core::Vulkan::Swapchain> mSwapchain = nullptr;
 
-  shared<Vulkan::CommandPool> mCommandPool = nullptr;
-  vec<shared<Vulkan::CommandBufferEncoder>> mCommandBufferEncoders;
+  shared<Core::Vulkan::CommandPool> mCommandPool = nullptr;
+  vec<shared<Core::Vulkan::CommandBufferEncoder>> mCommandBufferEncoders;
 
   VkRenderPass mRenderPass = VK_NULL_HANDLE;
   VkDescriptorSetLayout mDescriptorSetLayout = VK_NULL_HANDLE;
@@ -64,17 +64,17 @@ private:
   vec<VkFramebuffer> mSwapchainFramebuffers;
 
   u32 mMipLevels = 1;
-  shared<Vulkan::Image> mTextureImage = nullptr;
-  shared<Vulkan::ImageView> mTextureImageView = nullptr;
+  shared<Core::Vulkan::Image> mTextureImage = nullptr;
+  shared<Core::Vulkan::ImageView> mTextureImageView = nullptr;
   VkSampler mTextureSampler = VK_NULL_HANDLE;
 
-  shared<Vulkan::Allocator> mAllocator = nullptr;
+  shared<Core::Vulkan::Allocator> mAllocator = nullptr;
 
-  shared<Vulkan::Image> mColorImage = nullptr;
-  shared<Vulkan::ImageView> mColorImageView = nullptr;
+  shared<Core::Vulkan::Image> mColorImage = nullptr;
+  shared<Core::Vulkan::ImageView> mColorImageView = nullptr;
 
-  shared<Vulkan::Image> mDepthImage = nullptr;
-  shared<Vulkan::ImageView> mDepthImageView = nullptr;
+  shared<Core::Vulkan::Image> mDepthImage = nullptr;
+  shared<Core::Vulkan::ImageView> mDepthImageView = nullptr;
 
   vec<Vertex> mVertices;
   vec<u32> mIndices;
@@ -121,17 +121,18 @@ private:
   void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                     VkMemoryPropertyFlags properties, VkBuffer &buffer,
                     VkDeviceMemory &bufferMemory);
-  shared<Vulkan::CommandBufferEncoder> beginSingleTimeCommands();
-  void
-  endSingleTimeCommands(shared<Vulkan::CommandBufferEncoder> const &encoder);
+  shared<Core::Vulkan::CommandBufferEncoder> beginSingleTimeCommands();
+  void endSingleTimeCommands(
+      shared<Core::Vulkan::CommandBufferEncoder> const &encoder);
   void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
   void transitionImageLayout(VkImage image, VkFormat format,
                              VkImageLayout oldLayout, VkImageLayout newLayout,
                              u32 mipLevels);
   void copyBufferToImage(VkBuffer buffer, VkImage image, u32 width, u32 height);
-  void generateMipmaps(shared<Vulkan::Image> const &image, VkFormat imageFormat,
-                       i32 texWidth, i32 texHeight, u32 mipLevels);
+  void generateMipmaps(shared<Core::Vulkan::Image> const &image,
+                       VkFormat imageFormat, i32 texWidth, i32 texHeight,
+                       u32 mipLevels);
 
   void createTexture();
   void createTextureImageView();
@@ -146,8 +147,9 @@ private:
   void createDescriptorPool();
   void createDescriptorSets();
 
-  void recordCommandBuffer(shared<Vulkan::CommandBufferEncoder> const &encoder,
-                           u32 imageIndex);
+  void
+  recordCommandBuffer(shared<Core::Vulkan::CommandBufferEncoder> const &encoder,
+                      u32 imageIndex);
 
   void createSyncObjects();
 

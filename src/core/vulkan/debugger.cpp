@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 DebugObject::DebugObject(VkDebugUtilsObjectNameInfoEXT const &info)
     : objectType(info.objectType), handle(info.objectHandle) {
@@ -128,4 +128,4 @@ debugCallbackWrapper(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
   return static_cast<VkBool32>(result);
 }
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

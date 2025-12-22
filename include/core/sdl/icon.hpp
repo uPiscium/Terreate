@@ -2,7 +2,7 @@
 
 #include "common/type.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 class Icon {
 private:
@@ -20,4 +20,4 @@ public:
   operator SDL_Surface *() const;
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

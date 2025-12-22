@@ -4,7 +4,7 @@
 
 #include "enum.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 struct CameraFrame {
 public:
@@ -50,4 +50,4 @@ public:
   static vec<SDL_CameraID> getCameras();
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

@@ -4,7 +4,7 @@
 #define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.h>
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 Allocator::Allocator(shared<Instance> const &instance,
                      shared<Device> const &device)
@@ -91,4 +91,4 @@ shared<Allocator> Allocator::create(shared<Instance> const &instance,
   return shared<Allocator>(allocator);
 }
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

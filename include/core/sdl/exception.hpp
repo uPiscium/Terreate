@@ -2,7 +2,7 @@
 
 #include "common/exception.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 class SDLException : public TerreateException {
 public:
@@ -49,4 +49,4 @@ public:
   WindowException(str const &message) : SDLException(message) {}
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

@@ -1,7 +1,7 @@
 #include "core/sdl/exception.hpp"
 #include "core/sdl/registry.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 bool Registry::hasAudioDevice(AudioDeviceID id) const {
   return mAudioDevices.contains(id);
@@ -178,4 +178,4 @@ void Registry::unregisterWindow(WindowID id) {
   }
 }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

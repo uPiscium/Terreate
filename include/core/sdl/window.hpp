@@ -7,7 +7,7 @@
 #include "icon.hpp"
 #include "mouse.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 class WindowSettings {
 public:
@@ -41,7 +41,7 @@ private:
   PROHIBIT_COPY_AND_ASSIGN(Window);
 
 private:
-  shared<Vulkan::Instance> mInstance = nullptr;
+  shared<Core::Vulkan::Instance> mInstance = nullptr;
   SDL_Window *mWindow = nullptr;
   VkSurfaceKHR mSurface = VK_NULL_HANDLE;
 
@@ -49,8 +49,9 @@ public:
   shared<Mouse> mouse = nullptr;
 
 private:
-  Window(shared<Vulkan::Instance> instance, u32 const &width, u32 const &height,
-         str const &title, shared<Mouse> mouse, u64 const &flags);
+  Window(shared<Core::Vulkan::Instance> instance, u32 const &width,
+         u32 const &height, str const &title, shared<Mouse> mouse,
+         u64 const &flags);
 
 public:
   ~Window();
@@ -117,9 +118,10 @@ public:
 
 public:
   static shared<Window>
-  create(shared<Vulkan::Instance> instance, u32 const &width, u32 const &height,
-         str const &title, shared<Mouse> mouse = nullptr,
+  create(shared<Core::Vulkan::Instance> const &instance, u32 const &width,
+         u32 const &height, str const &title,
+         shared<Mouse> const &mouse = nullptr,
          WindowSettings const &settings = WindowSettings());
 };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

@@ -12,7 +12,7 @@
 #include "registry.hpp"
 #include "window.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 struct Modifier {
 public:
   bool lshift = false;
@@ -489,4 +489,4 @@ public:
     return std::make_shared<EventHandler>(registry);
   }
 };
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

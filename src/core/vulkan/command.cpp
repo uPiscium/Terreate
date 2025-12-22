@@ -2,7 +2,7 @@
 #include "core/vulkan/command.hpp"
 #include "core/vulkan/exception.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 CommandPool::CommandPool(shared<Device> const &device, bool transient,
                          bool protect)
@@ -325,4 +325,4 @@ CommandBufferEncoder::create(shared<CommandBuffer> const &commandBuffer) {
   return shared<CommandBufferEncoder>(encoder);
 }
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

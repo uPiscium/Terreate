@@ -1,7 +1,7 @@
 #include "core/sdl/exception.hpp"
 #include "core/sdl/icon.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 Icon::~Icon() {
   if (mIcon) {
@@ -26,4 +26,4 @@ void Icon::setImage(pair<u32> const &size, vec<u8> const &pixels) {
 
 Icon::operator SDL_Surface *() const { return mIcon; }
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

@@ -2,7 +2,7 @@
 
 #include "common/type.hpp"
 
-namespace Terreate::SDL {
+namespace Terreate::Core::SDL {
 
 enum class AudioFormat {
   UNKNOWN = SDL_AUDIO_UNKNOWN,
@@ -542,4 +542,4 @@ enum class SDLSensor {
 
 enum class TextCandidateOrientation { HORIZONTAL, VERTICAL };
 
-} // namespace Terreate::SDL
+} // namespace Terreate::Core::SDL

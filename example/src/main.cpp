@@ -57,15 +57,15 @@ vec<VkVertexInputAttributeDescription> Vertex::getAttributeDescriptions() {
 }
 
 void App::initWindow(int const &width, int const &height, str const &title) {
-  shared<SDL::Mouse> mouse;
+  shared<Core::SDL::Mouse> mouse;
   if (mSDLRegistry->hasMouse(0)) {
     mouse = mSDLRegistry->getMouse(0);
   } else {
-    mouse = std::make_shared<SDL::Mouse>(0);
+    mouse = std::make_shared<Core::SDL::Mouse>(0);
     mSDLRegistry->registerMouse(0, mouse);
   }
 
-  mWindow = SDL::Window::create(mInstance, width, height, title, mouse);
+  mWindow = Core::SDL::Window::create(mInstance, width, height, title, mouse);
 }
 
 VkShaderModule App::createShaderModule(vec<char> const &code) {
@@ -376,26 +376,26 @@ void App::createGraphicsPipeline() {
 void App::createColorResources() {
   VkFormat colorFormat = mSwapchain->getImageFormat();
   VkExtent2D extent = mSwapchain->getExtent();
-  mColorImage = Vulkan::Image::create(
+  mColorImage = Core::Vulkan::Image::create(
       mDevice, mAllocator, {extent.width, extent.height}, 1,
       mDevice->getMaxSampleCount(), colorFormat, VK_IMAGE_TILING_OPTIMAL,
       VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT |
           VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-  mColorImageView = Vulkan::ImageView::create(mDevice, mColorImage, colorFormat,
-                                              VK_IMAGE_ASPECT_COLOR_BIT, 1);
+  mColorImageView = Core::Vulkan::ImageView::create(
+      mDevice, mColorImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
 }
 
 void App::createDepthResources() {
   VkFormat depthFormat = this->findDepthFormat();
   VkExtent2D extent = mSwapchain->getExtent();
-  mDepthImage = Vulkan::Image::create(
+  mDepthImage = Core::Vulkan::Image::create(
       mDevice, mAllocator, {extent.width, extent.height}, 1,
       mDevice->getMaxSampleCount(), depthFormat, VK_IMAGE_TILING_OPTIMAL,
       VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-  mDepthImageView = Vulkan::ImageView::create(mDevice, mDepthImage, depthFormat,
-                                              VK_IMAGE_ASPECT_DEPTH_BIT, 1);
+  mDepthImageView = Core::Vulkan::ImageView::create(
+      mDevice, mDepthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
   this->transitionImageLayout(
       *mDepthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED,
       VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
@@ -405,7 +405,7 @@ void App::createFramebuffers() {
   mSwapchainFramebuffers.resize(mSwapchain->getImageCount());
   VkExtent2D extent = mSwapchain->getExtent();
 
-  vec<shared<Vulkan::ImageView>> const &swapchainImageViews =
+  vec<shared<Core::Vulkan::ImageView>> const &swapchainImageViews =
       mSwapchain->getImageViews();
   for (u32 i = 0; i < mSwapchain->getImageCount(); ++i) {
     vec<VkImageView> attachments = {
@@ -475,18 +475,19 @@ void App::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
   vkBindBufferMemory(*mDevice, buffer, bufferMemory, 0);
 }
 
-shared<Vulkan::CommandBufferEncoder> App::beginSingleTimeCommands() {
-  shared<Vulkan::CommandBuffer> commandBuffer = Vulkan::CommandBuffer::create(
-      mDevice, mCommandPool, Vulkan::CommandBufferLevel::PRIMARY);
-  shared<Vulkan::CommandBufferEncoder> encoder =
-      Vulkan::CommandBufferEncoder::create(commandBuffer);
-  encoder->begin(Vulkan::CommandBufferUsage::ONE_TIME_SUBMIT);
+shared<Core::Vulkan::CommandBufferEncoder> App::beginSingleTimeCommands() {
+  shared<Core::Vulkan::CommandBuffer> commandBuffer =
+      Core::Vulkan::CommandBuffer::create(
+          mDevice, mCommandPool, Core::Vulkan::CommandBufferLevel::PRIMARY);
+  shared<Core::Vulkan::CommandBufferEncoder> encoder =
+      Core::Vulkan::CommandBufferEncoder::create(commandBuffer);
+  encoder->begin(Core::Vulkan::CommandBufferUsage::ONE_TIME_SUBMIT);
 
   return encoder;
 }
 
 void App::endSingleTimeCommands(
-    shared<Vulkan::CommandBufferEncoder> const &commandBuffer) {
+    shared<Core::Vulkan::CommandBufferEncoder> const &commandBuffer) {
   commandBuffer->end();
 
   mQueue->submit(
@@ -496,7 +497,7 @@ void App::endSingleTimeCommands(
 
 void App::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer,
                      VkDeviceSize size) {
-  shared<Vulkan::CommandBufferEncoder> encoder =
+  shared<Core::Vulkan::CommandBufferEncoder> encoder =
       this->beginSingleTimeCommands();
 
   VkBufferCopy copyRegion{};
@@ -512,7 +513,7 @@ void App::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer,
 void App::transitionImageLayout(VkImage image, VkFormat format,
                                 VkImageLayout oldLayout,
                                 VkImageLayout newLayout, u32 mipLevels) {
-  shared<Vulkan::CommandBufferEncoder> encoder =
+  shared<Core::Vulkan::CommandBufferEncoder> encoder =
       this->beginSingleTimeCommands();
 
   VkImageMemoryBarrier barrier{};
@@ -574,7 +575,7 @@ void App::transitionImageLayout(VkImage image, VkFormat format,
 
 void App::copyBufferToImage(VkBuffer buffer, VkImage image, u32 width,
                             u32 height) {
-  shared<Vulkan::CommandBufferEncoder> encoder =
+  shared<Core::Vulkan::CommandBufferEncoder> encoder =
       this->beginSingleTimeCommands();
 
   VkBufferImageCopy region{};
@@ -594,7 +595,7 @@ void App::copyBufferToImage(VkBuffer buffer, VkImage image, u32 width,
   this->endSingleTimeCommands(encoder);
 }
 
-void App::generateMipmaps(shared<Vulkan::Image> const &image,
+void App::generateMipmaps(shared<Core::Vulkan::Image> const &image,
                           VkFormat imageFormat, i32 texWidth, i32 texHeight,
                           u32 mipLevels) {
   VkFormatProperties formatProperties =
@@ -605,7 +606,7 @@ void App::generateMipmaps(shared<Vulkan::Image> const &image,
         "Texture image format does not support linear blitting.");
   }
 
-  shared<Vulkan::CommandBufferEncoder> encoder =
+  shared<Core::Vulkan::CommandBufferEncoder> encoder =
       this->beginSingleTimeCommands();
 
   VkImageMemoryBarrier barrier{};
@@ -705,7 +706,7 @@ void App::createTexture() {
   vkUnmapMemory(*mDevice, stagingBufferMemory);
   stbi_image_free(pixels);
 
-  mTextureImage = Vulkan::Image::create(
+  mTextureImage = Core::Vulkan::Image::create(
       mDevice, mAllocator, {static_cast<u32>(width), static_cast<u32>(height)},
       mMipLevels, VK_SAMPLE_COUNT_1_BIT, VK_FORMAT_R8G8B8A8_SRGB,
       VK_IMAGE_TILING_OPTIMAL,
@@ -725,9 +726,9 @@ void App::createTexture() {
 }
 
 void App::createTextureImageView() {
-  mTextureImageView =
-      Vulkan::ImageView::create(mDevice, mTextureImage, VK_FORMAT_R8G8B8A8_SRGB,
-                                VK_IMAGE_ASPECT_COLOR_BIT, mMipLevels);
+  mTextureImageView = Core::Vulkan::ImageView::create(
+      mDevice, mTextureImage, VK_FORMAT_R8G8B8A8_SRGB,
+      VK_IMAGE_ASPECT_COLOR_BIT, mMipLevels);
 }
 
 void App::createTextureSampler() {
@@ -864,10 +865,11 @@ void App::createUniformBuffers() {
 void App::createCommandBuffers() {
   mCommandBufferEncoders.clear();
   for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-    shared<Vulkan::CommandBuffer> commandBuffer = Vulkan::CommandBuffer::create(
-        mDevice, mCommandPool, Vulkan::CommandBufferLevel::PRIMARY);
+    shared<Core::Vulkan::CommandBuffer> commandBuffer =
+        Core::Vulkan::CommandBuffer::create(
+            mDevice, mCommandPool, Core::Vulkan::CommandBufferLevel::PRIMARY);
     mCommandBufferEncoders.push_back(
-        Vulkan::CommandBufferEncoder::create(commandBuffer));
+        Core::Vulkan::CommandBufferEncoder::create(commandBuffer));
   }
 }
 
@@ -948,8 +950,8 @@ void App::createDescriptorSets() {
 }
 
 void App::recordCommandBuffer(
-    shared<Vulkan::CommandBufferEncoder> const &encoder, u32 imageIndex) {
-  encoder->begin(Vulkan::CommandBufferUsage::NONE);
+    shared<Core::Vulkan::CommandBufferEncoder> const &encoder, u32 imageIndex) {
+  encoder->begin(Core::Vulkan::CommandBufferUsage::NONE);
 
   VkExtent2D extent = mSwapchain->getExtent();
   VkRenderPassBeginInfo renderPassInfo{};
@@ -1053,12 +1055,12 @@ void App::recreateSwapchain() {
 }
 
 void App::initVulkan() {
-  mDevice = Vulkan::Device::create(mInstance, mWindow);
-  mQueue = Vulkan::Queue::create(mDevice);
-  mSwapchain = Vulkan::Swapchain::create(mDevice, mWindow);
-  mAllocator = Vulkan::Allocator::create(mInstance, mDevice);
+  mDevice = Core::Vulkan::Device::create(mInstance, mWindow);
+  mQueue = Core::Vulkan::Queue::create(mDevice);
+  mSwapchain = Core::Vulkan::Swapchain::create(mDevice, mWindow);
+  mAllocator = Core::Vulkan::Allocator::create(mInstance, mDevice);
 
-  mCommandPool = Vulkan::CommandPool::create(mDevice);
+  mCommandPool = Core::Vulkan::CommandPool::create(mDevice);
   this->createCommandBuffers();
 
   this->createRenderPass();
@@ -1242,9 +1244,10 @@ App::App(int const &width, int const &height, str const &title, bool debugMode)
     return;
   }
 
-  mSDLRegistry = std::make_shared<SDL::Registry>();
-  mDebugger = std::make_shared<Vulkan::DefaultDebugger>();
-  mInstance = Vulkan::Instance::create("Vulkan App", {0, 0, 1}, mDebugMode);
+  mSDLRegistry = std::make_shared<Core::SDL::Registry>();
+  mDebugger = std::make_shared<Core::Vulkan::DefaultDebugger>();
+  mInstance =
+      Core::Vulkan::Instance::create("Vulkan App", {0, 0, 1}, mDebugMode);
   mInstance->attachDebugger(mDebugger);
 
   this->initWindow(width, height, title);

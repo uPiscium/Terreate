@@ -7,7 +7,7 @@
 #include "device.hpp"
 #include "instance.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 struct BufferAllocation {
   VkBuffer buffer = VK_NULL_HANDLE;
@@ -50,4 +50,4 @@ public:
                                   shared<Device> const &device);
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

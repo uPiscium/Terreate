@@ -6,7 +6,7 @@
 #include "device.hpp"
 #include "swapchain.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 class Queue {
 private:
@@ -40,4 +40,4 @@ public:
   static shared<Queue> create(shared<Device> const &device);
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

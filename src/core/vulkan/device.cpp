@@ -1,7 +1,7 @@
 #include "common/bitflag.hpp"
 #include "core/vulkan/device.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 VkSampleCountFlagBits PhysicalDevice::getMaxUsableSampleCount() const {
   VkPhysicalDeviceProperties physicalDeviceProperties;
@@ -595,4 +595,4 @@ shared<Device> Device::create(shared<Instance> const &instance,
   return shared<Device>(device);
 }
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan

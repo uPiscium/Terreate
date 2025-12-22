@@ -5,7 +5,7 @@
 #include "allocator.hpp"
 #include "device.hpp"
 
-namespace Terreate::Vulkan {
+namespace Terreate::Core::Vulkan {
 
 class Image {
 private:
@@ -65,4 +65,4 @@ public:
                                   u32 mipLevels);
 };
 
-} // namespace Terreate::Vulkan
+} // namespace Terreate::Core::Vulkan
