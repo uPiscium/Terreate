@@ -1,4 +1,4 @@
-project(TerreateCore)
+project(TerreateGraphics)
 
 include(utils)
 
@@ -15,7 +15,7 @@ find_package(spdlog CONFIG REQUIRED)
 configure_target(
   ${PROJECT_NAME}
   ${CMAKE_SOURCE_DIR}/include
-  "glm::glm;spdlog::spdlog"
+  "glm::glm;spdlog::spdlog;SDL3::SDL3"
 )
 
 # target_include_directories(
@@ -23,7 +23,8 @@ configure_target(
 #   ${CMAKE_SOURCE_DIR}/include
 # )
 # target_link_libraries(
-#   ${PROJECT_NAME} PRIVATE
+#   ${PROJECT_NAME} PUBLIC
 #   glm::glm
 #   spdlog::spdlog
+#   SDL3::SDL3
 # )

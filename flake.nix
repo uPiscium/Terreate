@@ -8,23 +8,19 @@
       gccTarget = pkgs.stdenv.hostPlatform.config;
     in
     {
-      # devShells.x86_64-linux.default = pkgs.mkShell {
       devShells.x86_64-linux.default = pkgs.mkShell.override {
         stdenv = pkgs.clangStdenv;
       } {
         buildInputs = with pkgs; [
           cmake
-          sdl3
-          shaderc
-          vulkan-loader
-        ];
-        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
+          ninja
+
           alsa-lib
-          glibc
           hidapi
           jack2
           libusb1
-          sdl3
+          libxkbcommon
+          shaderc
           vulkan-headers
           vulkan-loader
           vulkan-tools
@@ -32,9 +28,36 @@
           vulkan-validation-layers
           wayland
           wayland-protocols
+          wayland-scanner
           xorg.libX11
+          xorg.libxcb
           xorg.libXcursor
           xorg.libXi
+          xorg.libXi
+          xorg.libXrandr
+          xorg.libXinerama
+        ];
+        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
+          alsa-lib
+          hidapi
+          jack2
+          libusb1
+          libxkbcommon
+          vulkan-headers
+          vulkan-loader
+          vulkan-tools
+          vulkan-tools-lunarg
+          vulkan-validation-layers
+          wayland
+          wayland-protocols
+          wayland-scanner
+          xorg.libX11
+          xorg.libxcb
+          xorg.libXcursor
+          xorg.libXi
+          xorg.libXrandr
+          xorg.libXinerama
+          libxkbcommon
         ]);
         VULKAN_SDK = "${pkgs.vulkan-headers}";
         VK_LAYER_PATH = "${pkgs.vulkan-validation-layers}/share/vulkan/explicit_layer.d";
