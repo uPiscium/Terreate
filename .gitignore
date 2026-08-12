@@ -1,3 +1,2 @@
 .direnv/
-build/
-samples/
+.cache/
