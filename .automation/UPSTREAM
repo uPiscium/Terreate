@@ -1,0 +1,3 @@
+repository = "github:upiscium/Templates"
+ref = "main"
+component = "components/agent-core"

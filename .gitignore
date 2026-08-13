@@ -1,3 +1,5 @@
 .direnv/
-build/
-samples/
+/.cache/
+
+/.worktrees/
+/.build/
