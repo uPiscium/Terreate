@@ -15,6 +15,7 @@
             ninja
             clang
             clang-tools
+            python3
             just
             git
             gh
